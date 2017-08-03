@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+	<head>
+		<title>SVG Graph</title>
+		<link rel="manifest" href="manifest.json">
+		<link rel="stylesheet" href="../css/index.css"></link>
+		<link rel="stylesheet" href="svg-graph.css"></link>
+		<link rel="serviceworker" href="service-worker.js"></link><!-- doesn't work yet.. -->
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	</head>
+	<body>
+		<svg-graph points='[[10,10], [20,20], [30,30], [40,40], [10,20,"blue"], [20,30,"blue"], [70,95,"blue"]]'></svg-graph>
+		<script src="utilities.js"></script>
+		<script src="svg-graph.js"></script>
+	</body>
+</html>
