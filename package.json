@@ -1,0 +1,20 @@
+{
+  "name": "wc-lib",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx http-server -c-1 .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Somnid/wc-lib.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Somnid/wc-lib/issues"
+  },
+  "homepage": "https://github.com/Somnid/wc-lib#readme"
+}
