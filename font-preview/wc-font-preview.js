@@ -44,12 +44,14 @@ customElements.define("wc-font-preview",
 						font-style: normal;
 					}
 				</style>
+				<h2 id="title"></h2>
 				<div id="container"></div>
 			`;
 		}
 		cacheDom(){
 			this.dom = {
-				container: this.shadowRoot.querySelector("#container")
+				container: this.shadowRoot.querySelector("#container"),
+				title: this.shadowRoot.querySelector("#title")
 			};
 		}
 		buildTable(){
@@ -87,7 +89,10 @@ customElements.define("wc-font-preview",
 			this.classList.remove("dragover");
 			const file = e.dataTransfer.files[0];
 			const split = file.name.split(".");
-			const ext = split[split.length - 1];
+			let ext = split[split.length - 1];
+			if(ext === "ttf"){
+				ext = "truetype";
+			}
 			const url = URL.createObjectURL(file);
 
 			const style = document.createElement("style");
@@ -108,6 +113,7 @@ customElements.define("wc-font-preview",
 
 			this.appendChild(style);
 			this.buildTable();
+			this.dom.title.textContent = file.name;
 		}
 		dragover(e){
 			e.preventDefault();
