@@ -1,20 +1,28 @@
 {
-  "name": "wc-lib",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "npx http-server -c-1 .",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Somnid/wc-lib.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Somnid/wc-lib/issues"
-  },
-  "homepage": "https://github.com/Somnid/wc-lib#readme"
+    "name": "wc-lib",
+    "version": "1.0.0",
+    "description": "Web Component Library",
+    "main": "index.js",
+    "scripts": {
+        "start": "npx http-server -c-1 .",
+        "test": "npx karma start ./karma.conf.js",
+        "test:debug": "npx karma start ./karma.conf.js --no-single-run --auto-watch"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Somnid/wc-lib.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Somnid/wc-lib/issues"
+    },
+    "homepage": "https://github.com/Somnid/wc-lib#readme",
+    "devDependencies": {
+        "jasmine-core": "^3.5.0",
+        "karma": "^5.1.0",
+        "karma-chrome-launcher": "^3.1.0",
+        "karma-cli": "^2.0.0",
+        "karma-jasmine": "^3.3.1"
+    }
 }
