@@ -4,7 +4,7 @@
     "description": "Web Component Library",
     "main": "index.js",
     "scripts": {
-        "start": "npx http-server -c-1 .",
+        "start": "npx http-server -c-1 -o .",
         "test": "npx karma start ./karma.conf.js",
         "test:debug": "npx karma start ./karma.conf.js --no-single-run --auto-watch"
     },

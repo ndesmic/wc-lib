@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Rotation Input Example</title>
+	<link rel="manifest" href="manifest.json">
+	<link rel="stylesheet" href="../css/index.css">
+	</link>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+</head>
+
+<body>
+	<wc-rotation-input precision="0" unit="deg" trigger="settled">
+		<input type="number" id="value">
+	</wc-rotation-input>
+	<div id="grad" style="height:100px; width:100px;"></div>
+	<script src="wc-rotation-input.js" type="module"></script>
+	<script>
+		const input = document.querySelector("#value");
+		const grad = document.querySelector("#grad");
+
+		input.addEventListener("input", e => {
+			grad.style.background =  `conic-gradient(red ${input.value}deg, white ${parseInt(input.value) + 10}deg)`;
+		});
+	</script>
+</body>
+
+</html>
