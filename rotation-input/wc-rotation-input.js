@@ -14,21 +14,70 @@ function validateEnum(val, choices){
     throw new Error(`invalid type, only ${choices.join(",")} allowed.`);
 }
 
+const TWO_PI = Math.PI * 2;
 function normalizeAngle(angle){
     if (angle < 0) {
-        return 360 - (Math.abs(angle) % 360);
+        return TWO_PI - (Math.abs(angle) % TWO_PI);
     }
-    return angle % 360;
+    return angle % TWO_PI;
+}
+
+function degreesToRadians(deg) {
+    return deg * (Math.PI / 180);
+}
+
+function radiansToDegrees(rad) {
+    return rad * (180 / Math.PI);
+}
+
+function getSteps(step, end, start = 0) {
+    const steps = [start];
+    let current = start + step;
+    while (current < end) {
+        steps.push(current);
+        current += step;
+    }
+    steps.push(end);
+    return steps;
+}
+
+export function getClosest(value, possibleValues) {
+    let highIndex = possibleValues.length;
+    let lowIndex = 0;
+    let midIndex;
+
+    while (lowIndex < highIndex) {
+        midIndex = Math.floor((highIndex + lowIndex) / 2);
+        if (value === possibleValues[midIndex]) return possibleValues[midIndex];
+        if (value < possibleValues[midIndex]) {
+            if (midIndex > 0 && value > possibleValues[midIndex - 1]) {
+                return value - possibleValues[midIndex + 1] >= possibleValues[midIndex] - value
+                    ? possibleValues[midIndex]
+                    : possibleValues[midIndex - 1]
+            }
+            highIndex = midIndex;
+        }
+        else {
+            if (midIndex < highIndex - 1 && value < possibleValues[midIndex + 1]) {
+                return value - possibleValues[midIndex] >= possibleValues[midIndex + 1] - value
+                    ? possibleValues[midIndex + 1]
+                    : possibleValues[midIndex]
+            }
+            lowIndex = midIndex + 1;
+        }
+    }
+    return possibleValues[midIndex]
 }
 
 export class WcRotationInput extends HTMLElement {
-    #isManipulating = false;
     #center = {};
     #precision = 2;
     #unit = "deg";
     #currentValue = 0;
     static #unitType = ["deg", "rad"];
     #trigger = "manipulate";
+    #stepAmount = 1;
+    #steps = null;
     static #triggerType = ["manipulate", "settled"];
     static observedAttributes = ["precision", "unit", "trigger"];
     constructor() {
@@ -43,6 +92,9 @@ export class WcRotationInput extends HTMLElement {
         this.onPointerMove = this.onPointerMove.bind(element);
         this.onPointerUp = this.onPointerUp.bind(element);
         this.onWheel = this.onWheel.bind(element);
+        this.onInputChange = this.onInputChange.bind(element);
+        this.updateSteps = this.updateSteps.bind(element);
+        this.onKeydown = this.onKeydown.bind(element);
     }
     render(){
         this.shadow = this.attachShadow({ mode: "open" });
@@ -85,11 +137,17 @@ export class WcRotationInput extends HTMLElement {
             </svg>
             <div id="value"></div>
         `;
+        if(this.tabIndex <= 0){
+            this.tabIndex = 0;
+        }
+        this.setAttribute("aria-role", "slider");
     }
     connectedCallback() {
         this.render();
         this.cacheDom();
         this.attachEvents();
+        this.updateSteps();
+        this.updateValue(this.parse(this.dom.input.value) || 0);
     }
     cacheDom(){
         this.dom = {
@@ -102,9 +160,27 @@ export class WcRotationInput extends HTMLElement {
     attachEvents(){
         this.dom.svg.addEventListener("pointerdown", this.onPointerDown);
         this.addEventListener("wheel", this.onWheel);
+        this.addEventListener("keydown", this.onKeydown);
+        this.mutationObserver = new MutationObserver(this.onInputChange);
+        this.mutationObserver.observe(this.dom.input, { attributes: true });
+    }
+    onInputChange(mutationList){
+        for(const mutation of mutationList){
+            if(mutation.attributeName === "step"){
+                this.updateSteps();
+            }
+        }
+    }
+    updateSteps(){
+        if(!this.dom.input.hasAttribute(step)){
+            this.#steps = null;
+            this.#stepAmount = 1;
+        }
+        this.#stepAmount = parseFloat(this.dom.input.getAttribute("step") || 1);
+        const stepsAmountRad = this.#unit === "rad" ? this.#stepAmount : degreesToRadians(this.#stepAmount);
+        this.#steps = getSteps(stepsAmountRad, TWO_PI);
     }
     onPointerDown(e){
-        this.#isManipulating = true;
         const rect = this.dom.svg.getBoundingClientRect();
         this.#center = { x: rect.x + (rect.width / 2), y: rect.y + (rect.height / 2) };
         document.addEventListener("pointermove", this.onPointerMove);
@@ -118,36 +194,52 @@ export class WcRotationInput extends HTMLElement {
         else if (offsetX < 0 && offsetY >= 0) { rad = (Math.PI / 2) + Math.atan(-offsetX / offsetY); }
         else if (offsetX < 0 && offsetY < 0) { rad = Math.PI + Math.atan(offsetY / offsetX); }
         else { rad = (3 * Math.PI / 2) + Math.atan(offsetX / -offsetY); }
-        const deg = (180 / Math.PI) * rad;
+        
+        rad = this.#steps === null ? rad : getClosest(rad, this.#steps);
+
+        const deg = radiansToDegrees(rad);
         const finalValue = (this.#unit === "rad" ? rad : deg).toFixed(this.#precision);
         this.dom.pointer.style = `transform: rotateZ(-${deg}deg)`;
         this.dom.value.textContent = finalValue;
 
         if(this.#trigger === "manipulate"){
-            this.dom.input.value = finalValue;
-            fireEvent(this.dom.input, "input");
-            fireEvent(this.dom.input, "change");
+            this.updateValue(rad);
         } else {
-            this.#currentValue = finalValue;
+            this.#currentValue = rad;
         }
     }
+    updateValue(valueRad){
+        const finalValue = (this.#unit === "rad" ? valueRad : radiansToDegrees(valueRad)).toFixed(this.#precision);
+        const valueDeg  = radiansToDegrees(valueRad);
+        this.dom.input.value = finalValue;
+        this.dom.value.textContent = finalValue;
+        this.dom.pointer.style = `transform: rotateZ(-${valueDeg}deg)`;
+        fireEvent(this.dom.input, "input");
+        fireEvent(this.dom.input, "change");
+        this.setAttribute("aria-valuenow", finalValue);
+        this.setAttribute("aria-valuetext", finalValue);
+    }
     onPointerUp(){
-        this.#isManipulating = false;
         document.removeEventListener("pointermove", this.onPointerMove);
         document.removeEventListener("pointerup", this.onPointerUp);
         if(this.#trigger === "settled"){
-            this.dom.input.value = this.#currentValue;
-            fireEvent(this.dom.input, "input");
-            fireEvent(this.dom.input, "change");
+            this.updateValue(this.#currentValue);
         }
     }
     onWheel(e){
-        const delta = e.deltaY * (15 / 100)
-        const newValue = normalizeAngle(parseFloat(this.dom.input.value || 0) + delta);
-        this.dom.value.textContent = newValue;
-        this.dom.input.value = newValue;
-        fireEvent(this.dom.input, "input");
-        fireEvent(this.dom.input, "change");
+        const delta = e.deltaY * (this.#unit === "rad" ? this.#stepAmount : degreesToRadians(this.#stepAmount)) / 100;
+        const newValue = normalizeAngle(this.parse(this.dom.input.value || 0) + delta);
+        this.updateValue(newValue);
+    }
+    onKeydown(e){
+        if(e.which !== 38 && e.which !== 40) return;
+        const delta = (this.#unit === "rad" ? this.#stepAmount : degreesToRadians(this.#stepAmount)) * (e.which === 40 ? -1 : 1);
+        const newValue = normalizeAngle(this.parse(this.dom.input.value || 0) + delta);
+        this.updateValue(newValue)
+    }
+    parse(unparsedValue){
+        const value = parseFloat(unparsedValue);
+        return this.#unit === "rad" ? value : degreesToRadians(value);
     }
     attributeChangedCallback(name, oldValue, newValue) {
         this[name] = newValue;

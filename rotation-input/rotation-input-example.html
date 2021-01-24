@@ -11,18 +11,64 @@
 </head>
 
 <body>
+	<label for="value" style="display: block;">Rotation Input:</label>
 	<wc-rotation-input precision="0" unit="deg" trigger="settled">
 		<input type="number" id="value">
 	</wc-rotation-input>
 	<div id="grad" style="height:100px; width:100px;"></div>
+	<fieldset>
+		<label for="step">Step:</label>
+		<input id="step" type="number">
+	</fieldset>
+	<fieldset>
+		<label for="precision">Precision:</label>
+		<input id="precision" type="number">
+	</fieldset>
+	<fieldset>
+		<legend>Unit</legend>
+		<label for="unit-degree">Degrees:</label>
+		<input id="unit-degree" name="unit" type="radio" value="deg" checked>
+		<label for="unit-radian">Radians:</label>
+		<input id="unit-radian" name="unit" type="radio" value="rad">
+	</fieldset>
+	<fieldset>
+		<legend>Trigger</legend>
+		<label for="trigger-settled">Settled:</label>
+		<input id="trigger-settled" name="trigger" type="radio" value="settled" checked>
+		<label for="trigger-manipulate">Manipulate:</label>
+		<input id="trigger-manipulate" name="trigger" type="radio" value="manipulate">
+	</fieldset>
 	<script src="wc-rotation-input.js" type="module"></script>
 	<script>
+		const rotationInput = document.querySelector("wc-rotation-input");
 		const input = document.querySelector("#value");
 		const grad = document.querySelector("#grad");
+		const step = document.querySelector("#step");
+		const precision = document.querySelector("#precision");
+		const trigger = Array.from(document.querySelectorAll("[name='trigger']"));
+		const unit = Array.from(document.querySelectorAll("[name='unit']"));
 
 		input.addEventListener("input", e => {
 			grad.style.background =  `conic-gradient(red ${input.value}deg, white ${parseInt(input.value) + 10}deg)`;
 		});
+		step.addEventListener("input", () => {
+			input.setAttribute("step", step.value);
+		});
+		precision.addEventListener("input", () => {
+			rotationInput.setAttribute("precision", precision.value);
+		});
+		trigger.forEach(t => {
+			t.addEventListener("click", e => { 
+				rotationInput.setAttribute("trigger", e.currentTarget.value);
+			});
+		});
+		unit.forEach(t => {
+			t.addEventListener("click", e => {
+				input.value = 0;
+				rotationInput.setAttribute("unit", e.currentTarget.value);
+			});
+		});		
+
 	</script>
 </body>
 

@@ -7,7 +7,7 @@
 	</head>
 	<body>
         <p>You must use a same-domain image.</p>
-		<shader-canvas image="image.jpg">
+		<wc-shader-canvas image="image.jpg">
             precision mediump float;
             uniform sampler2D u_image;
             varying vec2 vTextureCoordinate;
@@ -39,7 +39,7 @@
 
                 gl_FragColor = target;
             }
-        </shader-canvas>
-		<script src="shader-canvas.js"></script>
+        </wc-shader-canvas>
+		<script src="shader-canvas.js" type="module"></script>
 	</body>
 </html>
