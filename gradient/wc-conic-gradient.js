@@ -67,6 +67,11 @@ function validateStops(stops) {
 	return stops;
 }
 
+function hyphenCaseToCamelCase(text) {
+	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
+}
+
+
 export class WcConicGradient extends HTMLElement {
 	#stops = [];
 	#cx;
@@ -76,9 +81,10 @@ export class WcConicGradient extends HTMLElement {
 	#ry;
 	#clip = "clamp";
 	#theta = 0;
+	#clipTheta = 0;
 	#width = 400;
 	#height = 400;
-	static observedAttributes = ["stops", "cx", "cy", "r", "rx", "ry", "clip", "theta", "width", "height"];
+	static observedAttributes = ["stops", "cx", "cy", "r", "rx", "ry", "clip", "theta", "clip-theta", "width", "height"];
 	constructor() {
 		super();
 		this.bind(this);
@@ -97,7 +103,7 @@ export class WcConicGradient extends HTMLElement {
 					display: block;
 				}	
             </style>
-			<canvas height="${this.#height}" width="${this.#width}" style="height: ${this.#height}px; width: ${this.#width}}px"></canvas>
+			<canvas height="${this.#height}" width="${this.#width}" style="height: ${this.#height}px; width: ${this.#width}px"></canvas>
         `;
 	}
 	renderGradient() {
@@ -126,10 +132,11 @@ export class WcConicGradient extends HTMLElement {
 		context.putImageData(imageData, 0, 0);
 	}
 	getRValue(r, theta){
+		const transformedTheta = normalizeAngle(theta - this.#clipTheta);
 		if(!this.#rx && !this.ry){
 			return r / this.#r;
 		} else if (this.#rx && this.#ry){
-			return r / ((this.#rx * this.#ry) / Math.sqrt((this.#ry * Math.cos(theta))**2 + (this.#rx * Math.sin(theta))**2));
+			return r / ((this.#rx * this.#ry) / Math.sqrt((this.#ry * Math.cos(transformedTheta))**2 + (this.#rx * Math.sin(transformedTheta))**2));
 		}
 	}
 	connectedCallback() {
@@ -147,7 +154,7 @@ export class WcConicGradient extends HTMLElement {
 	attachEvents() {
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
-		this[name] = newValue;
+		this[hyphenCaseToCamelCase(name)] = newValue;
 	}
 	set stops(val) {
 		if (val.startsWith("#")) {
@@ -203,6 +210,9 @@ export class WcConicGradient extends HTMLElement {
 	}
 	set height(val){
 		this.#height = parseFloat(val);
+	}
+	set clipTheta(val){
+		this.#clipTheta = degreesToRadians(parseFloat(val));
 	}
 }
 

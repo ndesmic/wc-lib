@@ -18,8 +18,10 @@
 	<wc-linear-gradient stops="#FF0000FF,#FF000000"></wc-linear-gradient>
 	<h2>Multi-stop</h2>
 	<wc-linear-gradient stops="#FF0000,#00FF00,#0000FF"></wc-linear-gradient>
+	<wc-linear-gradient stops="#FF0000,#FFFF00,#00FFFF,#0000FF" width="1200" height="400"></wc-linear-gradient>
 	<h2>Multi-stop location</h2>
-	<wc-linear-gradient stops="[[1,1,0,1,0],[1,0,0,1,0.33],[0,1,0,1,0.33],[0,1,0,1,0.66],[0,0,1,1,0.66],[0,1,1,1,1]]"></wc-linear-gradient>
+	<wc-linear-gradient stops="[[1,1,0,1,0],[1,0,0,1,0.33],[0,1,0,1,0.33],[0,1,0,1,0.66],[0,0,1,1,0.66],[0,1,1,1,1]]">
+	</wc-linear-gradient>
 	<h2>Rotated</h2>
 	<div class="row">
 		<wc-linear-gradient stops="#FF0000,#0000FF" angle="45" height="400" width="400"></wc-linear-gradient>
@@ -29,7 +31,8 @@
 	<div class="row">
 		<wc-linear-gradient stops="#FF0000,#0000FF" height="400" width="400" cx="400"></wc-linear-gradient>
 		<wc-linear-gradient stops="#FF0000,#0000FF" height="400" width="400" angle="90" cx="300"></wc-linear-gradient>
-		<wc-linear-gradient stops="[[1,0,0],[1,0,0],[0,0,1]]" height="400" width="400" angle="45" cy="300" cy="300"></wc-linear-gradient>
+		<wc-linear-gradient stops="[[1,0,0],[1,0,0],[0,0,1]]" height="400" width="400" angle="45" cy="300" cy="300">
+		</wc-linear-gradient>
 	</div>
 	<h2>Scaled</h2>
 	<wc-linear-gradient stops="#FF0000,#0000FF" height="50" width="800" length="100"></wc-linear-gradient>
@@ -40,9 +43,26 @@
 	]"></wc-square-gradient>
 	<h1>Radial</h1>
 	<h2>Clamped</h2>
-	<wc-radial-gradient stops="#FF0000,#0000FF" cx="200" cy="200" r="200"></wc-radial-gradient>
+	<div class="row">
+		<wc-radial-gradient stops="#FF0000,#0000FF" cx="200" cy="200" r="200"></wc-radial-gradient>
+		<wc-radial-gradient stops="#FF0000,#0000FF" cx="300" cy="200" r="200"></wc-radial-gradient>
+	</div>
 	<h2>Clipped</h2>
-	<wc-radial-gradient stops="#FFFF00,#00FFFF" cx="200" cy="200" r="200" ob="#FFFFFF00"></wc-radial-gradient>
+	<div class="row">
+		<wc-radial-gradient stops="#FFFF00,#00FFFF" cx="200" cy="200" r="200" clip="#FFFFFF00"></wc-radial-gradient>
+		<wc-radial-gradient stops="#FFFF00,#00FFFF" cx="300" cy="200" r="200" clip="#FFFFFF00"></wc-radial-gradient>
+	</div>
+	<h2>Ellipse</h2>
+	<div class="row">
+		<wc-radial-gradient stops="#0000FF,#FF0000" cx="200" cy="200" ry="100" rx="200"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" cx="200" cy="200" ry="100" rx="200" clip="#FFFFFF00"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" cx="200" cy="200" ry="100" rx="200" clip="#FFFFFF00" angle="60"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" cx="200" cy="200" ry="100" rx="200" angle="60">
+		</wc-radial-gradient>
+	</div>
+
+	<wc-radial-gradient stops="#FF0000,#FFFF00,#00FF00,#00FFFF,#0000FF" width="1200" height="400" cx="600" cy="200" r="600"></wc-radial-gradient>
+
 	<h1>Conic</h1>
 	<h2>Clamped</h2>
 	<wc-conic-gradient stops="#FF00FF,#00FFFF" cx="200" cy="200" r="200"></wc-conic-gradient>
@@ -51,7 +71,11 @@
 	<h2>Rotated</h2>
 	<wc-conic-gradient stops="#0000FF,#FFFF00" cx="200" cy="200" r="200" theta="30"></wc-conic-gradient>
 	<h2>Ellipse</h2>
-	<wc-conic-gradient stops="#0000FF,#FFFF00" cx="200" cy="100" ry="100" rx="200" theta="30" clip="#FFFFFF00" height="200" width="400"></wc-conic-gradient>
+	<wc-conic-gradient stops="#0000FF,#FFFF00" cx="200" cy="100" ry="100" rx="200" theta="30" clip="#FFFFFF00"
+		height="200" width="400"></wc-conic-gradient>-->
+	<h2>Ellipse with clip rotation</h2>
+	<wc-conic-gradient stops="#0000FF,#FFFF00" cx="200" cy="200" ry="100" rx="200" theta="30" clip-theta="60"
+		clip="#FFFFFF00" height="400" width="400"></wc-conic-gradient>
 	<script src="wc-linear-gradient.js" type="module"></script>
 	<script src="wc-square-gradient.js" type="module"></script>
 	<script src="wc-radial-gradient.js" type="module"></script>

@@ -23,6 +23,14 @@ function lerp(pointA, pointB, normalValue) {
 	];
 }
 
+const TWO_PI = Math.PI * 2;
+export function normalizeAngle(angle) {
+	if (angle < 0) {
+		return TWO_PI - (Math.abs(angle) % TWO_PI);
+	}
+	return angle % TWO_PI;
+}
+
 function validateStops(stops) {
 	if (stops.length < 2) throw "Gradient requires at least 2 colors";
 	for (const color of stops) {
@@ -60,8 +68,13 @@ export class WcRadialGradient extends HTMLElement {
 	#cx;
 	#cy;
 	#r;
-	#ob = "clamp";
-	static observedAttributes = ["stops", "cx", "cy", "r", "ob"];
+	#rx;
+	#ry;
+	#clip = "clamp";
+	#angle = 0;
+	#height = 400;
+	#width = 400;
+	static observedAttributes = ["stops", "cx", "cy", "r", "rx", "ry", "clip", "angle", "height", "width"];
 	constructor() {
 		super();
 		this.bind(this);
@@ -81,8 +94,7 @@ export class WcRadialGradient extends HTMLElement {
 				}	
 				input { display: none; }
             </style>
-			<canvas height="400" width="400" style="height: 400px; width: 400px"></canvas>
-			<input type="range">
+			<canvas height="${this.#height}" width="${this.#width}" style="height: ${this.#height}px; width: ${this.#width}px"></canvas>
         `;
 	}
 	renderGradient() {
@@ -91,13 +103,13 @@ export class WcRadialGradient extends HTMLElement {
 		for (let i = 0; i < imageData.width; i++) {
 			for (let j = 0; j < imageData.height; j++) {
 				const y = imageData.height - j; 
-				const [r, _] = cartesianToPolar(i, y, this.#cx, this.#cy);
-				let rValue = r / this.#r;
-				if(this.#ob !== "clamp" && rValue > 1){
-					imageData.data[(j * imageData.width * 4) + 4 * i] = this.#ob[0] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 1] = this.#ob[1] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 2] = this.#ob[2] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 3] = this.#ob[3] * 255;
+				const [r, theta] = cartesianToPolar(i, y, this.#cx, this.#cy);
+				let rValue = this.getRValue(r, theta);
+				if(this.#clip !== "clamp" && rValue > 1){
+					imageData.data[(j * imageData.width * 4) + 4 * i] = this.#clip[0] * 255;
+					imageData.data[(j * imageData.width * 4) + (4 * i) + 1] = this.#clip[1] * 255;
+					imageData.data[(j * imageData.width * 4) + (4 * i) + 2] = this.#clip[2] * 255;
+					imageData.data[(j * imageData.width * 4) + (4 * i) + 3] = this.#clip[3] * 255;
 				} else {
 					rValue = Math.min(1.0, rValue);
 					const color = linearGradient(this.#stops, rValue);
@@ -108,7 +120,21 @@ export class WcRadialGradient extends HTMLElement {
 				}
 			}
 		}
+		//hack to fill in center
+		const y = imageData.height - this.#cy;
+		imageData.data[((y * imageData.width * 4) + 4 * this.#cx)] = this.#stops[0][0] * 255;
+		imageData.data[((y * imageData.width * 4) + (4 * this.#cx) + 1)] = this.#stops[0][1] * 255;
+		imageData.data[((y * imageData.width * 4) + (4 * this.#cx) + 2)] = this.#stops[0][2] * 255;
+		imageData.data[((y * imageData.width * 4) + (4 * this.#cx) + 3)] = this.#stops[0][3] * 255;
 		context.putImageData(imageData, 0, 0);
+	}
+	getRValue(r, theta) {
+		const transformedTheta = normalizeAngle(theta - this.#angle);
+		if (!this.#rx && !this.ry) {
+			return r / this.#r;
+		} else if (this.#rx && this.#ry) {
+			return r / ((this.#rx * this.#ry) / Math.sqrt((this.#ry * Math.cos(transformedTheta)) ** 2 + (this.#rx * Math.sin(transformedTheta)) ** 2));
+		}
 	}
 	connectedCallback() {
 		this.render();
@@ -123,7 +149,6 @@ export class WcRadialGradient extends HTMLElement {
 		};
 	}
 	attachEvents() {
-		this.dom.slider.addEventListener("change", this.sliderChange);
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
 		this[name] = newValue;
@@ -155,12 +180,27 @@ export class WcRadialGradient extends HTMLElement {
 	set r(val){
 		this.#r = parseFloat(val);
 	}
-	set ob(val){
+	set rx(val){
+		this.#rx = parseFloat(val);
+	}
+	set ry(val){
+		this.#ry = parseFloat(val);
+	 }
+	set height(val){
+		this.#height = parseInt(val);
+	}
+	set width(val){
+		this.#width = parseInt(val);
+	}
+	set angle(val){
+		this.#angle = parseFloat(val);
+	}
+	set clip(val){
 		if(val === "clamp"){
-			this.#ob = "clamp";
+			this.#clip = "clamp";
 		} else if(val.startsWith("#")){
 			const hex = val.trim().slice(1);
-			this.#ob = [
+			this.#clip = [
 				parseInt(hex.substring(0, 2), 16) / 255,
 				parseInt(hex.substring(2, 4), 16) / 255,
 				parseInt(hex.substring(4, 6), 16) / 255,
