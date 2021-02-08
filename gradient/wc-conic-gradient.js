@@ -71,20 +71,42 @@ function hyphenCaseToCamelCase(text) {
 	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
 }
 
+function parseColor(val) {
+	const trimmedVal = val.trim();
+	if (trimmedVal.startsWith("#")) {
+		const hex = trimmedVal.trim().slice(1);
+		return [
+			parseInt(hex.substring(0, 2), 16) / 255,
+			parseInt(hex.substring(2, 4), 16) / 255,
+			parseInt(hex.substring(4, 6), 16) / 255,
+			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
+		];
+	} else if (trimmedVal.startsWith("[")) {
+		return JSON.parse(trimmedVal);
+	}
+}
+
+function writePixel(imageData, x, y, color) {
+	const index = (imageData.width * 4 * y) + (x * 4);
+	imageData.data[index] = color[0] * 255;
+	imageData.data[index + 1] = color[1] * 255;
+	imageData.data[index + 2] = color[2] * 255;
+	imageData.data[index + 3] = color[3] * 255;
+}
 
 export class WcConicGradient extends HTMLElement {
 	#stops = [];
 	#cx;
 	#cy;
-	#r;
 	#rx;
 	#ry;
+	#p = 2;
 	#clip = "clamp";
-	#theta = 0;
-	#clipTheta = 0;
+	#angle = 0;
+	#clipAngle = 0;
 	#width = 400;
 	#height = 400;
-	static observedAttributes = ["stops", "cx", "cy", "r", "rx", "ry", "clip", "theta", "clip-theta", "width", "height"];
+	static observedAttributes = ["stops", "cx", "cy", "r", "p", "rx", "ry", "clip", "angle", "clip-angle", "width", "height"];
 	constructor() {
 		super();
 		this.bind(this);
@@ -115,29 +137,19 @@ export class WcConicGradient extends HTMLElement {
 				const [r, theta] = cartesianToPolar(i, y, this.#cx, this.#cy);
 				const rValue = this.getRValue(r, theta);
 				if (this.#clip !== "clamp" && rValue > 1) {
-					imageData.data[(j * imageData.width * 4) + 4 * i] = this.#clip[0] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 1] = this.#clip[1] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 2] = this.#clip[2] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 3] = this.#clip[3] * 255;
+					writePixel(imageData, i,j, this.#clip);
 				} else {
-					const tValue = normalizeAngle(theta - this.#theta) / TWO_PI;
+					const tValue = normalizeAngle(theta - this.#angle) / TWO_PI;
 					const color = linearGradient(this.#stops, tValue);
-					imageData.data[(j * imageData.width * 4) + 4 * i] = color[0] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 1] = color[1] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 2] = color[2] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 3] = color[3] * 255;
+					writePixel(imageData, i,j, color);
 				}
 			}
 		}
 		context.putImageData(imageData, 0, 0);
 	}
 	getRValue(r, theta){
-		const transformedTheta = normalizeAngle(theta - this.#clipTheta);
-		if(!this.#rx && !this.ry){
-			return r / this.#r;
-		} else if (this.#rx && this.#ry){
-			return r / ((this.#rx * this.#ry) / Math.sqrt((this.#ry * Math.cos(transformedTheta))**2 + (this.#rx * Math.sin(transformedTheta))**2));
-		}
+		const transformedTheta = normalizeAngle(theta - this.#clipAngle);
+		return r / ((this.#rx * this.#ry) / (Math.abs(this.#ry * Math.cos(transformedTheta)) ** this.#p + Math.abs(this.#rx * Math.sin(transformedTheta)) ** this.#p) ** (1 / this.#p));
 	}
 	connectedCallback() {
 		this.render();
@@ -158,18 +170,7 @@ export class WcConicGradient extends HTMLElement {
 	}
 	set stops(val) {
 		if (val.startsWith("#")) {
-			this.#stops = validateStops(val.split(",").map(x => {
-				x = x.trim();
-				if (x.startsWith("#")) {
-					const hex = x.trim().slice(1);
-					return [
-						parseInt(hex.substring(0, 2), 16) / 255,
-						parseInt(hex.substring(2, 4), 16) / 255,
-						parseInt(hex.substring(4, 6), 16) / 255,
-						hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
-					];
-				}
-			}));
+			this.#stops = validateStops(val.split(",").map(x => parseColor(x)));
 		} else if (val.startsWith("[")) {
 			this.#stops = validateStops(JSON.parse(val));
 		}
@@ -181,7 +182,9 @@ export class WcConicGradient extends HTMLElement {
 		this.#cy = parseFloat(val);
 	}
 	set r(val) {
-		this.#r = parseFloat(val);
+		const r = parseFloat(val);
+		this.#rx = r;
+		this.#ry = r;
 	}
 	set rx(val){
 		this.#rx = parseFloat(val);
@@ -192,18 +195,12 @@ export class WcConicGradient extends HTMLElement {
 	set clip(val) {
 		if (val === "clamp") {
 			this.#clip = "clamp";
-		} else if (val.startsWith("#")) {
-			const hex = val.trim().slice(1);
-			this.#clip = [
-				parseInt(hex.substring(0, 2), 16) / 255,
-				parseInt(hex.substring(2, 4), 16) / 255,
-				parseInt(hex.substring(4, 6), 16) / 255,
-				hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
-			];
+		} else {
+			this.#clip = parseColor(val);
 		}
 	}
-	set theta(val){
-		this.#theta = degreesToRadians(parseFloat(val));
+	set angle(val){
+		this.#angle = degreesToRadians(parseFloat(val));
 	}
 	set width(val){
 		this.#width = parseFloat(val);
@@ -211,8 +208,11 @@ export class WcConicGradient extends HTMLElement {
 	set height(val){
 		this.#height = parseFloat(val);
 	}
-	set clipTheta(val){
-		this.#clipTheta = degreesToRadians(parseFloat(val));
+	set clipAngle(val){
+		this.#clipAngle = degreesToRadians(parseFloat(val));
+	}
+	set p(val){
+		this.#p = parseFloat(val);
 	}
 }
 

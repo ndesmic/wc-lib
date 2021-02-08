@@ -2,6 +2,10 @@ export function cartesianToPolar(x, y, cx = 0, cy = 0) {
 	return [Math.sqrt((x - cx) ** 2 + (y - cy) ** 2), Math.atan((y - cy) / (x - cx))];
 }
 
+export function degreesToRadians(deg) {
+	return deg * (Math.PI / 180);
+}
+
 function linearGradient(stops, value) {
 	let stopIndex = 0;
 	while (stops[stopIndex + 1][4] < value) {
@@ -63,18 +67,41 @@ function validateStops(stops) {
 	return stops;
 }
 
+function parseColor(val) {
+	const trimmedVal = val.trim();
+	if (trimmedVal.startsWith("#")) {
+		const hex = trimmedVal.trim().slice(1);
+		return [
+			parseInt(hex.substring(0, 2), 16) / 255,
+			parseInt(hex.substring(2, 4), 16) / 255,
+			parseInt(hex.substring(4, 6), 16) / 255,
+			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
+		];
+	} else if (trimmedVal.startsWith("[")) {
+		return JSON.parse(trimmedVal);
+	}
+}
+
+function writePixel(imageData, x, y, color) {
+	const index = (imageData.width * 4 * y) + (x * 4);
+	imageData.data[index] = color[0] * 255;
+	imageData.data[index + 1] = color[1] * 255;
+	imageData.data[index + 2] = color[2] * 255;
+	imageData.data[index + 3] = color[3] * 255;
+}
+
 export class WcRadialGradient extends HTMLElement {
 	#stops = [];
 	#cx;
 	#cy;
-	#r;
 	#rx;
 	#ry;
+	#p = 2;
 	#clip = "clamp";
 	#angle = 0;
 	#height = 400;
 	#width = 400;
-	static observedAttributes = ["stops", "cx", "cy", "r", "rx", "ry", "clip", "angle", "height", "width"];
+	static observedAttributes = ["stops", "p", "cx", "cy", "r", "rx", "ry", "clip", "angle", "height", "width"];
 	constructor() {
 		super();
 		this.bind(this);
@@ -106,17 +133,11 @@ export class WcRadialGradient extends HTMLElement {
 				const [r, theta] = cartesianToPolar(i, y, this.#cx, this.#cy);
 				let rValue = this.getRValue(r, theta);
 				if(this.#clip !== "clamp" && rValue > 1){
-					imageData.data[(j * imageData.width * 4) + 4 * i] = this.#clip[0] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 1] = this.#clip[1] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 2] = this.#clip[2] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 3] = this.#clip[3] * 255;
+					writePixel(imageData, i,j,this.#clip);
 				} else {
 					rValue = Math.min(1.0, rValue);
 					const color = linearGradient(this.#stops, rValue);
-					imageData.data[(j * imageData.width * 4) + 4 * i] = color[0] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 1] = color[1] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 2] = color[2] * 255;
-					imageData.data[(j * imageData.width * 4) + (4 * i) + 3] = color[3] * 255;
+					writePixel(imageData, i, j, color);
 				}
 			}
 		}
@@ -130,11 +151,7 @@ export class WcRadialGradient extends HTMLElement {
 	}
 	getRValue(r, theta) {
 		const transformedTheta = normalizeAngle(theta - this.#angle);
-		if (!this.#rx && !this.ry) {
-			return r / this.#r;
-		} else if (this.#rx && this.#ry) {
-			return r / ((this.#rx * this.#ry) / Math.sqrt((this.#ry * Math.cos(transformedTheta)) ** 2 + (this.#rx * Math.sin(transformedTheta)) ** 2));
-		}
+		return r / ((this.#rx * this.#ry) / (Math.abs(this.#ry * Math.cos(transformedTheta)) ** this.#p + Math.abs(this.#rx * Math.sin(transformedTheta)) ** this.#p) ** (1 / this.#p));
 	}
 	connectedCallback() {
 		this.render();
@@ -155,18 +172,7 @@ export class WcRadialGradient extends HTMLElement {
 	}
 	set stops(val) {
 		if (val.startsWith("#")) {
-			this.#stops = validateStops(val.split(",").map(x => {
-				x = x.trim();
-				if (x.startsWith("#")) {
-					const hex = x.trim().slice(1);
-					return [
-						parseInt(hex.substring(0, 2), 16) / 255,
-						parseInt(hex.substring(2, 4), 16) / 255,
-						parseInt(hex.substring(4, 6), 16) / 255,
-						hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
-					];
-				}
-			}));
+			this.#stops = validateStops(val.split(",").map(x => parseColor(x)));
 		} else if (val.startsWith("[")) {
 			this.#stops = validateStops(JSON.parse(val));
 		}
@@ -178,7 +184,9 @@ export class WcRadialGradient extends HTMLElement {
 		this.#cy = parseFloat(val);
 	}
 	set r(val){
-		this.#r = parseFloat(val);
+		const r = parseFloat(val);
+		this.#rx = r;
+		this.#ry = r;
 	}
 	set rx(val){
 		this.#rx = parseFloat(val);
@@ -193,19 +201,16 @@ export class WcRadialGradient extends HTMLElement {
 		this.#width = parseInt(val);
 	}
 	set angle(val){
-		this.#angle = parseFloat(val);
+		this.#angle = degreesToRadians(parseFloat(val));
+	}
+	set p(val){
+		this.#p = parseFloat(val);
 	}
 	set clip(val){
 		if(val === "clamp"){
 			this.#clip = "clamp";
-		} else if(val.startsWith("#")){
-			const hex = val.trim().slice(1);
-			this.#clip = [
-				parseInt(hex.substring(0, 2), 16) / 255,
-				parseInt(hex.substring(2, 4), 16) / 255,
-				parseInt(hex.substring(4, 6), 16) / 255,
-				hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
-			];
+		} else {
+			this.#clip = parseColor(val);
 		}
 	}
 }

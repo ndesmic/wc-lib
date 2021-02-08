@@ -9,14 +9,60 @@
 </head>
 
 <body>
-	<h1>Squircle</h1>
-	<wc-squircle height="200" width="200" cx="100" cy="100" r="99" p="2"></wc-squircle>
-	<wc-squircle height="200" width="200" cx="100" cy="100" r="99" p="1"></wc-squircle>
-	<wc-squircle height="200" width="200" cx="100" cy="100" r="99" p="0.5"></wc-squircle>
-	<wc-squircle height="200" width="200" cx="100" cy="100" r="99" p="150"></wc-squircle>
-	<wc-squircle height="200" width="200" cx="100" cy="100" r="99" p="4"></wc-squircle>
+	<h1>Superellipse</h1>
+	<h2>P = 2 (circle)</h2>
+	<div class="row">
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="100" p="2"></wc-superellipse>
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="100" p="2" precision="pixel"></wc-superellipse>
+	</div>
+	<h2>P = 1 (diamond)</h2>
+	<div class="row">
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="99" p="1"></wc-superellipse>
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="99" p="1" precision="pixel"></wc-superellipse>
+	</div>
+	<h2>P = 0.5 (Astroid)</h2>
+	<div class="row">
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="99" p="0.5" precision="0.01" color="[0,0,1,1]"></wc-superellipse>
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="99" p="0.5" precision="0.001" color="[0,0,1,1]"></wc-superellipse>
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="99" p="0.5" precision="pixel" color="[0,0,1,1]"></wc-superellipse>
+	</div>
+	<h2>P = "Infinite" (Square)</h2>
+	<div class="row">
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="99" p="Infinity" precision="pixel"></wc-superellipse>
+	</div>
+	<h2>P = 4 (Squircle)</h2>
+	<div class="row">
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="99" p="4" precision="0.01" color="[0,0,1,1]"></wc-superellipse>
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="99" p="4" precision="0.001"></wc-superellipse>
+		<wc-superellipse height="200" width="200" cx="100" cy="100" r="99" p="4" precision="pixel"></wc-superellipse>
+	</div>
+	<h2>Superoval</h2>
+	<div class="row">
+		<wc-superellipse height="200" width="200" cx="100" cy="100" ry="75" rx="99" p="4" precision="0.01" color="[0,0,1,1]"></wc-superellipse>
+		<wc-superellipse height="200" width="200" cx="100" cy="100" ry="75" rx="99" p="4" precision="pixel" color="[0,1,0,1]"></wc-superellipse>
+		<wc-superellipse height="200" width="200" cx="100" cy="100" ry="75" rx="99" p="4" precision="pixel" color="[0,1,0,1]" thickness="2">
+		</wc-superellipse>
+	</div>
+	<h2>Rotated</h2>
+	<div class="row">
+		<wc-superellipse id="se0" height="200" width="200" cx="100" cy="100" r="75" p="4" angle="0" precision="0.01" color="[1,0,1,1]"></wc-superellipse>
+		<wc-superellipse id="se1" height="200" width="200" cx="100" cy="100" r="75" p="4" angle="0" precision="pixel" color="[1,0,1,1]"></wc-superellipse>
+		<div id="d0"></div>
+		<input id="r0" type="range" min="0" max="360" value="0" />
+		<script>
+			const se0 = document.getElementById("se0");
+			const se1 = document.getElementById("se1");
+			const d0 = document.getElementById("d0");
+			document.getElementById("r0").addEventListener("change", e => {
+				se0.angle = e.target.value;
+				se1.angle = e.target.value;
+				d0.textContent = e.target.value;
+			})
+		</script>
+	</div>
+	<h2>Rectangle</h2>
 	<wc-rectangle height="200" width="200" cx="100" cy="100" r="99" cr="49.5"></wc-rectangle>
-	<script src="wc-squircle.js" type="module"></script>
+	<script src="wc-superellipse.js" type="module"></script>
 	<script src="wc-rectangle.js" type="module"></script>
 </body>
 

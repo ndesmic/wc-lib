@@ -60,22 +60,45 @@
 		<wc-radial-gradient stops="#0000FF,#FF0000" cx="200" cy="200" ry="100" rx="200" angle="60">
 		</wc-radial-gradient>
 	</div>
-
+	<h2>Superellipse</h2>
+	<div class="row">
+		<wc-radial-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="0.5"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="1"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="2"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="4"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="Infinity"></wc-radial-gradient>
+	</div>
+	<div class="row">
+		<wc-radial-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="0.5" clip="[0,0,0,0]"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="1" clip="[0,0,0,0]"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="2" clip="[0,0,0,0]"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="4" clip="[0,0,0,0]"></wc-radial-gradient>
+		<wc-radial-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="Infinity" clip="[0,0,0,0]"></wc-radial-gradient>
+	</div>
+	<h2>Test</h2>
 	<wc-radial-gradient stops="#FF0000,#FFFF00,#00FF00,#00FFFF,#0000FF" width="1200" height="400" cx="600" cy="200" r="600"></wc-radial-gradient>
-
 	<h1>Conic</h1>
 	<h2>Clamped</h2>
 	<wc-conic-gradient stops="#FF00FF,#00FFFF" cx="200" cy="200" r="200"></wc-conic-gradient>
 	<h2>Clipped</h2>
 	<wc-conic-gradient stops="#FF00FF,#00FFFF" cx="200" cy="200" r="200" clip="#FFFFFF00"></wc-conic-gradient>
 	<h2>Rotated</h2>
-	<wc-conic-gradient stops="#0000FF,#FFFF00" cx="200" cy="200" r="200" theta="30"></wc-conic-gradient>
+	<wc-conic-gradient stops="#0000FF,#FFFF00" cx="200" cy="200" r="200" angle="30"></wc-conic-gradient>
 	<h2>Ellipse</h2>
-	<wc-conic-gradient stops="#0000FF,#FFFF00" cx="200" cy="100" ry="100" rx="200" theta="30" clip="#FFFFFF00"
-		height="200" width="400"></wc-conic-gradient>-->
+	<wc-conic-gradient stops="#0000FF,#FFFF00" cx="200" cy="100" ry="100" rx="200" angle="30" clip="#FFFFFF00"
+		height="200" width="400"></wc-conic-gradient>
 	<h2>Ellipse with clip rotation</h2>
-	<wc-conic-gradient stops="#0000FF,#FFFF00" cx="200" cy="200" ry="100" rx="200" theta="30" clip-theta="60"
+	<wc-conic-gradient stops="#0000FF,#FFFF00" cx="200" cy="200" ry="100" rx="200" angle="30" clip-angle="60"
 		clip="#FFFFFF00" height="400" width="400"></wc-conic-gradient>
+	<h2>Superellipse</h2>
+		<div class="row">
+			<wc-conic-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="0.5" clip="[0,0,0,0]"></wc-conic-gradient>
+			<wc-conic-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="1" clip="[0,0,0,0]"></wc-conic-gradient>
+			<wc-conic-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="2" clip="[0,0,0,0]"></wc-conic-gradient>
+			<wc-conic-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="4" clip="[0,0,0,0]"></wc-conic-gradient>
+			<!--<wc-conic-gradient stops="#0000FF,#FF0000" rx="100" ry="70" cx="200" cy="200" p="4" clip="[0,0,0,0]"></wc-conic-gradient>-->
+			<wc-conic-gradient stops="#0000FF,#FF0000" r="100" cx="200" cy="200" p="Infinity" clip="[0,0,0,0]"></wc-conic-gradient>
+		</div>
 	<script src="wc-linear-gradient.js" type="module"></script>
 	<script src="wc-square-gradient.js" type="module"></script>
 	<script src="wc-radial-gradient.js" type="module"></script>
