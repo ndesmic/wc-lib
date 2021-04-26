@@ -22,30 +22,6 @@ function catmullRomSpline(points, t) {
 	];
 }
 
-function catmullRomGradient(points, t){
-	const i = Math.floor(t);
-	const p0 = points[i];
-	const p1 = points[i + 1];
-	const p2 = points[i + 2];
-	const p3 = points[i + 3];
-
-	if (points.length <= i + 3) { //out of bounds then clamp
-		return points[points.length - 2];
-	}
-
-	const remainderT = t - i;
-
-	const q0 = (-3 * remainderT ** 2) + (4 * remainderT) -1;
-	const q1 = (9 * remainderT ** 2) + (-10 * remainderT);
-	const q2 = (-9 * remainderT ** 2) + (8 * remainderT) + 1;
-	const q3 = (3 * remainderT ** 2) - (2 * remainderT);
-
-	return [
-		0.5 * ((p0[0] * q0) + (p1[0] * q1) + (p2[0] * q2) + (p3[0] * q3)),
-		0.5 * ((p0[1] * q0) + (p1[1] * q1) + (p2[1] * q2) + (p3[1] * q3)),
-	];
-}
-
 function parseColor(val){
 	const trimmedVal = val.trim();
 	if (trimmedVal.startsWith("#")) {

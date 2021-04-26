@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Bézier Spline Example</title>
+	<link rel="stylesheet" href="../css/index.css">
+	</link>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+</head>
+
+<body>
+	<h1>Bézier Spline Spline</h1>
+	<h2>Simple 4-point</h2>
+	<div class="row">
+		<wc-bezier-spline width="1000" height="420" points="[[20,20],[200,300],[400,300],[600,20]]" editable></wc-bezier-spline>
+		<wc-bezier-spline width="640" height="480" points="[[20,50],[200,300],[400,300],[600,400]]" editable>
+		</wc-bezier-spline>
+	</div>
+	<div class="row">
+		<wc-bezier-spline width="640" height="480" points="[[20,20,1],[200,300,10],[400,300,1],[600,20,1]]" editable>
+		</wc-bezier-spline>
+		<wc-bezier-spline width="640" height="480" points="[[20,50,1],[200,300,1],[400,300,1],[600,400,1]]" editable>
+		</wc-bezier-spline>
+	</div>
+	<script src="wc-bezier-spline.js" type="module"></script>
+</body>
+
+</html>

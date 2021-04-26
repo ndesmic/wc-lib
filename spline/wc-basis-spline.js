@@ -2,7 +2,7 @@ function basisSpline(){
 
 }
 
-export class WcBSpline extends HTMLElement {
+export class WcBasisSpline extends HTMLElement {
 	#height = 480;
 	#width = 640;
 	#points = [];
@@ -79,4 +79,4 @@ export class WcBSpline extends HTMLElement {
 	}
 }
 
-customElements.define("wc-b-spline", WcBSpline);
+customElements.define("wc-basis-spline", WcBasisSpline);
