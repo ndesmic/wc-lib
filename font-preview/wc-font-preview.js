@@ -10,19 +10,18 @@ function parseBasedInt(str){
 
 customElements.define("wc-font-preview",
 	class extends HTMLElement {
-		static get observedAttributes() {
-			return ["range"];
-		}
+		#range = "0x00-0xFFFF";
+		static observedAttributes = ["range"];
+
 		constructor(){
 			super();
-			this.bind(this);
-			this.range = "0x00-0xFFFF"
+			this.bind(this); 
 		}
 		bind(element){
 			element.attachEvents = element.attachEvents.bind(element);
 			element.drop = element.drop.bind(element);
 			element.render = element.render.bind(element);
-			element.buildTable = element.buildTable.bind(element);
+			element.renderTable = element.renderTable.bind(element);
 			element.cacheDom = element.cacheDom.bind(element);
 			element.dragover = element.dragover.bind(element);
 			element.dragleave = element.dragleave.bind(element);
@@ -54,9 +53,10 @@ customElements.define("wc-font-preview",
 				title: this.shadowRoot.querySelector("#title")
 			};
 		}
-		buildTable(){
+		renderTable(){
+			if(!this.dom) return;
 			this.dom.container.innerHTML = "";
-			const split = this.range.split("-");
+			const split = this.#range.split("-");
 			const start = parseBasedInt(split[0]);
 			const end = parseBasedInt(split[1]); 
 			const paragraphLength = Math.min((end - start) / 16);
@@ -112,8 +112,8 @@ customElements.define("wc-font-preview",
 			}
 
 			this.appendChild(style);
-			this.buildTable();
 			this.dom.title.textContent = file.name;
+			this.renderTable();
 		}
 		dragover(e){
 			e.preventDefault();
@@ -127,6 +127,10 @@ customElements.define("wc-font-preview",
 		}
 		attributeChangedCallback(name, oldValue, newValue){
 			this[name] = newValue;
+		}
+		set range(value){
+			this.#range = value;
+			this.renderTable();
 		}
 	}
 );
