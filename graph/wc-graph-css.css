@@ -1,0 +1,50 @@
+table {
+	display: inline-block;
+	background: linear-gradient(90deg, transparent, transparent calc(50% - 1px), black 50%, black 50%, transparent calc(50% + 1px), transparent), linear-gradient(0deg, transparent, transparent calc(50% - 1px), black 50%, black 50%, transparent calc(50% + 1px), transparent);
+	font-size: 0;
+}
+tbody {
+	display: grid;
+	height: 100%;
+}
+tr {
+	display: block;
+	height: 100%;
+	position: relative;
+}
+td {
+	display: block;
+	position: relative;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+}
+table.continuous td::before {
+	content: "";
+	display: block;
+	height: 100%;
+	width: 100%;
+	background-color: var(--default-color);
+	clip-path: polygon(
+		0 calc(var(--prev-y) - var(--size) - var(--thickness) / 2), 
+		100% calc(var(--y) - var(--size) - var(--thickness) / 2), 
+		100% calc(var(--y) - var(--size) + var(--thickness) / 2), 
+		0 calc(var(--prev-y) - var(--size) + var(--thickness) / 2)
+	);
+}
+tr:first-child td::before {
+	content: none;
+}
+td::after {
+	content: "";
+	display: block;
+	position: absolute;
+	top: calc(var(--y) - var(--size));
+	height: calc(var(--size) * 2);
+	width: calc(var(--size) * 2);
+	background-color: var(--color);
+	right: calc(var(--size) * -1);
+}
+td.circle::after {
+	border-radius: var(--size);
+}

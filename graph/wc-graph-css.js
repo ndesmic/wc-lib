@@ -5,30 +5,25 @@ function windowValue(v, vmin, vmax, flipped = false) {
 function hyphenCaseToCamelCase(text) {
 	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
 }
-function createShape(shape, [x, y], size, color){
+
+function createShape(shape, [x, y], size, color, value, previousY){
+	const td = document.createElement("td");
+	td.style.setProperty("--y", y + "px");
+	td.style.setProperty("--prev-y", previousY + "px");
+	td.style.setProperty("--size", size + "px");
+	td.style.setProperty("--color", color);
+	td.textContent = value;
+
 	switch(shape){
 		case "circle": {
-			const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-			circle.setAttribute("cx", x);
-			circle.setAttribute("cy", y);
-			circle.setAttribute("r", size);
-			circle.setAttribute("fill", color);
-			return circle;
-		}
-		case "square": {
-			const halfSize = size / 2;
-			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-			rect.setAttribute("x", x - halfSize);
-			rect.setAttribute("y", y - halfSize);
-			rect.setAttribute("width", size * 2);
-			rect.setAttribute("height", size * 2);
-			rect.setAttribute("fill", color);
-			return rect;
+			td.classList.add("circle");
 		}
 	}
+
+	return td;
 }
 
-class WcGraphSvg extends HTMLElement {
+class WcGraphCss extends HTMLElement {
 	#points = [];
 	#width = 320;
 	#height = 240;
@@ -54,68 +49,65 @@ class WcGraphSvg extends HTMLElement {
 		element.attachEvents.bind(element);
 	}
 	render() {
-		if(!this.shadowRoot){
+		if (!this.shadowRoot) {
 			this.attachShadow({ mode: "open" });
 		}
 		this.shadowRoot.innerHTML = "";
-		const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		svg.setAttribute("width", this.#width);
-		svg.setAttribute("height", this.#height);
-		const background = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-		background.setAttribute("width", this.#width);
-		background.setAttribute("height", this.#height);
-		background.setAttribute("fill", "white");
-		svg.appendChild(background);
-		const guides = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		guides.setAttribute("stroke-width", 1.0);
-		guides.setAttribute("stroke", "black");
-		guides.setAttribute("d", `M0,${this.#height / 2} H${this.#width} M${this.#width / 2},0 V${this.#height}`);
-		svg.appendChild(guides);
-
+		
 		let points;
-		if(this.#func){
+		if (this.#func) {
 			points = [];
 			for (let x = this.#xmin; x < this.#xmax; x += this.#step) {
 				const y = this.#func(x);
-				points.push({ x, y, color: this.#defaultColor, size: this.#defaultSize, shape: this.#defaultShape});
+				points.push({ x, y, color: this.#defaultColor, size: this.#defaultSize, shape: this.#defaultShape });
 			}
 		} else {
 			points = this.#points;
 		}
 
-		points = points.map(p => ({ 
+		points = points.map((p, i, arr) => ({
 			x: windowValue(p.x, this.#xmin, this.#xmax) * this.#width,
 			y: windowValue(p.y, this.#ymin, this.#ymax, true) * this.#height,
+			value: p.y,
 			color: p.color,
 			size: p.size,
 			shape: p.shape
-		 }));
+		}));
 
-		if(this.#continuous){
-			const pathData = ["M"];
-			pathData.push(points[0].x.toFixed(2), points[0].y.toFixed(2));
+		points.sort((a,b) => b.x - a.x).reverse();
 
-			for (let i = 1; i < points.length; i++) {
-				pathData.push("L", points[i].x.toFixed(2), points[i].y.toFixed(2));
+		points = points.map((p, i, arr) => ({
+			...p,
+			...{
+				width: p.x - (arr[i - 1]?.x ?? 0),
+				previousY: (arr[i - 1]?.y ?? 0)
 			}
-			const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-			path.setAttribute("fill", "none");
-			path.setAttribute("stroke-width", this.#thickness);
-			path.setAttribute("stroke", this.#defaultColor);
-			path.setAttribute("d", pathData.join(" "));
-			svg.appendChild(path);
-		}
+		}));
 
-		for(const point of points){
-			const shape = createShape(
-				point.shape, 
-				[point.x, point.y],
-				point.size,
-				point.color
-			);
-			svg.appendChild(shape);
+		const style = document.createElement("link");
+		style.rel = "stylesheet";
+		style.href = "./wc-graph-css.css";
+		this.shadowRoot.append(style);
+
+		const table = document.createElement("table");
+		table.style.setProperty("--default-color", this.#defaultColor);
+		table.style.setProperty("--thickness", this.#thickness + "px");
+		if(this.#continuous){
+			table.classList.add("continuous");
 		}
-		this.shadowRoot.appendChild(svg);
+		table.style.width = this.#width + "px";
+		table.style.height = this.#height + "px";
+		const tbody = document.createElement("tbody");
+		tbody.style.gridTemplateColumns = points.map(p => p.width + "px").join(" ");
+		table.append(tbody);
+		for (const point of points) {
+			const tr = document.createElement("tr");
+			const td = createShape(point.shape, [point.x, point.y], point.size, point.color, point.value, point.previousY);
+			tr.append(td);
+			tbody.append(tr);
+		}
+		table.append(tbody);
+		this.shadowRoot.append(table);
 	}
 	attachEvents() {
 
@@ -128,7 +120,7 @@ class WcGraphSvg extends HTMLElement {
 		this[hyphenCaseToCamelCase(name)] = newValue;
 	}
 	set points(value) {
-		if(typeof(value) === "string"){
+		if (typeof (value) === "string") {
 			value = JSON.parse(value);
 		}
 
@@ -190,7 +182,7 @@ class WcGraphSvg extends HTMLElement {
 	set step(value) {
 		this.#step = parseFloat(value);
 	}
-	set defaultSize(value){
+	set defaultSize(value) {
 		this.#defaultSize = parseFloat(value);
 	}
 	set defaultShape(value) {
@@ -199,12 +191,12 @@ class WcGraphSvg extends HTMLElement {
 	set defaultColor(value) {
 		this.#defaultColor = value;
 	}
-	set continuous(value){
+	set continuous(value) {
 		this.#continuous = value !== undefined;
 	}
-	set thickness(value){
+	set thickness(value) {
 		this.#thickness = parseFloat(value);
 	}
 }
 
-customElements.define("wc-graph-svg", WcGraphSvg);
+customElements.define("wc-graph-css", WcGraphCss);
