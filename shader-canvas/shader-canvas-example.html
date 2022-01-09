@@ -39,7 +39,7 @@
             return result;
         </wc-js-shader-canvas>
         <h1>WGSL</h1>
-        <wc-wgsl-shader-canvas image="image.jpg">
+        z<wc-wgsl-shader-canvas image="image.jpg">
             <script type="wgsl">
                 [[block]]
                 struct Uniforms {
@@ -72,9 +72,7 @@
                         vec4<f32>(0.0, 0.0, 0.0, 1.0),
                     );
 
-                    var x: vec4<f32> = achromatopsia * textureSample(my_texture, my_sampler, fragData.uv);
-
-                    return vec4<f32>(1.0, 0.0, 0.0, 1.0);
+                    return achromatopsia * textureSample(my_texture, my_sampler, fragData.uv);
                 }
             </script>
         </wc-wgsl-shader-canvas>

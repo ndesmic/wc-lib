@@ -1,4 +1,7 @@
-import { fireEvent } from "../lib/utilities.js";
+export function fireEvent(element, eventName, bubbles = true, cancelable = true) {
+	const event = new Event(eventName, { bubbles, cancelable });
+	return element.dispatchEvent(event);
+}
 
 export class WcSplitPanel extends HTMLElement {
 	static observedAttributes = ["direction"];
