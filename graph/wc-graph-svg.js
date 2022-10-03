@@ -172,13 +172,13 @@ class WcGraphSvg extends HTMLElement {
 		return this.#xmin;
 	}
 	set ymax(value) {
-		this.#ymax = parseFloat(value);
+		this.#ymax = value === "fit" ? "fit" : parseFloat(value);
 	}
 	get ymax() {
 		return this.#ymax;
 	}
 	set ymin(value) {
-		this.#ymin = parseFloat(value);
+		this.#ymin = value === "fit" ? "fit" : parseFloat(value);
 	}
 	get ymin() {
 		return this.#ymin;

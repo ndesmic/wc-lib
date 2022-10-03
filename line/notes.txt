@@ -1,0 +1,4 @@
+https://blog.scottlogic.com/2019/11/18/drawing-lines-with-webgl.html
+https://mattdesl.svbtle.com/drawing-lines-is-hard
+https://www.codeproject.com/Articles/226569/Drawing-polylines-by-tessellation
+https://cesium.com/blog/2013/04/22/robust-polyline-rendering-with-webgl/
