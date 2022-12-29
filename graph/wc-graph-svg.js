@@ -73,6 +73,9 @@ class WcGraphSvg extends HTMLElement {
 		svg.appendChild(guides);
 
 		let points;
+		let dataYMin = Infinity;
+		let dataYMax = -Infinity;
+
 		if(this.#func){
 			points = [];
 			for (let x = this.#xmin; x < this.#xmax; x += this.#step) {
@@ -82,6 +85,8 @@ class WcGraphSvg extends HTMLElement {
 		} else {
 			points = this.#points;
 		}
+
+		const calculatedYMin = this.#ymin === "fit" ? min : this.#ymin; 
 
 		points = points.map(p => ({ 
 			x: windowValue(p.x, this.#xmin, this.#xmax) * this.#width,
