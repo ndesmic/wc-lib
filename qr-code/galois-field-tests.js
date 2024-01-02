@@ -1,6 +1,21 @@
-import { len, GaloisField } from "./wc-qr-code.js";
+import { GaloisField } from "./galois-field.js";
 
-describe("galios-field", () => {
+//https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders
+export function getBitLength(x) {
+	let bits = 0;
+	while (x >> bits !== 0) {
+		bits++;
+	}
+	return bits;
+}
+
+describe("getBitLength", () => {
+	it("should get length", () => {
+		expect(getBitLength(42)).toBe(6);
+	});
+});
+
+describe("galois-field", () => {
 	describe("add", () => {
 		it("should add", () => {
 			const gf = new GaloisField();
@@ -12,12 +27,6 @@ describe("galios-field", () => {
 		it("should subtract", () => {
 			const gf = new GaloisField();
 			expect(gf.sub(5, 6)).toBe(3);
-		});
-	});
-
-	describe("len", () => {
-		it("should get length", () => {
-			expect(len(42)).toBe(6);
 		});
 	});
 

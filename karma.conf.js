@@ -17,8 +17,16 @@ module.exports = function(config) {
     files: [
       //files to test
       { pattern: 'qr-code/wc-qr-code.js', type: "module", included: false },
+      { pattern: 'qr-code/galois-field.js', type: "module", included: false },
+      { pattern: 'qr-code/array-canvas.js', type: "module", included: false },
+      { pattern: 'qr-code/qr-canvas.js', type: "module", included: false },
+      { pattern: 'qr-code/canvas-utils.js', type: "module", included: false },
+      { pattern: 'qr-code/utils.js', type: "module", included: false },
       { pattern: 'qr-code/wc-qr-code-tests.js', type: "module" },
       { pattern: 'qr-code/galois-field-tests.js', type: "module" },
+      { pattern: 'qr-code/qr-canvas-tests.js', type: "module" },
+      { pattern: 'qr-code/array-canvas-tests.js', type: "module" },
+      { pattern: 'qr-code/utils-tests.js', type: "module" },
     ],
 
 

@@ -189,7 +189,7 @@ class WcGraphSvg extends HTMLElement {
 		return this.#ymin;
 	}
 	set func(value) {
-		this.#func = new Function(["x"], value);
+		this.#func = typeof(value) === "string" ? new Function(["x"], value) : value;
 		this.render();
 	}
 	set step(value) {

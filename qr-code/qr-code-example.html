@@ -3,14 +3,41 @@
 
 <head>
 	<title>QR Code</title>
-	<link rel="stylesheet" href="css/index.css">
+	<link rel="stylesheet" href="../css/index.css">
 	</link>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<style>
+		.row-wrap {
+			display: flex;
+			flex-flow: row wrap;
+			gap: 4rem;
+		}
+		.hero {
+			padding: 4rem;
+		}
+		wc-qr-code {
+			display: block;
+			height: 400px;
+			width: 400px;
+		}
+	</style>
 </head>
 
 <body>
-	<file-drop></file-drop>
-	<script src="wc-qr-code.js"></script>
+	<div class="hero">
+		<wc-qr-code payload="https://en.m.wikipedia.org" errorlevel="Q"></wc-qr-code>
+	</div>
+	<div class="row-wrap">
+		<!-- <wc-qr-code payload="HELLO WORLD" errorlevel="Q" mask="0"></wc-qr-code>
+		<wc-qr-code payload="HELLO WORLD" errorlevel="Q" mask="1"></wc-qr-code>
+		<wc-qr-code payload="HELLO WORLD" errorlevel="Q" mask="2"></wc-qr-code>
+		<wc-qr-code payload="HELLO WORLD" errorlevel="Q" mask="3"></wc-qr-code>
+		<wc-qr-code payload="HELLO WORLD" errorlevel="Q" mask="4"></wc-qr-code>
+		<wc-qr-code payload="HELLO WORLD" errorlevel="Q" mask="5"></wc-qr-code>
+		<wc-qr-code payload="HELLO WORLD" errorlevel="Q" mask="6"></wc-qr-code>
+		<wc-qr-code payload="HELLO WORLD" errorlevel="Q" mask="7"></wc-qr-code> -->
+	</div>
+	<script src="wc-qr-code.js" type="module"></script>
 </body>
 
 </html>

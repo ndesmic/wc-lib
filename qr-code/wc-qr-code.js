@@ -1,3 +1,13 @@
+import { drawQrCanvas } from "./canvas-utils.js";
+import { GaloisField } from "./galois-field.js";
+import { QrCanvas, masks } from "./qr-canvas.js";
+import { chunkArray, padArrayStart, padArrayEnd, trimArrayStart } from "./utils.js";
+
+/**
+ * @typedef {("numeric"|"alphanumeric"|"binary")} mode
+ * @typedef {("L"|"M"|"Q"|"H")} errorCorrectionLevel
+ */
+
 //TODO fill in versions 20-40
 export const versionCapabilities = {
 	"numeric": {
@@ -21,145 +31,6 @@ export const versionCapabilities = {
 };
 
 export const versionRemainderBits = [null,0,7,7,7,7,7,0,0,0,0,0,0,0,3,3,3,3,3,3,3,4,4,4,4,4,4,4,3,3,3,3,3,3,3,0,0,0,0,0,0];
-export const getVersionDimensions = version => ((version - 1) * 4) + 21;
-
-//https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders
-export const len = x => {
-	let bits = 0;
-	while (x >> bits !== 0) {
-		bits++;
-	}
-	return bits;
-}
-
-export class GaloisField {
-	constructor(length = 256, prime = 285) {
-		this.length = length;
-		this.prime = prime;
-		this.buildTables();
-	}
-	buildTables() {
-		this.expTable = new Array(this.length).fill(0);
-		this.logTable = new Array(this.length);
-		let x = 1;
-		for (let i = 0; i < this.length - 1; i++) {
-			this.expTable[i] = x;
-			this.logTable[x] = i;
-			x = this._mul(x, 2);
-		}
-		this.expTable[this.length - 1] = 1;
-	}
-	add(x, y) {
-		return x ^ y;
-	}
-	sub(x, y) {
-		return x ^ y;
-	}
-	//More efficent "Russian Peasant" multiplication
-	_mul(x, y, carryless = true) {
-		let result = 0;
-		let currentY = y;
-		let currentX = x;
-		while (currentY > 0) {
-			if ((currentY & 1) !== 0) { //odd
-				result = carryless ? result ^ currentX : result + currentX;
-			}
-			currentY = currentY >> 1; //divide by 2
-			currentX = currentX << 1; //x * 2
-			if (this.prime > 0 && ((currentX & this.length) > 0)) { //if > length
-				currentX = currentX ^ this.prime; //modulo
-			}
-		}
-		return result;
-	}
-	mul(x, y) {
-		if (x === 0 || y === 0) return 0;
-		return this.expTable[(this.logTable[x] + this.logTable[y]) % (this.length - 1)];
-	}
-	div(x, y) {
-		if (y === 0) throw `Tried to divide by zero`;
-		if (x === 0) return 0;
-		return this.expTable[((this.logTable[x] + this.length) - this.logTable[y]) % this.length];
-	}
-	pow(x, p) {
-		return this.expTable[(this.logTable[x] * p) % this.length];
-	}
-	polyMul(x, y) {
-		const result = new Array(x.length + y.length - 1).fill(0);
-		for (let j = 0; j < y.length; j++) {
-			for (let i = 0; i < x.length; i++) {
-				result[i + j] = this.add(result[i + j], this.mul(x[i], y[j]));
-			}
-		}
-		return result;
-	}
-	//https://en.wikipedia.org/wiki/Synthetic_division#Expanded_synthetic_division
-	polyDiv(dividend, divisor) {
-		let out = [...dividend];
-		//const normalizer = y[0];
-		for (let i = 0; i < dividend.length - (divisor.length - 1); i++) {
-			//out[i] = this.div(out[i], normalizer);
-			const coef = out[i];
-			if (coef !== 0) {
-				for (let j = 1; j < divisor.length; j++) {
-					if (divisor[j] === 0) continue;
-					out[i + j] = this.add(out[i + j], this.mul(divisor[j], coef));
-				}
-			}
-		}
-		const separator = 1 - divisor.length;
-		return [out.slice(0, separator), out.slice(separator)];
-	}
-	//coefficents are full decimal, not exponents
-	getGeneratorPoly(count) {
-		let g = [1];
-		for (let i = 0; i < count; i++) {
-			g = this.polyMul(g, [1, this.pow(2, i)]);
-		}
-		return g;
-	}
-}
-
-//for brevity things can only be drawn in positive direction
-export class ArrayCanvas {
-	constructor(height, width){
-		this.canvas = new Array(height);
-		this.height = height;
-		this.width = width;
-		for(let i = 0; i < height; i++){
-			this.canvas[i] = new Array(width).fill(0);
-		}
-	}
-	drawVerticalLine(startX, startY, length, value){
-		for(let i = 0; i < length; i++){
-			this.drawPixel(startX, startY + i, value);
-		}
-	}
-	drawHorizontalLine(startX, startY, length, value) {
-		for (let i = 0; i < length; i++) {
-			this.drawPixel(startX + i, startY, value);
-		}
-	}
-	drawOutlineRect(startX, startY, width, height, value){
-		this.drawHorizontalLine(startX, startY, width, value);
-		this.drawVerticalLine(startX + (width - 1), startY, height, value);
-		this.drawVerticalLine(startX, startY, height, value);
-		this.drawHorizontalLine(startX, (startY + height - 1), width, value);
-	}
-	drawFilledRect(startX, startY, width, height, value){
-		for(let row = startY; row < startY + height; row++){
-			for(let col = startX; col < startX + width; col++){
-				this.drawPixel(row, col, value);
-			}
-		}
-	}
-	drawPixel(x, y, value){
-		this.canvas[y][x] = value;
-	}
-	getPixel(x, y){
-		return this.canvas[y][x];
-	}
-}
 
 //Table is organized [EC Codewords per block] [# of blocks in Group 1] [Data Codewords per block in Group 1] [# of blocks in Group 2] [Data Codewords per block in Group 2]
 export const errorCorrectionTable = { 
@@ -168,9 +39,28 @@ export const errorCorrectionTable = {
 	"Q": [[13, 1, 13, 0, 0], [22, 1, 22, 0, 0], [18, 2, 17, 0, 0], [26, 2, 24, 0, 0], [18, 2, 15, 2, 16], [24, 4, 19, 0, 0], [18, 2, 14, 4, 15], [22, 4, 18, 2, 19], [20, 4, 16, 4, 17], [24, 6, 19, 2, 20], [28, 4, 22, 4, 23], [26, 4, 20, 6, 21], [24, 8, 20, 4, 21], [20, 11, 16, 5, 17], [30, 5, 24, 7, 25], [24, 15, 19, 2, 20], [28, 1, 22, 15, 23], [28, 17, 22, 1, 23], [26, 17, 21, 4, 22], [30, 15, 24, 5, 25], [28, 17, 22, 6, 23], [30, 7, 24, 16, 25], [30, 11, 24, 14, 25], [30, 11, 24, 16, 25], [30, 7, 24, 22, 25], [28, 28, 22, 6, 23], [30, 8, 23, 26, 24], [30, 4, 24, 31, 25], [30, 1, 23, 37, 24], [30, 15, 24, 25, 25], [30, 42, 24, 1, 25], [30, 10, 24, 35, 25], [30, 29, 24, 19, 25], [30, 44, 24, 7, 25], [30, 39, 24, 14, 25], [30, 46, 24, 10, 25], [30, 49, 24, 10, 25], [30, 48, 24, 14, 25], [30, 43, 24, 22, 25], [30, 34, 24, 34, 25]], 
 	"H": [[17, 1, 9, 0, 0], [28, 1, 16, 0, 0], [22, 2, 13, 0, 0], [16, 4, 9, 0, 0], [22, 2, 11, 2, 12], [28, 4, 15, 0, 0], [26, 4, 13, 1, 14], [26, 4, 14, 2, 15], [24, 4, 12, 4, 13], [28, 6, 15, 2, 16], [24, 3, 12, 8, 13], [28, 7, 14, 4, 15], [22, 12, 11, 4, 12], [24, 11, 12, 5, 13], [24, 11, 12, 7, 13], [30, 3, 15, 13, 16], [28, 2, 14, 17, 15], [28, 2, 14, 19, 15], [26, 9, 13, 16, 14], [28, 15, 15, 10, 16], [30, 19, 16, 6, 17], [24, 34, 13, 0, 0], [30, 16, 15, 14, 16], [30, 30, 16, 2, 17], [30, 22, 15, 13, 16], [30, 33, 16, 4, 17], [30, 12, 15, 28, 16], [30, 11, 15, 31, 16], [30, 19, 15, 26, 16], [30, 23, 15, 25, 16], [30, 23, 15, 28, 16], [30, 19, 15, 35, 16], [30, 11, 15, 46, 16], [30, 59, 16, 1, 17], [30, 22, 15, 41, 16], [30, 2, 15, 64, 16], [30, 24, 15, 46, 16], [30, 42, 15, 32, 16], [30, 10, 15, 67, 16], [30, 20, 15, 61, 16]] };
 
+const errorCorrectionBits = {
+	L: [0,1],
+	M: [0,0],
+	Q: [1,1],
+	H: [1,0]
+};
+const maskBits = {
+	0: [0,0,0],
+	1: [0,0,1],
+	2: [0,1,0],
+	3: [0,1,1],
+	4: [1,0,0],
+	5: [1,0,1],
+	6: [1,1,0],
+	7: [1,1,1]
+}
+
 //https://www.thonky.com/qr-code-tutorial/numeric-mode-encoding
 export function encodeNumeric(payload){
-	payload = typeof payload === "number" ? payload.toString() : payload;
+	payload = typeof payload === "number" 
+		? payload.toString() 
+		: payload;
 	const groupings = payload.match(/.{1,3}/g);
 	const binaryGroupings = groupings.map(x => toBinary(x));
 	return binaryGroupings.flat();
@@ -195,20 +85,6 @@ export function encodeAlphaNumeric(payload){
 	});
 	return binaryGroupings.flat();
 }
-export function padArrayStart(array, length, element){
-	let result = [...array];
-	while(result.length < length){
-		result.unshift(element);
-	}
-	return result;
-}
-export function padArrayEnd(array, length, element) {
-	let result = [...array];
-	while (result.length < length) {
-		result.push(element);
-	}
-	return result;
-}
 //https://www.thonky.com/qr-code-tutorial/byte-mode-encoding
 //Full UTF-8 not supported by all readers but this is much easier and more flexible to output, ISO 8859-1 is a subset
 export function encodeBytes(payload){
@@ -220,30 +96,28 @@ export function encodeBytes(payload){
 	}
 	return array.flat();
 }
+
+/**
+ * {Object.<mode,[number,number,number,number]>}
+ */
 const modeIndicator = {
 	"numeric": [0,0,0,1],
 	"alphanumeric": [0,0,1,0],
-	"byte": [0,1,0,0]
+	"binary": [0,1,0,0],
 }
+
+/**
+ * 
+ * @param {string} payload 
+ * @returns {mode}
+ */
 export function getMode(payload){
 	if(/^[0-9]*$/.test(payload)) return "numeric";
 	if(/^[0-9A-Z\$\%\*\+\-\.\/\:\s]*$/.test(payload)) return "alphanumeric";
 	//also kanji but ranges are difficult to figure out :/
-	return "byte";
+	return "binary";
 }
-export function arrayChunk(array, lengthPerChunk) {
-	const result = [];
-	let chunk = [array[0]];
-	for (let i = 1; i < array.length; i++) {
-		if (i % lengthPerChunk === 0) {
-			result.push(chunk);
-			chunk = [];
-		}
-		chunk.push(array[i]);
-	}
-	if (chunk.length > 0) result.push(chunk);
-	return result;
-}
+
 export function toBinary(n, len) {
 	function bin(n){
 		if (n > 1) {
@@ -270,6 +144,11 @@ export function fromBinary(array){
 	return n;
 }
 
+/**
+ * @param {number} length - The length in bytes
+ * @param {mode} mode - The encoding mode
+ * @param {string} errorCorrectionLevel - level level to correct for
+*/
 export function getVersionFor(length, mode, errorCorrectionLevel){
 	const versions = versionCapabilities[mode][errorCorrectionLevel];
 	let i = 0;
@@ -277,6 +156,14 @@ export function getVersionFor(length, mode, errorCorrectionLevel){
 	if(versions[i] === undefined) throw `Data larger than biggest possible QR code for values ${mode}, ${errorCorrectionLevel}`;
 	return i + 1;
 }
+
+/**
+ * 
+ * @param {number} version 
+ * @param {mode} mode 
+ * @returns 
+ */
+
 export function getCharacterCountLength(version, mode){
 	switch(mode){
 		case "numeric": {
@@ -288,7 +175,7 @@ export function getCharacterCountLength(version, mode){
 			if (version < 10) return 9;
 			if (version >= 10 && version < 27) return 11;
 			if (version >= 27 && version < 41) return 13;
-		case "byte":
+		case "binary":
 			if (version < 10) return 8;
 			if (version >= 10 && version < 41) return 16;
 	}
@@ -304,12 +191,19 @@ export function getBitSizeForCode(version, errorCorrectionLevel){
 	return ((row[1] * row[2]) + (row[3] * row[4])) * 8;
 }
 
+/**
+ * 
+ * @param {string} payload 
+ * @param {mode} mode 
+ * @param {number} version 
+ * @returns 
+ */
 export function encodePayloadWithModeAndLength(payload, mode, version){
 	let encodedPayload;
 	switch (mode) {
 		case "numeric":{ encodedPayload = encodeNumeric(payload); break; };
 		case "alphanumeric": { encodedPayload = encodeAlphaNumeric(payload); break; };
-		case "byte": { encodedPayload = encodeBytes(payload); break; };
+		case "binary": { encodedPayload = encodeBytes(payload); break; };
 	}
 	
 	const encodedLength = getCharacterCount(version, mode, payload.length);
@@ -344,11 +238,21 @@ export function createPadBytes(count){
 	return result;
 }
 
-export function encode(payload, errorCorrectionLevel){
+/**
+ * 
+ * @param {string} payload 
+ * @param {errorCorrectionLevel} errorCorrectionLevel 
+ * @returns {{ encodedData: number[], version: number, mode: mode }}
+ */
+export function qrEncodeData(payload, errorCorrectionLevel){
 	const mode = getMode(payload);
 	const version = getVersionFor(payload.length, mode, errorCorrectionLevel);
 	const paddedPayload = encodePayloadWithPadding(payload, mode, version, errorCorrectionLevel);
-	return errorEncodePaddedPayload(paddedPayload, version, errorCorrectionLevel);
+	return {
+		encodedData: errorEncodePaddedPayload(paddedPayload, version, errorCorrectionLevel),
+		version,
+		mode
+	};
 }
 
 //gets encoding for data and pads
@@ -367,7 +271,6 @@ export function errorEncodeBlocks(groupBlocks, version, errorCorrectionLevel){
 	for(let g = 0; g < groupBlocks.length; g++){
 		const ecGroup = [];
 		for(let b = 0; b < groupBlocks[g].length; b++){
-			console.log(g, b, "@@")
 			const codewords = groupBlocks[g][b].map(x => fromBinary(x));
 			ecGroup.push(getErrorCodeWords(codewords, version, errorCorrectionLevel).map(x => toBinary(x, 8)));
 		}
@@ -380,15 +283,15 @@ export function errorEncodeBlocks(groupBlocks, version, errorCorrectionLevel){
 export function groupBlocks(data, version, errorCorrectionLevel){
 	const errorCorrectionBlocks = errorCorrectionTable[errorCorrectionLevel][version - 1];
 	const totalGroup1Blocks = errorCorrectionBlocks[1] * errorCorrectionBlocks[2];
-	let group1 = arrayChunk(data.slice(0, (totalGroup1Blocks * 8)), 8);
-	let group2 = arrayChunk(data.slice((totalGroup1Blocks * 8)), 8);
+	let group1 = chunkArray(data.slice(0, (totalGroup1Blocks * 8)), 8);
+	let group2 = chunkArray(data.slice((totalGroup1Blocks * 8)), 8);
 	const result = [];
 
 	if(errorCorrectionBlocks[1] > 0){ //number of block in group 1 > 0 (always true)
-		result.push(arrayChunk(group1, errorCorrectionBlocks[2])); //codewords per block
+		result.push(chunkArray(group1, errorCorrectionBlocks[2])); //codewords per block
 	}
 	if(errorCorrectionBlocks[3] > 0){ //number of blocks in group 2 > 0
-		result.push(arrayChunk(group2, errorCorrectionBlocks[4])); //codeword per block
+		result.push(chunkArray(group2, errorCorrectionBlocks[4])); //codeword per block
 	}
 	return result;
 }
@@ -433,6 +336,54 @@ export function interleaveBlocks(groups){
 	return result;
 }
 
+/**
+ * 
+ * @param {errorCorrectionLevel} errorCorrectionLevel 
+ * @param {number} mask 
+ * @returns
+ */
+
+export function getFormatString(errorCorrectionLevel, mask){
+	const formatString = [
+		...errorCorrectionBits[errorCorrectionLevel],
+		...maskBits[mask]
+	];
+	const errorBits = getFormatErrorBits(formatString);
+	const errorCorrectedFormatString = [...formatString, ...errorBits];
+	const maskString = [1,0,1,0,1,0,0,0,0,0,1,0,0,1,0];
+	return errorCorrectedFormatString.map((x, i) => x ^ maskString[i]);
+}
+
+export function getFormatErrorBits(formatString){
+	const generatorPoly = [1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1];
+
+	let errorCorrectionBits = trimArrayStart(padArrayEnd(formatString, 15, 0));
+
+	while (errorCorrectionBits.length > 10) {
+		let paddedGeneratorPoly = padArrayEnd(generatorPoly, errorCorrectionBits.length, 0);
+		errorCorrectionBits = trimArrayStart(errorCorrectionBits.map((x, i) => x ^ paddedGeneratorPoly[i]));
+	}
+	return padArrayStart(errorCorrectionBits, 10, 0);
+}
+
+export function getVersionInfoString(version){
+	const versionString = padArrayStart(toBinary(version), 6, 0);
+	const errorBits = getVersionErrorBits(versionString);
+	return [...versionString, ...errorBits];
+}
+
+export function getVersionErrorBits(versionString){
+	const generatorPoly = [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1];
+
+	let errorCorrectionBits = trimArrayStart(padArrayEnd(versionString, 18, 0));
+
+	while (errorCorrectionBits.length > 12) {
+		let paddedGeneratorPoly = padArrayEnd(generatorPoly, errorCorrectionBits.length, 0);
+		errorCorrectionBits = trimArrayStart(errorCorrectionBits.map((x, i) => x ^ paddedGeneratorPoly[i]));
+	}
+	return padArrayStart(errorCorrectionBits, 12, 0);
+}
+
 export function errorEncodePaddedPayload(paddedPayload, version, errorCorrectionLevel){
 	const groupedBlocks = groupBlocks(paddedPayload, version, errorCorrectionLevel);
 	const ecGroupedBlocks = errorEncodeBlocks(groupedBlocks, version, errorCorrectionLevel);
@@ -442,162 +393,16 @@ export function errorEncodePaddedPayload(paddedPayload, version, errorCorrection
 	return [...interleavedBlocks, ...interleavedEcBlocks, ...padBits].flat();
 }
 
-export function createQrMatrix(version) {
-	const dimension = getVersionDimensions(version);
-	const matrix = new ArrayCanvas(dimension, dimension);
-	matrix.drawOutlineRect(0, 0, 7, 7, 1);
-	matrix.drawOutlineRect(1, 1, 5, 5, 2);
-	matrix.drawFilledRect(2, 2, 3, 3, 1);
-	matrix.drawHorizontalLine(0, 7, 8, 2);
-	matrix.drawVerticalLine(7, 0, 8, 2);
 
-	matrix.drawOutlineRect(dimension - 7, 0, 7, 7, 1);
-	matrix.drawOutlineRect(dimension - 6, 1, 5, 5, 2);
-	matrix.drawFilledRect(dimension - 5, 2, 3, 3, 1);
-	matrix.drawHorizontalLine(dimension - 8, 7, 8, 2);
-	matrix.drawVerticalLine(dimension - 8, 0, 8, 2);
-
-	matrix.drawOutlineRect(0, dimension - 7, 7, 7, 1);
-	matrix.drawOutlineRect(1, dimension - 6, 5, 5, 2);
-	matrix.drawFilledRect(2, dimension - 5, 3, 3, 1);
-	matrix.drawHorizontalLine(0, dimension - 8, 8, 2);
-	matrix.drawVerticalLine(7, dimension - 8, 8, 2);
-	
-	for(let r = 6; r < matrix.height; r += 18){
-		for(let c = 6; c < matrix.width; c += 18){
-			if(matrix.canvas[r][c] === 0){
-				drawAlignmentPattern(matrix, c, r);
-			}
-		}
-	}
-
-	drawVerticalTimingPattern(matrix, 6, 8, dimension - 16);
-	drawHorizontalTimingPattern(matrix, 8, 6, dimension - 16);
-	matrix.drawPixel(8, (4 * version) + 9, 1); //dark module
-
-	reserveHorizontalLine(matrix, 0, 8, 9); //format resevered space
-	reserveVerticalLine(matrix, 8, 0, 8); //format resevered space
-	reserveHorizontalLine(matrix, dimension - 8, 8, 8); //format resevered space
-	reserveVerticalLine(matrix, 8, dimension - 7, 7); //format resevered space
-
-	if(version >= 7){
-		reserveRect(matrix, 0, dimension - 11, 6, 3);
-		reserveRect(matrix, dimension - 11, 0, 3, 6);
-	}
-
-	return matrix;
-}
-
-export function addDataToQrMatrix(matrix, payload){
-	let payloadIndex = 0;
-	let direction = "up";
-	for(let dataColumnStart = 0; dataColumnStart < matrix.width; dataColumnStart += 2){
-		if(dataColumnStart === matrix.width - 7) dataColumnStart++; //skip the vertical timing col
-		if(direction === "down"){
-			for (let row = 0; row < matrix.height; row++) {
-				const col = (matrix.width - 1) - dataColumnStart;
-				if(matrix.getPixel(col, row) === 0){
-					matrix.drawPixel(col, row, payload[payloadIndex++]);
-				}
-				if (matrix.getPixel(col - 1, row) === 0) {
-					matrix.drawPixel(col - 1, row, payload[payloadIndex++]);
-				}
-			}
-			direction = "up";
-		} else if (direction === "up"){
-			for(let row = matrix.height - 1; row >= 0; row--){
-				const col = (matrix.width - 1) - dataColumnStart;
-				if (matrix.getPixel(col, row) === 0) {
-					matrix.drawPixel(col, row, payload[payloadIndex++]);
-				}
-				if (matrix.getPixel(col - 1, row) === 0) {
-					matrix.drawPixel(col - 1, row, payload[payloadIndex++]);
-				}
-			}
-			direction = "down";
-		}
-	}
-}
-
-function drawVerticalTimingPattern(canvas, x, y, length){
-	for(let i = 0; i < length; i++){
-		canvas.drawPixel(x, y + i, i % 2 === 1 ? 2 : 1);
-	}
-}
-function drawHorizontalTimingPattern(canvas, x, y, length) {
-	for (let i = 0; i < length; i++) {
-		canvas.drawPixel(x + i, y, i % 2 === 1 ? 2 : 1);
-	}
-}
-
-function drawAlignmentPattern(canvas, x, y){
-	canvas.drawOutlineRect(x - 2, y - 2, 5, 5, 1);
-	canvas.drawOutlineRect(x - 1, y - 1, 3, 3, 2);
-	canvas.drawPixel(x, y, 1);
-}
-
-function reserveHorizontalLine(canvas, x, y, length){
-	for (let i = 0; i < length; i++) {
-		if(canvas.getPixel(x + i, y) === 0){
-			canvas.drawPixel(x + i, y, 2);
-		}
-	}
-}
-function reserveVerticalLine(canvas, x, y, length) {
-	for (let i = 0; i < length; i++) {
-		if (canvas.getPixel(x, y + i) === 0) {
-			canvas.drawPixel(x, y + i, 2);
-		}
-	}
-}
-
-function reserveRect(canvas, x, y, width, height){
-	for(let row = y; row < y + height; row++){
-		for(let col = x; col < x + width; col++){
-			if(canvas.getPixel(col, row) === 0){
-				canvas.drawPixel(col, row, 2);
-			}
-		}
-	}
-}
-
-export function matrixToCanvas(matrix){
-	const canvas = document.createElement("canvas");
-	canvas.width = matrix.width;
-	canvas.height = matrix.height;
-	const ctx = canvas.getContext("2d");
-	const pixels = ctx.getImageData(0, 0, matrix.height, matrix.width);
-	for(let row = 0; row < matrix.height; row++){
-		for(let col = 0; col < matrix.width; col++){
-			drawPixel(pixels, col, row, matrix.canvas[row][col]);
-		}
-	}
-	ctx.putImageData(pixels, 0, 0);
-	return canvas;
-}
-
-function drawPixel(imageData, x, y, colorId){
-	let color;
-	switch(colorId){
-		case 0: { color = [255,255,255]; } break;
-		case 1: { color = [0,0,0]; } break;
-		case 2: { color = [0,0,255]; } break;
-		case 3: { color = [255,0,0]; } break;
-	}
-	imageData.data[(y * imageData.width * 4) + (x * 4) + 0] = color[0];
-	imageData.data[(y * imageData.width * 4) + (x * 4) + 1] = color[1];
-	imageData.data[(y * imageData.width * 4) + (x * 4) + 2] = color[2];
-	imageData.data[(y * imageData.width * 4) + (x * 4) + 3] = 255;
-}
 
 customElements.define("wc-qr-code",
 	class extends HTMLElement {
 		static get observedAttributes(){
-			return ["payload"]
+			return ["payload", "errorlevel", "mask"]
 		}
 		constructor(){
 			super();
-			this.bind();
+			this.bind(this);
 		}
 		bind(element) {
 			element.cacheDom.bind(element);
@@ -609,7 +414,8 @@ customElements.define("wc-qr-code",
 		}
 		prerender() {
 			this.attachShadow({ mode: "open" });
-			this.innerHTML = `
+			this.shadowRoot.innerHTML = `
+				<style>canvas { width: 100%; height: 100%; image-rendering: pixelated; }</style>
 				<canvas id="qr"></canvas>
 			`;
 		}
@@ -619,8 +425,26 @@ customElements.define("wc-qr-code",
 			};
 		}
 		render(){
-			const mode = getMode(this.payload);
+			if(!this.errorlevel || !this.payload || !this.dom) return;
+			const {
+				encodedData,
+				version
+			} = qrEncodeData(this.payload, this.errorlevel);
+			const matrix = QrCanvas.fromVersion(version);
+			matrix.drawPayloadData(encodedData);
+			const mask = this.mask 
+				? parseInt(this.mask)
+				: matrix.getBestMask();
+			matrix.applyMask(masks[mask]);
+			matrix.drawFormatString(getFormatString(this.errorlevel, mask));
+			if(version >= 7){
+				matrix.drawVersionInfoString(getVersionInfoString(version));
+			}
+
+			this.dom.qr.height = matrix.height;
+			this.dom.qr.width = matrix.width;
 			const context = this.dom.qr.getContext("2d");
+			drawQrCanvas(context, matrix);
 		}
 		attributeChangedCallback(name, oldValue, newValue) {
 			this[name] = newValue;

@@ -1,4 +1,4 @@
-import { arrayChunk, getMode, encodeNumeric, encodeAlphaNumeric, toBinary, fromBinary, encodeBytes, encodePayloadWithModeAndLength, getVersionFor, getCharacterCountLength, getCharacterCount, getBitSizeForCode, addTerminalPadding, byteAlignData, createPadBytes, groupBlocks, encodePayloadWithPadding, byteToDec, getMessagePolynomial, getErrorCodeWords, interleaveBlocks, errorEncodeBlocks, errorEncodePaddedPayload, getVersionDimensions, createQrMatrix, matrixToCanvas, addDataToQrMatrix, encode } from "./wc-qr-code.js";
+import { getMode, encodeNumeric, encodeAlphaNumeric, toBinary, fromBinary, encodeBytes, encodePayloadWithModeAndLength, getVersionFor, getCharacterCountLength, getCharacterCount, getBitSizeForCode, addTerminalPadding, byteAlignData, createPadBytes, groupBlocks, encodePayloadWithPadding, byteToDec, getMessagePolynomial, getErrorCodeWords, interleaveBlocks, errorEncodeBlocks, errorEncodePaddedPayload, getFormatErrorBits, getFormatString, getVersionInfoString } from "./wc-qr-code.js";
 
 const bin = str => 
 	str[0].split("").filter(x => !/\s|\n|_/g.test(x)).map(x => parseInt(x));
@@ -11,7 +11,7 @@ describe("getMode", () => {
 		expect(getMode("123ABC")).toBe("alphanumeric");
 	});
 	it("gets byte", () => {
-		expect(getMode("http://foo#bar")).toBe("byte");
+		expect(getMode("http://foo#bar")).toBe("binary");
 	});
 });
 
@@ -67,30 +67,6 @@ describe("byteToDec", () => {
 		it(`Converts ${test[0]} array to ${test[1]}`, () => {
 			expect(byteToDec(test[0])).toBe(test[1]);
 		}));
-});
-
-describe("arrayChunk", () => {
-	it("chunks array", () => {
-		const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-		expect(arrayChunk(array, 3)).toEqual([
-			[1, 2, 3],
-			[4, 5, 6],
-			[7, 8, 9],
-			[10]
-		]);
-	});
-});
-
-describe("getVersionDimensions", () => {
-		[
-			[1, 21],
-			[2, 25],
-			[40, 177]
-		].forEach(test => 
-			it(`gets version dimensions for version ${test[0]}`, () => {
-				expect(getVersionDimensions(test[0])).toBe(test[1]);
-			})
-	);
 });
 
 describe("encodeNumeric", () => {
@@ -268,13 +244,13 @@ describe("getCharacterCountLength", () => {
 	[
 		[2, "numeric", 10],
 		[1, "alphanumeric", 9],
-		[5, "byte", 8],
+		[5, "binary", 8],
 		[17, "numeric", 12],
 		[19, "alphanumeric", 11],
-		[15, "byte", 16],
+		[15, "binary", 16],
 		[40, "numeric", 14],
 		[33, "alphanumeric", 13],
-		[35, "byte", 16]
+		[35, "binary", 16]
 	]
 		.forEach(test => it(`should get length ${test[2]} for ${test[0]},${test[1]}`, () =>
 			expect(getCharacterCountLength(test[0], test[1])).toBe(test[2]))
@@ -965,37 +941,36 @@ describe("errorEncodePaddedPayload", () => {
 	});
 });
 
-describe("createQrMatix", () => {
-	it("should create QR matrix", () => {
-		const matrix = createQrMatrix(1);
-		const canvas = matrixToCanvas(matrix);
-		canvas.style.width = "320px";
-		canvas.style.height = "320px";
-		canvas.style.imageRendering = "pixelated";
-		canvas.style.margin = "20px";
-		document.body.appendChild(canvas);
-	});
-	it("should create QR matrix", () => {
-		const matrix = createQrMatrix(8);
-		const canvas = matrixToCanvas(matrix);
-		canvas.style.width = "320px";
-		canvas.style.height = "320px";
-		canvas.style.imageRendering = "pixelated";
-		canvas.style.margin = "20px";
-		document.body.appendChild(canvas);
+describe("getFormatErrorBits", () => {
+	it("should get the error bits for format bit string", () => {
+		const result = getFormatErrorBits([0,1,1,0,0]);
+		expect(result).toEqual([1,0,0,0,1,1,1,1,0,1]);
 	});
 });
 
-fdescribe("addDataToQrMatrix", () => {
-	it("should create QR matrix", () => {
-		const payload = encode("HELLO WORLD", "Q")
-		const matrix = createQrMatrix(1);
-		addDataToQrMatrix(matrix, payload);
-		const canvas = matrixToCanvas(matrix);
-		canvas.style.width = "320px";
-		canvas.style.height = "320px";
-		canvas.style.imageRendering = "pixelated";
-		canvas.style.margin = "20px";
-		document.body.appendChild(canvas);
+describe("getFormatString", () => {
+	[
+		[["L", 4], bin`110011000101111`],
+		[["Q", 0], bin`011010101011111`],
+		[["Q", 1], bin`011000001101000`],
+		[["Q", 2], bin`011111100110001`],
+		[["Q", 3], bin`011101000000110`],
+		[["Q", 4], bin`010010010110100`],
+		[["Q", 5], bin`010000110000011`],
+		[["Q", 6], bin`010111011011010`],
+		[["Q", 7], bin`010101111101101`],
+	]
+	.forEach(([args, expected]) =>
+		it(`should get the format string for error: ${args[0]}, mask: ${args[1]}`, () => {
+			const result = getFormatString(args[0], args[1])
+			expect(result).toEqual(expected);
+		})
+	)
+});
+
+describe("getVersionInfoString", () => {
+	it("should get the version info string", () => {
+		const result = getVersionInfoString(7)
+		expect(result).toEqual(bin`000111110010010100`);
 	});
 });
