@@ -10,6 +10,7 @@ function loadImage(url) {
 }
 
 export class WcJsShaderCanvas extends HTMLElement {
+	#hasImage = false;
 	#image;
 	#height = 240;
 	#width = 320;
@@ -57,25 +58,30 @@ export class WcJsShaderCanvas extends HTMLElement {
 		const program = this.#mod
 			? this.#mod.default
 			: this.textContent.trim() !== ""
-				? new Function(["color", "Matrix", "Globals"], this.textContent)
+				? new Function(["color", "Matrix", "Globals", "attributes"], this.textContent)
 				: null;
 
 		if (!program || !this.#context) return;
+		if (this.#hasImage && !this.#image) return
 		this.#context.clearRect(0, 0, this.#width, this.#height);
 		if (this.#image) {
 			this.#context.drawImage(this.#image, 0, 0, this.#width, this.#height);
 		}
 
 		const imageData = this.#context.getImageData(0, 0, this.#width, this.#height);
+		const originalImageData = new ImageData(imageData.data.slice(0), imageData.width, imageData.height);
+
 		let i = 0;
 		while (i < imageData.data.length) {
 			const data = imageData.data;
+			const y = Math.floor(i / (imageData.width * 4));
+			const x = Math.floor(i / 4) % imageData.width;
 			const pixel = program([
 				data[i] / 255,
 				data[i + 1] / 255,
 				data[i + 2] / 255,
 				data[i + 3] / 255,
-			], Matrix, this.#globals);
+			], Matrix, this.#globals, { x, y, imageData: originalImageData });
 			data[i] = Math.floor(pixel[0] * 255);
 			data[i + 1] = Math.floor(pixel[1] * 255);
 			data[i + 2] = Math.floor(pixel[2] * 255);
@@ -85,6 +91,7 @@ export class WcJsShaderCanvas extends HTMLElement {
 		this.#context.putImageData(imageData, 0, 0);
 	}
 	set image(val) {
+		this.#hasImage = !!val;
 		loadImage(val)
 			.then(img => {
 				this.#image = img;
@@ -92,7 +99,7 @@ export class WcJsShaderCanvas extends HTMLElement {
 			});
 	}
 	set src(val) {
-		import(val)
+		import(new URL(val, window.location.href).toString())
 			.then(mod => {
 				this.#mod = mod;
 				this.update();

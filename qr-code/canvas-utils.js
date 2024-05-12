@@ -1,29 +1,46 @@
-export function arrayCanvasToCanvas(arrayCanvas) {
+export function arrayCanvasToCanvas(arrayCanvas, options) {
+	const scale = options?.scale ?? 1;
 	const canvas = document.createElement("canvas");
-	canvas.width = arrayCanvas.width;
-	canvas.height = arrayCanvas.height;
+	canvas.width = arrayCanvas.width * scale;
+	canvas.height = arrayCanvas.height * scale;
 	const context = canvas.getContext("2d");
 
-	drawArrayCanvas(context, arrayCanvas);
+	drawArrayCanvas(context, arrayCanvas, options);
 
 	return canvas;
 }
 
-export function drawArrayCanvas(context, arrayCanvas){
-	const pixels = context.getImageData(0, 0, arrayCanvas.height, arrayCanvas.width);
+export function drawArrayCanvas(context, arrayCanvas, options){
+	const scale = options?.scale ?? 1;
+	const height = scale * arrayCanvas.height;
+	const width = scale * arrayCanvas.width;
+	const pixels = context.getImageData(0, 0, height, width);
 	for (let row = 0; row < arrayCanvas.height; row++) {
 		for (let col = 0; col < arrayCanvas.width; col++) {
-			drawPixel(pixels, col, row, arrayCanvas.getPixel(col, row));
+			const px = arrayCanvas.getPixel(col, row);
+			for(let dx = 0; dx < scale; dx++){
+				for(let dy = 0; dy < scale; dy++){
+					drawPixel(pixels, (col * scale) + dx, (row * scale) + dy, px);
+				}
+			}
 		}
 	}
 	context.putImageData(pixels, 0, 0);
 }
 
-export function drawQrCanvas(context, qrCanvas) {
-	const pixels = context.getImageData(0, 0, qrCanvas.height, qrCanvas.width);
+export function drawQrCanvas(context, qrCanvas, options) {
+	const scale = options?.scale ?? 1;
+	const height = scale * qrCanvas.height;
+	const width = scale * qrCanvas.width;
+	const pixels = context.getImageData(0, 0, height, width);
 	for (let row = 0; row < qrCanvas.height; row++) {
 		for (let col = 0; col < qrCanvas.width; col++) {
-			drawPixel(pixels, col, row, qrCanvas.getMaskedPixel(col, row) ? 1 : 0);
+			const px = qrCanvas.getMaskedPixel(col, row) ? 1 : 0
+			for (let dx = 0; dx < scale; dx++) {
+				for (let dy = 0; dy < scale; dy++) {
+					drawPixel(pixels, (col * scale) + dx, (row * scale) + dy, px);
+				}
+			}
 		}
 	}
 	context.putImageData(pixels, 0, 0);

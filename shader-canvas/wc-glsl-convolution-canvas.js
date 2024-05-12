@@ -36,7 +36,7 @@ function compileShader(context, text, type) {
 	return shader;
 }
 
-function createDataTexture(context, data, textureIndex = 1, width = 32, height = 32){
+function createDataTexture(context, data, textureIndex = 1, width = 32, height = 32) {
 	context.activeTexture(context.TEXTURE0 + textureIndex);
 	const texture = context.createTexture();
 	context.bindTexture(context.TEXTURE_2D, texture);
@@ -76,6 +76,8 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 	#kernel = indentityKernel;
 	#kernelWidth = 3;
 	#kernelHeight = 3;
+	#height = 240;
+	#width = 320;
 	ready = new Promise(res => { this.#setReady = res; });
 	constructor() {
 		super();
@@ -103,9 +105,9 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 				<style>
 					:host { display: block; }
 					#message { display: none; }
-					canvas { image-rendering: pixelated; width: 180px; height: 180px; }
+					canvas { image-rendering: pixelated; }
 				</style>
-				<canvas width="180" height="180"></canvas>
+				<canvas width="${this.#width}" height="${this.#height}"></canvas>
 			`;
 	}
 	cacheDom() {
@@ -133,7 +135,7 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 		this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, indexBuffer);
 		this.context.bufferData(this.context.ELEMENT_ARRAY_BUFFER, indicies, this.context.STATIC_DRAW);
 	}
-	createAttributes(){
+	createAttributes() {
 		bindAttribute(this.context, [
 			-1.0, -1.0,
 			1.0, -1.0,
@@ -173,7 +175,7 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 					uv = aUv;
 				}
 			`, this.context.VERTEX_SHADER);
-	
+
 		const fragmentShader = compileShader(this.context, `#version 300 es
 				precision highp float;
 				
@@ -212,7 +214,7 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 		this.context.useProgram(this.#program);
 	}
 	createUniforms() {
-		if(!this.#image) return;
+		if (!this.#image) return;
 		createTexture(this.context, this.#image, 0);
 		const imgLocation = this.context.getUniformLocation(this.#program, "sampler");
 		this.context.uniform1i(imgLocation, 0);
@@ -246,7 +248,7 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 			});
 	}
 	set kernel(val) {
-		const valMatrix = typeof(val) === "string"
+		const valMatrix = typeof (val) === "string"
 			? JSON.parse(val)
 			: val;
 
@@ -255,11 +257,25 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 		this.#kernel = new Float32Array(valMatrix.flat());
 		this.#kernelWidth = width;
 		this.#kernelHeight = height;
-		
+
 		this.ready.then(() => {
 			this.createUniforms();
 			this.render();
 		});
+	}
+	set height(val) {
+		val = parseInt(val);
+		this.#height = val;
+		if (this.dom) {
+			this.dom.canvas.height = val;
+		}
+	}
+	set width(val) {
+		val = parseInt(val);
+		this.#width = val;
+		if (this.dom) {
+			this.dom.canvas.width = val;
+		}
 	}
 	//TODO: throw away program on detach
 }

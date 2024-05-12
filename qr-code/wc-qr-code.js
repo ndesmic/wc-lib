@@ -398,7 +398,7 @@ export function errorEncodePaddedPayload(paddedPayload, version, errorCorrection
 customElements.define("wc-qr-code",
 	class extends HTMLElement {
 		static get observedAttributes(){
-			return ["payload", "errorlevel", "mask"]
+			return ["payload", "errorlevel", "mask", "scale"]
 		}
 		constructor(){
 			super();
@@ -440,11 +440,14 @@ customElements.define("wc-qr-code",
 			if(version >= 7){
 				matrix.drawVersionInfoString(getVersionInfoString(version));
 			}
+			const scale = this.scale
+				? parseInt(this.scale)
+				: 1;
 
-			this.dom.qr.height = matrix.height;
-			this.dom.qr.width = matrix.width;
+			this.dom.qr.height = matrix.height * scale;
+			this.dom.qr.width = matrix.width * scale;
 			const context = this.dom.qr.getContext("2d");
-			drawQrCanvas(context, matrix);
+			drawQrCanvas(context, matrix, { scale });
 		}
 		attributeChangedCallback(name, oldValue, newValue) {
 			this[name] = newValue;
