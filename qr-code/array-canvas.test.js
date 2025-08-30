@@ -1,3 +1,5 @@
+import { describe, it } from "@std/testing/bdd";
+import { expect } from "@std/expect";
 import { ArrayCanvas } from "./array-canvas.js";
 
 describe("ArrayCanvas", () => {

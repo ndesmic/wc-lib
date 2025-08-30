@@ -63,35 +63,40 @@ function setPx(imageData, col, row, val) {
 	]
 }
 
-
+/***
+ * @param {Object} kernel
+ * @param {number[]} kernel.data
+ * @param {number[]} kernel.shape  
+ */
 function convolute(imageData, kernel, oobBehavior = { x: "clamp", y: "clamp" }) {
 	const output = new ImageData(imageData.width, imageData.height);
-	const kRowMid = (kernel.length - 1) / 2; //kernels should have odd dimensions
-	const kColMid = (kernel[0].length - 1) / 2;
+	const kRowMid = (kernel.shape[0] - 1) / 2; //kernels should have odd dimensions
+	const kColMid = (kernel.shape[1] - 1) / 2;
 
 	for (let row = 0; row < imageData.height; row++) {
 		for (let col = 0; col < imageData.width; col++) {
 
-			const sum = [0,0,0];
-			for (let kRow = 0; kRow < kernel.length; kRow++) {
-				for (let kCol = 0; kCol < kernel[kRow].length; kCol++) {
+			const sum = [0, 0, 0];
+			for (let kRow = 0; kRow < kernel.shape[1]; kRow++) {
+				for (let kCol = 0; kCol < kernel.shape[0]; kCol++) {
 					const sampleRow = row + (-kRowMid + kRow);
 					const sampleCol = col + (-kColMid + kCol);
-					if(oobBehavior.x === "omit" && (sampleCol >= imageData.width || sampleCol < 0)) continue;
-					if(oobBehavior.y === "omit" && (sampleRow >= imageData.height || sampleRow < 0)) continue;
-					
+					if (oobBehavior.x === "omit" && (sampleCol >= imageData.width || sampleCol < 0)) continue;
+					if (oobBehavior.y === "omit" && (sampleRow >= imageData.height || sampleRow < 0)) continue;
+
 					let color;
-					if (Array.isArray(oobBehavior.x) && (sampleCol >= imageData.width || sampleCol < 0)){
+					if (Array.isArray(oobBehavior.x) && (sampleCol >= imageData.width || sampleCol < 0)) {
 						color = oobBehavior.x;
-					} else if (Array.isArray(oobBehavior.y) && (sampleRow >= imageData.height || sampleRow < 0)) {  
+					} else if (Array.isArray(oobBehavior.y) && (sampleRow >= imageData.height || sampleRow < 0)) {
 						color = oobBehavior.y;
 					} else {
 						color = sample(imageData, sampleRow, sampleCol, oobBehavior);
 					}
 
-					sum[0] += color[0] * kernel[kRow][kCol];
-					sum[1] += color[1] * kernel[kRow][kCol];
-					sum[2] += color[2] * kernel[kRow][kCol];
+					const kernelValue = kernel.data[kRow * kernel.shape[0] + kCol];
+					sum[0] += color[0] * kernelValue;
+					sum[1] += color[1] * kernelValue;
+					sum[2] += color[2] * kernelValue;
 				}
 			}
 
@@ -102,20 +107,23 @@ function convolute(imageData, kernel, oobBehavior = { x: "clamp", y: "clamp" }) 
 	return output;
 }
 
-const indentityKernel = [
-	[0, 0, 0],
-	[0, 1, 0],
-	[0, 0, 0]
+const identityKernel = [
+	0, 0, 0,
+	0, 1, 0,
+	0, 0, 0
 ];
 
 export class WcJsConvolutionCanvas extends HTMLElement {
 	#image;
 	#context;
-	#kernel = indentityKernel;
+	#kernel = identityKernel;
+	#shape = [3, 3];
 	#edges; //"clamp", "wrap", "mirror", "omit"
+	#height = 240;
+	#width = 320;
 	#defaultEdgeValue = 0.0;
 
-	static observedAttributes = ["image", "kernel", "edges"];
+	static observedAttributes = ["image", "kernel", "shape", "edges"];
 	constructor() {
 		super();
 		this.bind(this);
@@ -132,12 +140,10 @@ export class WcJsConvolutionCanvas extends HTMLElement {
 				 display: block;
 			 }
 			 canvas {
-				width: 180px;
-				height: 180px;
 				image-rendering: pixelated;
 			 }
 			</style>
-            <canvas width="640" height="480"></canvas>
+            <canvas width="${this.#height}" height="${this.#width}"></canvas>
         `;
 	}
 	connectedCallback() {
@@ -164,7 +170,7 @@ export class WcJsConvolutionCanvas extends HTMLElement {
 		}
 
 		const imageData = this.#context.getImageData(0, 0, this.dom.canvas.width, this.dom.canvas.height);
-		const convolutedImageData = convolute(imageData, this.#kernel, this.#edges ? { x: this.#edges, y: this.#edges } : undefined );
+		const convolutedImageData = convolute(imageData, { data: this.#kernel, shape: this.#shape }, this.#edges ? { x: this.#edges, y: this.#edges } : undefined);
 		this.#context.putImageData(convolutedImageData, 0, 0);
 	}
 	set image(val) {
@@ -176,13 +182,31 @@ export class WcJsConvolutionCanvas extends HTMLElement {
 				this.update();
 			});
 	}
-	set edges(val){
+	set edges(val) {
 		val = val.trim();
 		this.#edges = val.startsWith("[") ? JSON.parse(val) : val;
 	}
 	set kernel(val) {
 		this.#kernel = Array.isArray(val) ? val : JSON.parse(val);
 		this.update();
+	}
+	set shape(val) {
+		this.#shape = Array.isArray(val) ? val : JSON.parse(val);
+		this.update();
+	}
+	set height(val) {
+		val = parseInt(val);
+		this.#height = val;
+		if (this.dom) {
+			this.dom.canvas.height = val;
+		}
+	}
+	set width(val) {
+		val = parseInt(val);
+		this.#width = val;
+		if (this.dom) {
+			this.dom.canvas.width = val;
+		}
 	}
 }
 

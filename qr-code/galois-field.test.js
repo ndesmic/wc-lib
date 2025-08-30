@@ -1,3 +1,5 @@
+import { describe, it } from "@std/testing/bdd";
+import { expect } from "@std/expect";
 import { GaloisField } from "./galois-field.js";
 
 //https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders

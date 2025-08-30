@@ -17,14 +17,14 @@ export function roundDown(value, increment) {
 }
 
 export const masks = [
-	(r, c) => (r + c) % 2,
-	(r, c) => r % 2,
-	(r, c) => c % 3,
-	(r, c) => (r + c) % 2,
-	(r, c) => (Math.floor(r / 2) + Math.floor(c / 3)) % 2,
-	(r, c) => ((r * c) % 2) + ((r * c) % 3),
-	(r, c) => (((r * c) % 2) + ((r * c) % 3)) % 2,
-	(r, c) => (((r + c) % 2) + ((r * c) % 3)) % 2
+	(c, r) => (r + c) % 2,
+	(c, r) => r % 2,
+	(c, r) => c % 3,
+	(c, r) => (r + c) % 2,
+	(c, r) => (Math.floor(r / 2) + Math.floor(c / 3)) % 2,
+	(c, r) => ((r * c) % 2) + ((r * c) % 3),
+	(c, r) => (((r * c) % 2) + ((r * c) % 3)) % 2,
+	(c, r) => (((r + c) % 2) + ((r * c) % 3)) % 2
 ];
 
 export function getAlignmentPositions(version) {
@@ -393,13 +393,13 @@ export class QrCanvas extends ArrayCanvas {
 	applyMask(mask) {
 		this.#mask = mask;
 	}
-	getMaskedPixel(x, y) {
-		const px = this.getPixel(x, y);
+	getMaskedPixel(col, row) {
+		const px = this.getPixel(col, row);
 		if (px === 3) return true;
 		if (px === 2) return false;
 		if (!this.#mask) return px === 1;
 
-		if (this.#mask(x, y) == 0) {
+		if (this.#mask(col, row) == 0) {
 			return px !== 1;
 		} else {
 			return px === 1;

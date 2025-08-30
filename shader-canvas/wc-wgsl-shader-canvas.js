@@ -126,13 +126,13 @@ export class WcWgslShaderCanvas extends HTMLElement {
 		const textureSize = {
 			width: this.#image.width,
 			height: this.#image.height,
-			depth: 1
+			depthOrArrayLayers: 1
 		};
 		this.#texture = this.#device.createTexture({
 			size: textureSize,
 			dimension: '2d',
 			format: `rgba8unorm`,
-			usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.SAMPLED
+			usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
 		});
 
 		this.#device.queue.copyExternalImageToTexture({
@@ -151,13 +151,14 @@ export class WcWgslShaderCanvas extends HTMLElement {
 		});
 	}
 	async updateShader() {
-		if(!this.#src && !this.dom.script) return;
+		if (!this.#src && !this.dom.script) return;
 		await this.#ready;
 
 		this.#shaderModule = this.#device.createShaderModule({
 			code: this.#src ? this.#src : this.dom.script?.textContent
 		});
 		const pipelineDescriptor = {
+			label: "canvas-pipeline",
 			vertex: {
 				module: this.#shaderModule,
 				entryPoint: "vertex_main",
@@ -174,7 +175,8 @@ export class WcWgslShaderCanvas extends HTMLElement {
 			},
 			primitive: {
 				topology: "triangle-list"
-			}
+			},
+			layout: "auto"
 		};
 
 		this.#renderPipeline = this.#device.createRenderPipeline(pipelineDescriptor);
@@ -191,6 +193,7 @@ export class WcWgslShaderCanvas extends HTMLElement {
 				{
 					loadValue: clearColor,
 					storeOp: "store",
+					loadOp: "load",
 					view: this.#context.getCurrentTexture().createView()
 				}
 			]
@@ -232,7 +235,7 @@ export class WcWgslShaderCanvas extends HTMLElement {
 		}
 
 		passEncoder.draw(6); //TODO need index buffer
-		passEncoder.endPass();
+		passEncoder.end();
 		this.#device.queue.submit([commandEncoder.finish()]);
 	}
 	set image(val) {

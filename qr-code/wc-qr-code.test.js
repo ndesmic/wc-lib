@@ -1,3 +1,5 @@
+import { describe, it } from "@std/testing/bdd";
+import { expect } from "@std/expect";
 import { getMode, encodeNumeric, encodeAlphaNumeric, toBinary, fromBinary, encodeBytes, encodePayloadWithModeAndLength, getVersionFor, getCharacterCountLength, getCharacterCount, getBitSizeForCode, addTerminalPadding, byteAlignData, createPadBytes, groupBlocks, encodePayloadWithPadding, byteToDec, getMessagePolynomial, getErrorCodeWords, interleaveBlocks, errorEncodeBlocks, errorEncodePaddedPayload, getFormatErrorBits, getFormatString, getVersionInfoString } from "./wc-qr-code.js";
 
 const bin = str => 
