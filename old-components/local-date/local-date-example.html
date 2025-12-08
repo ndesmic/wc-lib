@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Local Date Example</title>
+	<link rel="manifest" href="manifest.json">
+	<link rel="stylesheet" href="../../css/system.css">
+	</link>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+</head>
+
+<body>
+	<style></style>
+	<button id="add-hour">Add Hour</button>
+	<button id="subtract-hour">Subtract Hour</button>
+	<button id="date-style">Date Style</button>
+	<button id="time-style">Time Style</button>
+	<wc-local-date value="2020-11-06T01:00:00Z" date-style="short">2020-11-06T01:00:00Z</wc-local-date>
+	<script src="wc-local-date.js" type="module"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			const addHourBtn = document.querySelector("#add-hour");
+			const subHourBtn = document.querySelector("#subtract-hour");
+			const dateStyleBtn = document.querySelector("#date-style");
+			const timeStyleBtn = document.querySelector("#time-style");
+			const localDate = document.querySelector("wc-local-date");
+
+			const hour = (1000 * 60 * 60);
+			const format = ["full", "long", "medium", "short"];
+			let date = new Date();
+			let dateStyleIndex = 0;
+			let timeStyleIndex = 0;
+			
+
+			addHourBtn.addEventListener("click", () => {
+				date = new Date(date.getTime() + hour);
+				localDate.value = date;
+			});
+			subHourBtn.addEventListener("click", () => {
+				date = new Date(date.getTime() - hour);
+				localDate.value = date;
+			});
+			dateStyleBtn.addEventListener("click", () => {
+				dateStyleIndex = (dateStyleIndex + 1) % 4;
+				localDate.dateStyle = format[dateStyleIndex];
+			});
+			timeStyleBtn.addEventListener("click", () => {
+				timeStyleIndex = (timeStyleIndex + 1) % 4;
+				localDate.timeStyle = format[timeStyleIndex];
+			});
+		});
+	</script>
+</body>
+
+</html>

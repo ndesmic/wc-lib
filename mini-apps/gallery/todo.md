@@ -1,0 +1,3 @@
+- [ ] Get it working
+    - [ ] Show image grid
+    - [ ] Lightbox on click

@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Graph</title>
+		<link rel="stylesheet" href="../../css/system.css"></link>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+		<style>
+			wc-graph-svg, wc-graph-canvas, wc-graph-gl, wc-graph-wgpu, wc-graph-css {
+				display: block;
+			}
+		</style>
+	</head>
+	<body>
+
+		<h1>SVG</h1>
+		<!--
+		<wc-graph-svg points='[[10,10], [20,20], [30,30], [40,40], [10,20,"blue"], [20,30,"blue"], [70,95,"blue"],[-20,-20,"magenta", 2.5, "square"]]'></wc-graph-svg>
+
+		<wc-graph-svg points='[[10,10], [20,20], [30,30], [40,40], [10,20,"blue"], [20,30,"blue"], [70,95,"blue"]]'>
+		</wc-graph-svg>
+		<wc-graph-svg id="test1"></wc-graph-svg>
+
+		
+		<wc-graph-svg func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.01">
+		</wc-graph-svg>
+
+		<wc-graph-svg func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.05">
+		</wc-graph-svg>
+
+		<wc-graph-svg func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.01" width="1280" height="720" continuous default-size="4" default-color="blue" thickness="2">
+		</wc-graph-svg>-->
+
+		<wc-graph-svg func="return x * x * (3 - 2 * x)" xmin="0" xmax="1" step="0.01" width="1280" height="720" continuous default-size="4" default-color="blue" thickness="2" fit>
+		</wc-graph-svg>
+
+		
+		<h1>WebGL</h1>
+
+		<wc-graph-gl
+			points='[[10,10], [20,20], [30,30], [40,40], [10,20,0,0,1,1], [20,30,0,0,1,1], [70,95,0,0,1,1],[-20,-20,1,0,1,1,10]]'></wc-graph-gl>
+		<wc-graph-gl points='[[10,10], [20,20], [30,30], [40,40], [10,20,0,0,0,1], [20,30,0,0,1,1], [70,95,0,0,1,1]]'></wc-graph-gl>
+		
+		<wc-graph-gl id="test2"></wc-graph-gl>
+		
+		<wc-graph-gl func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.01">
+		</wc-graph-gl>
+		
+		<wc-graph-gl func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.05">
+		</wc-graph-gl>
+		<wc-graph-gl func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.01" width="1280" height="720" continuous
+			default-size="8" default-color="[0,0,1,1]" thickness="2">
+		</wc-graph-gl>
+
+
+		<h1>Canvas</h1>
+
+		<wc-graph-canvas
+			points='[[10,10], [20,20], [30,30], [40,40], [10,20,"blue"], [20,30,"blue"], [70,95,"blue"],[-20,-20,"magenta", 5, "square"]]'>
+		</wc-graph-canvas>
+		<wc-graph-canvas points='[[10,10], [20,20], [30,30], [40,40], [10,20,"blue"], [20,30,"blue"], [70,95,"blue"]]'>
+		</wc-graph-canvas>
+		
+		<wc-svg-canvas id="test3">
+		</wc-graph-canvas>
+	
+		<wc-graph-canvas func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.01">
+		</wc-graph-canvas>
+	
+		<wc-graph-canvas func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.05">
+		</wc-graph-canvas>
+		<wc-graph-canvas func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.01" width="1280" height="720" continuous
+			default-size="4" default-color="blue" thickness="2">
+		</wc-graph-canvas>
+
+
+		<h1>CSS</h1>
+
+		<wc-graph-css points='[[10,10], [20,20], [30,30], [40,40], [10,20,"blue"], [20,30,"blue"], [70,95,"blue"],[-20,-20,"magenta", 2.5, "square"]]'></wc-graph-css>
+		<wc-graph-css points='[[10,10], [20,20], [30,30], [40,40], [10,20,"blue"], [20,30,"blue"], [70,95,"blue"]]'>
+		</wc-graph-css>
+		<wc-graph-css id="test4"></wc-graph-css>
+
+		<wc-graph-css func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.01">
+		</wc-graph-css>
+		
+		<wc-graph-css func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.05">
+		</wc-graph-css>
+		
+		<wc-graph-css func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.01" width="1280" height="720" continuous
+			default-size="4" default-color="blue" thickness="2">
+		</wc-graph-css>
+
+		<h1>Web GPU</h1>
+
+		<wc-graph-wgpu
+			points='[[10,10], [20,20], [30,30], [40,40], [10,20,0,0,1,1], [20,30,0,0,1,1], [70,95,0,0,1,1],[-20,-20,1,0,1,1,10]]'>
+		</wc-graph-wgpu>
+		<wc-graph-wgpu points='[[10,10], [20,20], [30,30], [40,40], [10,20,0,0,0,1], [20,30,0,0,1,1], [70,95,0,0,1,1]]'>
+		</wc-graph-wgpu>
+		<wc-graph-wgpu id="test5"></wc-graph-wgpu>
+
+		<wc-graph-wgpu func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.01">
+		</wc-graph-wgpu>
+		<wc-graph-wgpu func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.05">
+		</wc-graph-wgpu>
+		<wc-graph-wgpu func="return 75 * Math.sin(5 * x)" xmin="-3" xmax="3" step="0.01" width="1280" height="720" continuous
+			default-size="8" default-color="[0,0,1,1]" thickness="2">
+		</wc-graph-wgpu>
+
+		<script src="wc-graph-svg.js" type="module"></script>
+		<script src="wc-graph-gl.js" type="module"></script>
+		<script src="wc-graph-canvas.js" type="module"></script>
+		<script src="wc-graph-css.js" type="module"></script>
+		<script src="wc-graph-wgpu.js" type="module"></script>
+		<script src="graph-example.js" type="module"></script>
+	</body>
+</html>

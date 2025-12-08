@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Encryptor FS</title>
+		<link rel="stylesheet" href="../../css/system.css">
+		<link rel="stylesheet" href="./encryptor-fs.css">
+	</head>
+	<body>
+		<div class="stack stretch gap2 full-width padding3">
+			<h2>Encrypted file system explorer</h2>
+			<a href="../../index.html">Back</a>
+			<ma-decrypt-file-system class="stack stretch gap2 full-width">
+				<div class="main-controls">
+					<div class="stack stretch passphrase-input">
+						<label for="decrypt-file-system-passphrase">Passphrase</label>
+						<wc-unhide-password-decorator>
+							<input
+								type="password"
+								id="decrypt-file-system-passphrase"
+								class="decrypt-file-system-passphrase"
+							>
+						</wc-unhide-password-decorator>
+					</div>
+					<div class="stack stretch hint-input">
+						<label for="decrypt-file-system-passphrase-hint">Passphrase hint</label>
+						<input
+							type="text"
+							id="decrypt-file-system-passphrase-hint"
+							class="decrypt-file-system-passphrase-hint"
+						>
+					</div>
+					<div class="stack stretch gap1 buttons">
+						<button id="decrypt-file-system-picker" class="decrypt-file-system-picker">
+							📂 Open filesystem
+						</button>
+						<button id="encrypt-file-button" class="encrypt-file-button">
+							🔒 Encrypt selected
+						</button>
+						<button id="decrypt-file-button" class="decrypt-file-button">
+							🔓 Decrypt selected
+						</button>
+						<button id="delete-file-button" class="delete-file-button">
+							🗑️ Delete selected
+						</button>
+					</div>
+				</div>
+                <div class="three-one-grid constrained-height">
+                    <wc-directory-listing icon-map="crypt:🔒"></wc-directory-listing>
+                    <wc-file-preview class="full-height overflow-y"></wc-file-preview>
+                </div>
+				<output id="decrypt-fs-output" class="decrypt-fs-output"></output>
+			</ma-decrypt-file-system>
+		</div>
+        <script src="./ma-decrypt-file-system.js" type="module"></script>
+        <script src="../../components/wc-directory-listing.js" type="module"></script>
+        <script src="../../components/wc-file-preview.js" type="module"></script>
+		<script src="../../components/wc-unhide-password-decorator.js" type="module"></script>
+	</body>
+</html>

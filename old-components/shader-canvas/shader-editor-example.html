@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Shader Editor</title>
+		<link rel="stylesheet" href="../css/index.css"></link>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	</head>
+	<body>
+        <h1>WGSL Editor</h1>
+        <wc-wgsl-shader-editor image="image.jpg">
+            <script type="wgsl">
+            const U32_MAX: u32 = 4294967295u;
+            const SCREEN_WIDTH = 320;
+            
+            fn seed_per_thread(id: u32) -> u32 {
+                return id * 1099087573u;
+            }
+            fn taus_step(z: u32, s1: u32, s2: u32, s3: u32, m: u32) -> u32 {
+                let b = ((z << s1) ^ z) >> s2;
+                return ((z & m) << s3) ^ b;
+            }
+            fn lcg_step(z: u32, a: u32, c: u32) -> u32 {
+                return a * z + c;
+            }
+            fn hybrid_taus(z1: u32, z2: u32, z3: u32, z4: u32) -> f32 {
+                let r = taus_step(z1, 13u, 19u, 12u, 4294967294u) ^
+                        taus_step(z2, 2u, 25u, 4u, 4294967288u) ^
+                        taus_step(z3, 3u, 11u, 17u, 4294967280u) ^
+                        lcg_step(z4, 1664525u, 1013904223u);
+                return f32(r) * 2.3283064365387e-10;
+            }
+
+            fn rand_uint(last_r: u32) -> u32 {
+                let z1 = taus_step(last_r, 13u, 19u, 12u, 429496729u);
+                let z2 = taus_step(last_r, 2u, 25u, 4u, 4294967288u);
+                let z3 = taus_step(last_r, 3u, 11u, 17u, 429496280u);
+                let z4 = lcg_step(1664525, last_r, 1013904223u);
+                return (z1 ^ z2 ^ z3 ^ z4);
+            }
+
+            fn uint_to_normalized_float(value: u32) -> f32 {
+                return f32(value) / (f32(U32_MAX) + 1.0); //+1 to account for 0
+            }
+
+
+            @group(0) @binding(0) var my_sampler: sampler;
+            @group(0) @binding(1) var my_texture: texture_2d<f32>;
+
+            struct VertexOut {
+                @builtin(position) position : vec4<f32>,
+                @location(0) uv : vec2<f32>
+            };
+
+            @vertex
+            fn vertex_main(@location(0) position: vec2<f32>, @location(1) uv: vec2<f32>) -> VertexOut
+            {
+                var output : VertexOut;
+                output.position = vec4<f32>(position, 0.0, 1.0);
+                output.uv = uv;
+                return output;
+            }
+
+            @fragment
+            fn fragment_main(frag_data: VertexOut) -> @location(0) vec4<f32>
+            {
+                let id = u32(frag_data.position.x) + (u32(frag_data.position.y) * SCREEN_WIDTH);
+                let seed = seed_per_thread(id);
+
+                let int_r = rand_uint(seed);
+                let int_g = rand_uint(int_r);
+                let int_b = rand_uint(int_g);
+
+                let r = uint_to_normalized_float(int_r);
+                let b = uint_to_normalized_float(int_g);
+                let g = uint_to_normalized_float(int_b);
+                
+                return vec4(r, g, b, 1.0);
+            }
+            </script>
+        </wc-wgsl-shader-editor>
+        <script src="wc-wgsl-shader-editor.js" type="module"></script>
+	</body>
+</html>

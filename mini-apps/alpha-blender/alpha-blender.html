@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Alpha Blender</title>
+		<link rel="stylesheet" href="../../css/system.css">
+	</head>
+	<body class="center">
+		<a href="../../index.html">Back</a>
+		<main class="constrained-width constrained-height">
+			<div class="stack gap2 card full-width">
+				<h1>Alpha Blender</h1>
+
+				<div class="stack gap1">
+					<label for="top-color">Top Color</label>
+					<input type="color" id="top-color" value="#000000">
+				</div>
+				<div class="stack gap1">
+					<label for="bottom-color">Bottom Color</label>
+					<input type="color" id="bottom-color" value="#FFFFFF">
+				</div>
+				<div class="stack gap1">
+					<label for="alpha">Alpha</label>
+					<input type="number" id="alpha" value="0.5">
+				</div>
+				<div class="stack gap1">
+					<label for="output">Result</label>
+					<output id="output"></output>
+					<div id="swatch" class="swatch"></div>
+				</div>
+			</div>
+		</main>
+		<script src="./alpha-blender.js" type="module"></script>
+	</body>
+</html>

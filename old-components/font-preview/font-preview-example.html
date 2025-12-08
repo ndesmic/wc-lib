@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Font Drop</title>
+		<link rel="stylesheet" href="../../css/system.css"></link>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	</head>
+	<body>
+		<h1>Font Drop</h1>
+		<label for="range">Range</label>
+		<input id="range" type="text" placeholder="0x00-0xFF" />
+		<wc-font-preview range="0xE900-0xEA00"></wc-font-preview>
+		<script src="wc-font-preview.js" type="module"></script>
+		<script>
+			const range = document.querySelector("#range");
+			const fontPreview = document.querySelector("wc-font-preview")
+			range.addEventListener("change", () => {
+				fontPreview.range = range.value;
+			});
+		</script>
+	</body>
+</html>

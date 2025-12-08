@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Color Converter</title>
+		<link rel="stylesheet" href="../../css/system.css">
+	</head>
+	<body class="center">
+		<a href="../../index.html">Back</a>
+		<main class="constrained-width constrained-height">
+			<div class="stack gap2 card full-width">
+				<h1>Color Converter</h1>
+                <ma-color-converter class="stack gap3">
+                    <div class="stack gap1">
+                        <label for="input-color">Color</label>
+                        <input type="text" id="input-color" class="input-color" value="#000000">
+                    </div>
+                    <div class="stack gap1">
+                        <mc-swatch></mc-swatch>
+                        <div class="stack gap1">
+                            <label for="output-rgb-hex">RGB (hex)</label>
+                            <output id="output-rgb-hex" class="output-rgb-hex"></output>
+                        </div>
+                        <div class="stack gap1">
+                            <label for="output-rgb-int">RGB (int)</label>
+                            <output id="output-rgb-int" class="output-rgb-int"></output>
+                        </div>
+                        <div class="stack gap1">
+                            <label for="output-rgb-float">RGB (float)</label>
+                            <output id="output-rgb-float" class="output-rgb-float"></output>
+                        </div>
+                    </div>
+                </div>
+            </ma-color-converter>
+		</main>
+		<script src="./ma-color-converter.js" type="module"></script>
+	</body>
+</html>

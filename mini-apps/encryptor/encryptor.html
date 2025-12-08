@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+	<title>Encryptor</title>
+	<link rel="stylesheet" href="../../css/system.css">
+</head>
+<body class="center">
+	<a href="../../index.html">Back</a>
+	<main class="constrained-width constrained-height">
+		<div class="stack gap2 card full-width full-height overflow-y">
+			<h1>Encryptor</h1>
+			<wc-tab-panel class="full-width flex-grow">
+				<div slot="tab">Encrypt Text</div>
+				<div slot="tab">Decrypt Text</div>
+				<div slot="tab">Encrypt File</div>
+				<div slot="tab">Decrypt File</div>
+				<div slot="tab">Decrypt File System</div>
+				<div slot="content">
+					<div class="stack stretch gap2 full-height">
+						<h2>Encrypt text</h2>
+						<ma-encrypt-text class="stack stretch gap1 flex-grow">
+							<label for="encrypt-text-passphrase">Passphrase</label>
+							<wc-unhide-password-decorator attached>
+								<input type="password" id="encrypt-text-passphrase" class="encrypt-text-passphrase">
+							</wc-unhide-password-decorator>
+							<label for="encrypt-input-text">Input text</label>
+							<textarea id="encrypt-input-text" class="encrypt-input-text"></textarea>
+							<label for="encrypt-output-text">Output text</label>
+							<wc-copy-button-decorator inline>
+								<output id="encrypt-output-text" class="encrypt-output-text" class="flex-grow"></output>
+							</wc-copy-button-decorator>
+						</ma-encrypt-text>
+					</div>
+				</div>
+				<div slot="content">
+					<ma-decrypt-text class="stack stretch gap2 full-height">
+						<h2>Decrypt text</h2>
+						<div class="stack stretch gap1 flex-grow">
+							<label for="decrypt-text-passphrase">Passphrase</label>
+							<wc-unhide-password-decorator>
+								<input type="password" id="decrypt-text-passphrase" class="decrypt-text-passphrase">
+							</wc-unhide-password-decorator>
+							<label for="decrypt-input-text">Input text</label>
+							<textarea id="decrypt-input-text" class="decrypt-input-text"></textarea>
+							<label for="decrypt-output-text">Output text</label>
+							<wc-copy-button-decorator>
+								<output id="decrypt-output-text" class="decrypt-output-text" class="flex-grow"></output>
+							</wc-copy-button-decorator>
+						</div>
+					</ma-decrypt-text>
+				</div>
+				<div slot="content">
+					<div class="stack stretch gap2">
+						<h2>Encrypt file</h2>
+						<ma-encrypt-file class="stack stretch gap2">
+							<label for="encrypt-file-passphrase">Passphrase</label>
+							<wc-unhide-password-decorator>
+								<input type="password" id="encrypt-file-passphrase" class="encrypt-file-passphrase">
+							</wc-unhide-password-decorator>
+							<label for="encrypt-file-passphrase-hint">Passphrase Hint</label>
+							<input type="text" id="encrypt-file-passphrase-hint" class="encrypt-file-passphrase-hint">
+							<label for="encrypt-input-file">Input file</label>
+							<label file-label>
+								<input type="file" id="encrypt-input-file" class="encrypt-input-file">
+							</label>
+							<button id="encrypt-output-file" class="encrypt-output-file" disabled>Download</button>
+						</ma-encrypt-file>
+					</div>
+				</div>
+				<div slot="content">
+					<div class="stack stretch gap2">
+						<h2>Decrypt file</h2>
+						<ma-decrypt-file class="stack stretch gap2">
+							<label for="decrypt-file-passphrase">Passphrase</label>
+							<wc-unhide-password-decorator>
+								<input type="password" id="decrypt-file-passphrase" class="decrypt-file-passphrase">
+							</wc-unhide-password-decorator>
+							<label for="decrypt-input-file">Input file</label>
+							<label file-label>
+								<input type="file" id="decrypt-input-file" class="decrypt-file-file">
+							</label>
+							<wc-file-preview id="decrypt-file-preview" class="decrypt-file-preview"></wc-file-preview>
+							<button id="decrypt-output-file" class="decrypt-file-download" disabled>Download</button>
+							<output id="decrypt-file-output" class="decrypt-file-output"></output>
+						</ma-decrypt-file>
+					</div>
+				</div>
+			</wc-tab-panel>
+		</div>
+	</main>
+	<script src="../../components/wc-tab-panel.js" type="module"></script>
+	<script src="../../components/wc-file-preview.js" type="module"></script>
+	<script src="../../components/wc-copy-button-decorator.js" type="module"></script>
+	<script src="../../components/wc-unhide-password-decorator.js" type="module"></script>
+	<script src="./ma-encrypt-text.js" type="module"></script>
+	<script src="./ma-decrypt-text.js" type="module"></script>
+	<script src="./ma-encrypt-file.js" type="module"></script>
+	<script src="./ma-decrypt-file.js" type="module"></script>
+	<script src="./ma-decrypt-file-system.js" type="module"></script>
+</body>
+</html>

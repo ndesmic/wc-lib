@@ -1,0 +1,438 @@
+@view-transition {
+	navigation: auto;
+}
+:root{
+	/*settings*/
+	--primary-color: oklch(0.4733 0.1628 315.53);
+	/*--complimentary: #0000ff - automatic if not defined*/
+	--neutral-color: oklch(0.5 0 0);
+	--warn-color: oklch(0.8 0.4 106);
+	--negative: oklch(0.5 0.5 50);
+	--info-color: oklch(0.5 0.4 270);
+	--positive-color: oklch(0.5 0.75 135);
+	--color-ramp-interval: 40%;
+	--border-radius: 0.3125rem;
+
+	color-scheme: light dark;
+    interpolate-size: allow-keywords;
+
+	/*neutrals*/
+	--neutral-darkest: #000;
+    --neutral-medium: var(--neutral-color);
+	--neutral-dark-1: color-mix(in oklch, var(--neutral-color), #000 var(--color-ramp-interval));
+    --neutral-dark-2: color-mix(in oklch, var(--neutral-dark-1), #000 var(--color-ramp-interval));
+	--neutral-dark-3: color-mix(in oklch, var(--neutral-dark-2), #000 var(--color-ramp-interval));
+	--neutral-light-1: color-mix(in oklch, var(--neutral-color), #fff var(--color-ramp-interval));
+    --neutral-light-2: color-mix(in oklch, var(--neutral-light-1), #fff var(--color-ramp-interval));
+	--neutral-light-3: color-mix(in oklch, var(--neutral-light-2), #fff var(--color-ramp-interval));
+	--neutral-lightest: #fff;
+
+	/*primaries*/
+	--primary-medium: var(--primary-color);
+	--primary-dark-1: color-mix(in oklch, var(--primary-color), #000 var(--color-ramp-interval));
+	--primary-dark-2: color-mix(in oklch, var(--primary-dark-1), #000 calc(var(--color-ramp-interval) * 2));
+	--primary-light-1: color-mix(in oklch, var(--primary-color), #fff var(--color-ramp-interval));
+	--primary-light-2: color-mix(in oklch, var(--primary-light-1), #fff calc(var(--color-ramp-interval) * 2));
+
+    --complimentary-medium: var(--complimentary-color, oklch(from var(--primary-color) l c calc(h + 180)));
+	--complimentary-dark-1: color-mix(in oklch, var(--complimentary-medium), #000 var(--color-ramp-interval));
+	--complimentary-dark-2: color-mix(in oklch, var(--complimentary-dark-1), #000 calc(var(--color-ramp-interval) * 2));
+	--complimentary-light-1: color-mix(in oklch, var(--complimentary-medium), #fff var(--color-ramp-interval));
+	--complimentary-light-2: color-mix(in oklch, var(--complimentary-light-1), #fff calc(var(--color-ramp-interval) * 2));
+
+	/*Themes*/
+    --warn-medium: var(--warn-color);
+	--warn-dark-1: color-mix(in oklch, var(--warn-color), #000 var(--color-ramp-interval));
+	--warn-dark-2: color-mix(in oklch, var(--warn-dark-1), #000 calc(var(--color-ramp-interval) * 2));
+	--warn-light-1: color-mix(in oklch, var(--warn-color), #fff var(--color-ramp-interval));
+	--warn-light-2: color-mix(in oklch, var(--warn-light-1), #fff calc(var(--color-ramp-interval) * 2));
+
+    --negative-medium: var(--negative);
+	--negative-dark-1: color-mix(in oklch, var(--negative), #000 var(--color-ramp-interval));
+	--negative-dark-2: color-mix(in oklch, var(--negative-dark-1), #000 calc(var(--color-ramp-interval) * 2));
+	--negative-light-1: color-mix(in oklch, var(--negative), #fff var(--color-ramp-interval));
+	--negative-light-2: color-mix(in oklch, var(--negative-light-1), #fff calc(var(--color-ramp-interval) * 2));
+
+    --info-medium: var(--info-color);
+	--info-dark-1: color-mix(in oklch, var(--info-color), #000 var(--color-ramp-interval));
+	--info-dark-2: color-mix(in oklch, var(--info-dark-1), #000 calc(var(--color-ramp-interval) * 2));
+	--info-light-1: color-mix(in oklch, var(--info-color), #fff var(--color-ramp-interval));
+	--info-light-2: color-mix(in oklch, var(--info-light-1), #fff calc(var(--color-ramp-interval) * 2));
+
+    --positive-medium: var(--positive-color);
+	--positive-dark-1: color-mix(in oklch, var(--positive-color), #000 var(--color-ramp-interval));
+	--positive-dark-2: color-mix(in oklch, var(--positive-dark-1), #000 calc(var(--color-ramp-interval) * 2));
+	--positive-light-1: color-mix(in oklch, var(--positive-color), #fff var(--color-ramp-interval));
+	--positive-light-2: color-mix(in oklch, var(--positive-light-1), #fff calc(var(--color-ramp-interval) * 2));
+
+	/*Parts*/
+    --background: light-dark(var(--neutral-lightest), var(--neutral-dark-1));
+	--border: light-dark(var(--neutral-light-1), var(--neutral-medium));
+	--text: light-dark(var(--neutral-darkest), var(--neutral-lightest));
+	--text-alt: var(--neutral-lightest);
+	--shadow: light-dark(var(--neutral-medium), var(--neutral-dark-2));
+
+    --corner-radius: 8px;
+
+	--checker: linear-gradient(45deg, #eee 25%, transparent 25%),
+	  linear-gradient(-45deg, #eee 25%, transparent 25%),
+	  linear-gradient(45deg, transparent 75%, #eee 75%),
+      linear-gradient(-45deg, transparent 75%, #eee 75%);
+}
+
+@media (prefers-color-scheme: dark){
+	:root a {
+		color: var(--primary-medium);
+	}
+	:root .text-button {
+		color: var(--primary-medium);
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	position: relative;
+}
+*:not(:defined){
+	display: contents;
+}
+*:focus {
+	outline-color: var(--primary-medium);
+}
+body,html {
+	margin : 0;
+	padding: 0;
+	font-family: arial;
+	font-size: 100%;
+	background-color: var(--background);
+	color: var(--text);
+	block-size: 100%;
+}
+label, button, textarea, input {
+	display: block;
+}
+h1,h2,h3,h4,h5,h6{
+	margin: 0;
+}
+button {
+	margin: 0;
+	font-size: 1rem;
+}
+ul, ol {
+	padding: 0;
+	margin: 0;
+}
+li {
+	list-style: none;
+}
+fieldset {
+	border: none;
+	margin: 0;
+}
+section {
+	margin: 0;
+}
+a {
+	color: var(--complimentary-medium);
+}
+label {
+	font-weight: 600;
+}
+input[type='text'],
+input[type='password'],
+input[type='url'],
+input[type='search'],
+input[type='number'],
+input[type='color'],
+input[type='datetime'],
+input[type='datetime-local'],
+input[type='month'],
+input[type='time'],
+input[type='email'],
+input[type='tel'],
+input[type='file'],
+output,
+textarea {
+	display: inline-block;
+	color: var(--text);
+	border: 1px solid var(--border);
+	background-color: var(--background);
+	padding: 0.5rem;
+	min-block-size: 2.25rem; /*Not clear where the extra 0.25 comes from but needed to look correct*/
+	font-size: 1rem;
+
+	&:focus {
+		border-color: var(--primary-medium);
+	}
+}
+output {
+	word-break: break-word;
+}
+textarea {
+	min-block-size: 20rem;
+	resize: vertical;
+}
+input[type='file'] {
+	padding: 0px;
+	border: none;
+
+	&::file-selector-button {
+		width: 100%;
+		height: 100%;
+		padding: 0.5rem;
+		border: 2px dotted var(--primary-medium);
+		background-color: transparent;
+		font-size: 1rem;
+		color: var(--text);
+		border-radius: var(--border-radius);
+		cursor: pointer;
+		text-align: left;
+		background-clip: padding-box;
+	}
+	&::file-selector-button:hover {
+		background-color: var(--primary-light-2);
+	}
+	&::file-selector-button:active {
+		background-color: var(--primary-light-1);
+	}
+}
+label[file-label] {
+	border: 2px dotted var(--primary-medium);
+	display: block;
+	cursor: pointer;
+
+	input[type='file']{
+		cursor: pointer;
+		width: 100%;
+
+		&::file-selector-button {
+			width: auto;
+			height: 2.25rem;
+			border: none;
+			background-color: var(--primary-medium);
+			color: var(--text-alt);
+		}
+		&:hover {
+			background-color: var(--primary-light-2);
+			
+			&::file-selector-button {
+				background-color: var(--primary-dark-1);
+			}
+		}
+		&:active {
+			background-color: var(--primary-light-1);
+
+			&::file-selector-button {
+				background-color: var(--primary-dark-2);
+			}
+		}
+	}
+}
+dialog{
+	position: fixed;
+	inline-size: 50%;
+	block-size: 50%;
+	background-color: var(--neutral-lightest);
+	top: 25%;
+	box-shadow: 0px 0px 0px 1000px rgba(0, 0, 0, 0.5);
+	z-index: 1;
+	border: none;
+	border-radius: var(--border-radius);
+}
+button {
+	background-color: var(--primary-medium);
+	border: none;
+	border-radius: var(--border-radius);
+	padding: 0.5rem;
+	color: var(--text-alt);
+	cursor: pointer;
+
+	&:disabled {
+		background-color: var(--primary-light-2);
+		cursor: default;
+	}
+	&:hover:not(:disabled) {
+		background: var(--primary-dark-1);
+	}
+	&:active:not(:disabled) {
+		background: var(--primary-dark-2);
+	}
+
+	&.toggle {
+		position: relative;
+		border-radius: 1rem;
+		inline-size: 4rem;
+		block-size: 2rem;
+		border: 1px solid var(--border);
+		padding: 0;
+		background: var(--complimentary-medium);
+		transition: 0.25s;
+	}
+	&.toggle::after {
+		content: "";
+		display: block;
+		border-radius: 1rem;
+		inline-size: 2rem;
+		block-size: calc(2rem - 2px);
+		border: 1px solid var(--border);
+		background: var(--background);
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+	&.toggle.on {
+		border: 1px solid var(--border);
+		background-color: var(--negative-medium)
+	}
+	&.toggle.on::after{
+		transform: translateX(2rem);
+	}
+
+	&.toggled:hover {
+		background: var(--complimentary-dark-1);
+	}
+	&.text-button {
+		background: none;
+		color: var(--complimentary-medium);
+	}
+}
+.ul, .ol {
+	&.display-list {
+		padding-inline-start: 2rem;
+
+		li {
+			list-style-type: disc;
+		}
+		li:has(ul, ol){
+			list-style-type: none;
+		}
+
+		ul,ol {
+			padding-inline-start: 1rem;
+		}
+	}
+}
+
+/*Layouts*/
+.row{
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: center;
+}
+.stack{
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-items: center;
+}
+.row, .stack {
+	&.align-start {
+		align-items: start;
+	}
+	&.align-end {
+		align-items: end;
+	}
+    &.gap1 {
+        gap: 0.25rem;
+    }
+    &.gap2 {
+        gap: 0.5rem;
+    }
+    &.gap3 {
+        gap: 1rem;
+    }
+	&.stretch {
+		align-items: stretch;
+	}
+	&.align-start {
+		align-items: start;
+	}
+	&.align-end {
+		align-items: end;
+	}
+}
+.center {
+	display: grid;
+    place-content: center;
+}
+.block-center {
+	margin-inline: auto;
+}
+.flex-grow {
+	flex-grow: 1;
+}
+.three-one-grid {
+	display: grid;
+	grid-template-columns: 75% 25%;
+}
+.overflow-y {
+	overflow-y: auto;
+}
+.padding1 {
+	padding: 0.25rem;
+}
+.padding2 {
+	padding: 0.5rem;
+}
+.padding3 {
+	padding: 1rem;
+}
+
+
+/*Sizing*/
+.full-width {
+	width: 100%;
+}
+.full-height {
+	height: 100%;
+}
+.constrained-width {
+	width: 1024px;
+}
+.constrained-height {
+	height: 768px;
+}
+
+/*Themes*/
+.hidden {
+	display: none !important;
+}
+.card {
+    padding: 1rem;
+    border: 1px solid var(--border);
+    background-color: var(--background);
+    border-radius: var(--corner-radius);
+	overflow: hidden;
+}
+.error {
+	color: var(--negative-medium);
+	background-color: var(--negative-light-2);
+    border-color: var(--negative-medium);
+}
+.success {
+	color: var(--positive-medium);
+	background-color: var(--positive-light-2);
+	border-color: var(--positive-medium);
+}
+.warn {
+	color: var(--warn-medium);
+	background-color: var(--warn-light-2);
+	border-color: var(--warn-medium);
+}
+.info {
+	color: var(--info-medium);
+	background-color: var(--info-light-2);
+	border-color: var(--info-medium);
+}
+
+/*Microcomponents*/
+mc-swatch:not(:defined) {
+	display: inline-block;
+    block-size: 4rem;
+    inline-size: 4rem;
+    border: 1px solid var(--border);
+	background-color: attr(value type(<color>));
+}

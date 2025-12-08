@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="./system.css">
+</head>
+
+<body>
+    <div class="stack gap1 stretch">
+        <div class="card warn">Hello World!</div>
+        <div class="card info">Hello World!</div>
+        <div class="card error">Hello World!</div>
+        <div class="card success">Hello World!</div>
+        <button>Button</button>
+        <input type="file">
+        <label file-label>
+            <input type="file">
+        </label>
+        <wc-copy-button-decorator inline>
+            <output id="d-output">Hello World! Hello World! Hello World!</output>
+        </wc-copy-button-decorator>
+        <wc-copy-button-decorator inline-attached>
+            <input type="text" id="d-output-2" value="Hello World! Hello World! Hello World!"></input>
+        </wc-copy-button-decorator>
+        <wc-copy-button-decorator>
+            <textarea id="d-textarea">Hello World!\n Hello World!\n Hello World!</textarea>
+        </wc-copy-button-decorator>
+        <wc-unhide-password-decorator>
+            <input type="password" id="p-password">
+        </wc-unhide-password-decorator>
+        <wc-unhide-password-decorator attached>
+            <input type="password" id="p-password-attach">
+        </wc-unhide-password-decorator>
+    </div>
+    <script src="../shared/components/wc-copy-button-decorator.js" type="module"></script>
+    <script src="../shared/components/wc-unhide-password-decorator.js" type="module"></script>
+</body>
+
+</html>

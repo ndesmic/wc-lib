@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>WGSL Convolution Canvas</title>
+	<link rel="stylesheet" href="../css/index.css">
+	</link>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+</head>
+
+<body>
+	<p>You must use a same-domain image.</p>
+	<h1>Convolution</h1>
+	<table>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Matrix</th>
+				<th>WGSL</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Identity</td>
+				<td>
+					<table>
+						<tr>
+							<td>0</td>
+							<td>0</td>
+							<td>0</td>
+						</tr>
+						<tr>
+							<td>0</td>
+							<td>1</td>
+							<td>0</td>
+						</tr>
+						<tr>
+							<td>0</td>
+							<td>0</td>
+							<td>0</td>
+						</tr>
+					</table>
+				</td>
+				<td>
+					<wc-wgsl-convolution-canvas image="./bird.png" kernel="[
+						[0, 0, 0],
+						[0, 1, 0],
+						[0, 0, 0]
+					]"></wc-glsl-convolution-canvas>
+				</td>
+			</tr>
+			<tr>
+				<td>Box Blur</td>
+				<td>
+					<table>
+						<tr>
+							<td>1/9</td>
+							<td>1/9</td>
+							<td>1/9</td>
+						</tr>
+						<tr>
+							<td>1/9</td>
+							<td>1/9</td>
+							<td>1/9</td>
+						</tr>
+						<tr>
+							<td>1/9</td>
+							<td>1/9</td>
+							<td>1/9</td>
+						</tr>
+					</table>
+				</td>
+				<td>
+					<wc-wgsl-convolution-canvas image="./bird.png" kernel="[
+						[0.1111, 0.1111, 0.1111],
+						[0.1111, 0.1111, 0.1111],
+						[0.1111, 0.1111, 0.1111]
+					]"></wc-glsl-convolution-canvas>
+				</td>
+			</tr>
+			<tr>
+				<td>Guassian Blur</td>
+				<td>
+					<table>
+						<tr>
+							<td>1/16</td>
+							<td>1/8</td>
+							<td>1/16</td>
+						</tr>
+						<tr>
+							<td>1/8</td>
+							<td>1/4</td>
+							<td>1/8</td>
+						</tr>
+						<tr>
+							<td>1/16</td>
+							<td>1/8</td>
+							<td>1/16</td>
+						</tr>
+					</table>
+				</td>
+				<td>
+					<wc-wgsl-convolution-canvas image="./bird.png" kernel="[
+						[0.0625, 0.125, 0.0625],
+						[0.125, 0.25, 0.125],
+						[0.0625, 0.125, 0.0625]
+					]"></wc-wgsl-convolution-canvas>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<script src="wc-wgsl-convolution-canvas.js" type="module"></script>
+	<script src="wc-js-convolution-canvas.js" type="module"></script>
+</body>
+
+</html>

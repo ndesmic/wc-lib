@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Tree</title>
+	<link rel="stylesheet" href="../../css/system.css">
+	</link>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<style>
+		wc-tree {
+			display: block;
+		}
+	</style>
+</head>
+
+<body>
+	<wc-tree id="tree"></wc-tree>
+
+	<script src="./wc-tree.js"></script>
+	<script>
+		const tree = document.querySelector("#tree");
+		tree.root = {
+			data: "foo",
+			nodes: [
+				{ 
+					data: "bar",
+					nodes: [
+						{ data: "bar2" },
+						{ data: "bar3" }
+					]
+			 	},
+				{
+					data: "baz",
+					nodes: [
+						{ data: "baz2" },
+						{ data: "baz3" },
+						{ data: "baz4", 
+						  nodes: [
+							{
+								data: "baz5" 
+							}
+						  ] 
+						}
+					]
+				}
+			]
+		}
+	</script>
+</body>
+
+</html>
