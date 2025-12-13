@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "request": "launch",
+            "name": "Test",
+            "type": "node",
+            "program": "${workspaceFolder}/libs/wc-utils.test.js",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
+            "runtimeArgs": [
+                "test",
+                "--unstable",
+                "--inspect-wait",
+                "--allow-all"
+            ],
+            "attachSimplePort": 9229
+        }
+    ]
+}

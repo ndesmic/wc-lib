@@ -1,3 +1,5 @@
+import { parseFloatArrayOrDefault, parseFloatArrayWithLengthOrDefault } from "../../libs/wc-utils.js";
+
 function clamp(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) {
 	return Math.max(Math.min(value, max), min);
 }
@@ -164,6 +166,7 @@ export class WcJsConvolutionCanvas extends HTMLElement {
 	}
 	update() {
 		if (!this.#context || !this.#image) return;
+		if (this.#kernel.length != this.#shape[0] * this.#shape[1]) return;
 		this.#context.clearRect(0, 0, this.dom.canvas.width, this.dom.canvas.height);
 		if (this.#image) {
 			this.#context.drawImage(this.#image, 0, 0, this.dom.canvas.width, this.dom.canvas.height);
@@ -187,11 +190,11 @@ export class WcJsConvolutionCanvas extends HTMLElement {
 		this.#edges = val.startsWith("[") ? JSON.parse(val) : val;
 	}
 	set kernel(val) {
-		this.#kernel = Array.isArray(val) ? val : JSON.parse(val);
+		this.#kernel = parseFloatArrayOrDefault(val, []);
 		this.update();
 	}
 	set shape(val) {
-		this.#shape = Array.isArray(val) ? val : JSON.parse(val);
+		this.#shape = parseFloatArrayWithLengthOrDefault(val, 2, [0,0]);
 		this.update();
 	}
 	set height(val) {

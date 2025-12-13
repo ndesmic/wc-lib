@@ -1,18 +1,3 @@
-export function padArrayStart(array, length, element) {
-	let result = [...array];
-	while (result.length < length) {
-		result.unshift(element);
-	}
-	return result;
-}
-export function padArrayEnd(array, length, element) {
-	let result = [...array];
-	while (result.length < length) {
-		result.push(element);
-	}
-	return result;
-}
-
 export function trimArrayStart(array, element = 0){
 	const result = array.slice(0);
 	while(result[0] === element){

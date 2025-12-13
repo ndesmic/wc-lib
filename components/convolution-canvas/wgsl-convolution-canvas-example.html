@@ -3,19 +3,20 @@
 
 <head>
 	<title>WGSL Convolution Canvas</title>
-	<link rel="stylesheet" href="../css/index.css">
+	<link rel="stylesheet" href="../../css/system.css">
 	</link>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 </head>
 
 <body>
-	<p>You must use a same-domain image.</p>
+	<div class="card warn">You must use a same-domain image.</div>
 	<h1>Convolution</h1>
 	<table>
 		<thead>
 			<tr>
 				<th>Name</th>
 				<th>Matrix</th>
+				<th>JS</th>
 				<th>WGSL</th>
 			</tr>
 		</thead>
@@ -42,11 +43,18 @@
 					</table>
 				</td>
 				<td>
-					<wc-wgsl-convolution-canvas image="./bird.png" kernel="[
-						[0, 0, 0],
-						[0, 1, 0],
-						[0, 0, 0]
-					]"></wc-glsl-convolution-canvas>
+					<wc-js-convolution-canvas image="./bird.png" kernel="
+						0, 0, 0,
+						0, 1, 0,
+						0, 0, 0
+					" shape="3,3"></wc-js-convolution-canvas>
+				</td>
+				<td>
+					<wc-wgsl-convolution-canvas image="./bird.png" kernel="
+						0, 0, 0,
+						0, 1, 0,
+						0, 0, 0
+					" shape="3,3"></wc-glsl-convolution-canvas>
 				</td>
 			</tr>
 			<tr>
@@ -71,11 +79,18 @@
 					</table>
 				</td>
 				<td>
-					<wc-wgsl-convolution-canvas image="./bird.png" kernel="[
-						[0.1111, 0.1111, 0.1111],
-						[0.1111, 0.1111, 0.1111],
-						[0.1111, 0.1111, 0.1111]
-					]"></wc-glsl-convolution-canvas>
+					<wc-js-convolution-canvas image="./bird.png" kernel="
+						0.1111, 0.1111, 0.1111,
+						0.1111, 0.1111, 0.1111,
+						0.1111, 0.1111, 0.1111
+					" shape="3,3"></wc-js-convolution-canvas>
+				</td>
+				<td>
+					<wc-wgsl-convolution-canvas image="./bird.png" kernel="
+						0.1111, 0.1111, 0.1111,
+						0.1111, 0.1111, 0.1111,
+						0.1111, 0.1111, 0.1111
+					" shape="3,3"></wc-glsl-convolution-canvas>
 				</td>
 			</tr>
 			<tr>
@@ -100,11 +115,18 @@
 					</table>
 				</td>
 				<td>
-					<wc-wgsl-convolution-canvas image="./bird.png" kernel="[
-						[0.0625, 0.125, 0.0625],
-						[0.125, 0.25, 0.125],
-						[0.0625, 0.125, 0.0625]
-					]"></wc-wgsl-convolution-canvas>
+					<wc-js-convolution-canvas image="./bird.png" kernel="
+						0.0625, 0.125, 0.0625,
+						0.125, 0.25, 0.125,
+						0.0625, 0.125, 0.0625
+					" shape="3,3"></wc-js-convolution-canvas>
+				</td>
+				<td>
+					<wc-wgsl-convolution-canvas image="./bird.png" kernel="
+						0.0625, 0.125, 0.0625,
+						0.125, 0.25, 0.125,
+						0.0625, 0.125, 0.0625
+					" shape="3,3"></wc-wgsl-convolution-canvas>
 				</td>
 			</tr>
 		</tbody>
