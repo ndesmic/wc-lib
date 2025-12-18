@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Convolution Editor</title>
+		<link rel="stylesheet" href="../../css/system.css">
+		<style>wc-editor { width: 100%; tab-size: 2; }</style>
+	</head>
+	<body class="center">
+		<a href="../../index.html">Back</a>
+		<main class="constrained-width constrained-height">
+			<div class="stack gap2 card full-width">
+				<h1>Convolution Editor</h1>
+                <wc-editor preview-attribute="kernels">
+                    <textarea slot="editor">{&#13;&#09;"values": [&#13;&#09;&#09;0,0,0,&#13;&#09;&#09;0,1,0,&#13;&#09;&#09;0,0,0&#13;&#09;],&#13;&#09;"shape": [3,3]&#13;}</textarea>
+                    <wc-js-convolution-canvas slot="preview" image="../../components/convolution-canvas/bird.png"></wc-js-convolution-canvas>
+                </wc-editor>
+			</div>
+		</main>
+		<script src="../../components/editor/wc-editor.js" type="module"></script>
+        <script src="../../components/convolution-canvas/wc-js-convolution-canvas.js" type="module"></script>
+	</body>
+</html>

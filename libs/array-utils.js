@@ -39,3 +39,15 @@ export function getValuesFromEntriesRecursive(entries){
 		return keyval[1];
 	});
 }
+
+/**
+ * 
+ * @param {T | T[]} val 
+ * @returns 
+ */
+export function getSingleOrArray(val){
+	if(Array.isArray(val)){
+		return val;
+	}
+	return [val];
+}

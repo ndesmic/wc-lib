@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Blur Convolution</title>
+		<link rel="stylesheet" href="../../css/system.css">
+	</head>
+	<body class="center">
+		<a href="../../index.html">Back</a>
+		<main class="constrained-width constrained-height">
+			<div class="stack gap2 card full-width">
+				<h1>Blur Convolution</h1>
+				<ma-blur-convolution>
+					<div class="stack gap1">
+						<label for="std-x">Standard deviation X</label>
+						<input type="text" id="std-x" class="std-x" value="1">
+					</div>
+					<div class="stack gap1">
+						<label for="std-y">Standard deviation Y</label>
+						<input type="text" id="std-y" class="std-y" value="1">
+					</div>
+					<div class="stack gap1">
+						<legend>Output type</label>
+						<label for="radio-gaussian">Guassian</label>
+						<input name="output-type" type="radio" id="radio-gaussian">
+						<label for="radio-box">Repeated Box</label>
+						<input name="output-type" type="radio" id="radio-box" checked>
+					</div>
+					<div class="stack gap1">
+						<label for="output">Result</label>
+						<output id="output" class="output"></output>
+					</div>
+				</ma-blur-convolution>
+			</div>
+		</main>
+		<script src="./ma-blur-convolution.js" type="module"></script>
+	</body>
+</html>

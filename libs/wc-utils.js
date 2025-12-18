@@ -49,3 +49,46 @@ export function parseFloatArrayWithLengthOrDefault(text, length, defaultValue = 
     }
     return array;
 }
+
+/**
+ * 
+ * @param {string} text 
+ * @param {any} defaultValue 
+ * @param {boolean} isSilent 
+ * @returns 
+ */
+export function parseJsonOrDefault(text, defaultValue = null, isSilent = false){
+    if(typeof(text) === "string"){
+        try {
+            const value = JSON.parse(text);
+            return value;
+        } catch(e){
+            if(!isSilent){
+                console.warn(`Could not parse value \`${text}\``);
+            }
+            return defaultValue;
+        }
+    }
+    return text;
+}
+
+/**
+ * 
+ * @param {string} text 
+ * @param {any} defaultValue 
+ * @param {boolean} isSilent 
+ * @returns 
+ */
+export function parseJsonOrThrow(text, isSilent = false){
+    try {
+        if(typeof(text) === "string"){
+            const value = JSON.parse(text);
+            return value;
+        }
+    } catch(e){
+        if(!isSilent){
+            throw e;
+        }
+    }
+    return text;
+}

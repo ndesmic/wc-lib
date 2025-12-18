@@ -1,4 +1,6 @@
-import { parseFloatArrayOrDefault, parseFloatArrayWithLengthOrDefault } from "../../libs/wc-utils.js";
+import { parseJsonOrDefault } from "../../libs/wc-utils.js";
+import { getSingleOrArray } from "../../libs/array-utils.js";
+import { loadImage } from "../../libs/image-utils.js";
 
 function clamp(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) {
 	return Math.max(Math.min(value, max), min);
@@ -20,15 +22,6 @@ function mirrorWrap(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_
 	if (value < min && minDistance % (range + range) > range) return max - intervalValue; //too low (mirrored)
 	if (value <= min) return min + intervalValue; //to low (mirrored)
 	return value;
-}
-
-function loadImage(url) {
-	return new Promise((res, rej) => {
-		const image = new Image();
-		image.src = url;
-		image.onload = () => res(image);
-		image.onerror = rej;
-	});
 }
 
 function readOob(value, min, max, behavior) {
@@ -70,62 +63,69 @@ function setPx(imageData, col, row, val) {
  * @param {number[]} kernel.data
  * @param {number[]} kernel.shape  
  */
-function convolute(imageData, kernel, oobBehavior = { x: "clamp", y: "clamp" }) {
-	const output = new ImageData(imageData.width, imageData.height);
-	const kRowMid = (kernel.shape[0] - 1) / 2; //kernels should have odd dimensions
-	const kColMid = (kernel.shape[1] - 1) / 2;
+function convolute(imageData, kernels, oobBehavior = { x: "clamp", y: "clamp" }) {
+	let lastOutput = imageData;
 
-	for (let row = 0; row < imageData.height; row++) {
-		for (let col = 0; col < imageData.width; col++) {
+	for(const kernel of kernels){
+		const output = new ImageData(lastOutput.width, lastOutput.height);
+		const kRowMid = (kernel.shape[0] - 1) / 2; //kernels should have odd dimensions
+		const kColMid = (kernel.shape[1] - 1) / 2;
 
-			const sum = [0, 0, 0];
-			for (let kRow = 0; kRow < kernel.shape[1]; kRow++) {
-				for (let kCol = 0; kCol < kernel.shape[0]; kCol++) {
-					const sampleRow = row + (-kRowMid + kRow);
-					const sampleCol = col + (-kColMid + kCol);
-					if (oobBehavior.x === "omit" && (sampleCol >= imageData.width || sampleCol < 0)) continue;
-					if (oobBehavior.y === "omit" && (sampleRow >= imageData.height || sampleRow < 0)) continue;
+		for (let row = 0; row < lastOutput.height; row++) {
+			for (let col = 0; col < lastOutput.width; col++) {
 
-					let color;
-					if (Array.isArray(oobBehavior.x) && (sampleCol >= imageData.width || sampleCol < 0)) {
-						color = oobBehavior.x;
-					} else if (Array.isArray(oobBehavior.y) && (sampleRow >= imageData.height || sampleRow < 0)) {
-						color = oobBehavior.y;
-					} else {
-						color = sample(imageData, sampleRow, sampleCol, oobBehavior);
+				const sum = [0, 0, 0];
+				for (let kRow = 0; kRow < kernel.shape[1]; kRow++) {
+					for (let kCol = 0; kCol < kernel.shape[0]; kCol++) {
+						const sampleRow = row + (-kRowMid + kRow);
+						const sampleCol = col + (-kColMid + kCol);
+						if (oobBehavior.x === "omit" && (sampleCol >= lastOutput.width || sampleCol < 0)) continue;
+						if (oobBehavior.y === "omit" && (sampleRow >= lastOutput.height || sampleRow < 0)) continue;
+
+						let color;
+						if (Array.isArray(oobBehavior.x) && (sampleCol >= lastOutput.width || sampleCol < 0)) {
+							color = oobBehavior.x;
+						} else if (Array.isArray(oobBehavior.y) && (sampleRow >= lastOutput.height || sampleRow < 0)) {
+							color = oobBehavior.y;
+						} else {
+							color = sample(lastOutput, sampleRow, sampleCol, oobBehavior);
+						}
+
+						const kernelValue = kernel.values[kRow * kernel.shape[0] + kCol];
+						sum[0] += color[0] * kernelValue;
+						sum[1] += color[1] * kernelValue;
+						sum[2] += color[2] * kernelValue;
 					}
-
-					const kernelValue = kernel.data[kRow * kernel.shape[0] + kCol];
-					sum[0] += color[0] * kernelValue;
-					sum[1] += color[1] * kernelValue;
-					sum[2] += color[2] * kernelValue;
 				}
-			}
 
-			setPx(output, col, row, [...sum, 1.0]);
+				setPx(output, col, row, [...sum, 1.0]);
+			}
 		}
+		lastOutput = output;
 	}
 
-	return output;
+	return lastOutput;
 }
 
-const identityKernel = [
-	0, 0, 0,
-	0, 1, 0,
-	0, 0, 0
-];
+const identityKernel3x3 = {
+	shape: [3,3],
+	values: [
+		0, 0, 0,
+		0, 1, 0,
+		0, 0, 0
+	]
+}
 
 export class WcJsConvolutionCanvas extends HTMLElement {
 	#image;
 	#context;
-	#kernel = identityKernel;
-	#shape = [3, 3];
+	#kernels = [identityKernel3x3];
 	#edges; //"clamp", "wrap", "mirror", "omit"
 	#height = 240;
 	#width = 320;
 	#defaultEdgeValue = 0.0;
 
-	static observedAttributes = ["image", "kernel", "shape", "edges"];
+	static observedAttributes = ["image", "kernels", "edges"];
 	constructor() {
 		super();
 		this.bind(this);
@@ -166,14 +166,15 @@ export class WcJsConvolutionCanvas extends HTMLElement {
 	}
 	update() {
 		if (!this.#context || !this.#image) return;
-		if (this.#kernel.length != this.#shape[0] * this.#shape[1]) return;
+		if (!this.#kernels) return;
+
 		this.#context.clearRect(0, 0, this.dom.canvas.width, this.dom.canvas.height);
 		if (this.#image) {
 			this.#context.drawImage(this.#image, 0, 0, this.dom.canvas.width, this.dom.canvas.height);
 		}
 
 		const imageData = this.#context.getImageData(0, 0, this.dom.canvas.width, this.dom.canvas.height);
-		const convolutedImageData = convolute(imageData, { data: this.#kernel, shape: this.#shape }, this.#edges ? { x: this.#edges, y: this.#edges } : undefined);
+		const convolutedImageData = convolute(imageData, this.#kernels, this.#edges ? { x: this.#edges, y: this.#edges } : undefined);
 		this.#context.putImageData(convolutedImageData, 0, 0);
 	}
 	set image(val) {
@@ -189,12 +190,15 @@ export class WcJsConvolutionCanvas extends HTMLElement {
 		val = val.trim();
 		this.#edges = val.startsWith("[") ? JSON.parse(val) : val;
 	}
-	set kernel(val) {
-		this.#kernel = parseFloatArrayOrDefault(val, []);
-		this.update();
-	}
-	set shape(val) {
-		this.#shape = parseFloatArrayWithLengthOrDefault(val, 2, [0,0]);
+	set kernels(val){
+		const parsedValue = parseJsonOrDefault(val);
+		if(!parsedValue) return;
+		const value = getSingleOrArray(parsedValue);
+		if(!value.every(k => k.values.length === (k.shape[0] * k.shape[1]))){
+			//throw new Error("kernel values are not valid.");
+			return;
+		}
+		this.#kernels = value;
 		this.update();
 	}
 	set height(val) {
