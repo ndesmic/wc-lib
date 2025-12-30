@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Test",
             "type": "node",
-            "program": "${workspaceFolder}/libs/wc-utils.test.js",
+            "program": "${workspaceFolder}/libs/image-sample-utils.test.js",
             "cwd": "${workspaceFolder}",
             "env": {},
             "runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",

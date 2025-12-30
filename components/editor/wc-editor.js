@@ -1,7 +1,11 @@
+import { accessProperty } from "../../libs/object-utils.js";
+
 export class WcEditor extends HTMLElement {
-    static observedAttributes = ["preview-attribute"];
+    static observedAttributes = ["preview-attribute", "editor-event", "editor-event-prop"];
 
     #previewAttribute = "value";
+    #editorEvent = "input";
+    #editorEventProp = "target.value";
 
     connectedCallback(){
         this.bind();
@@ -32,7 +36,7 @@ export class WcEditor extends HTMLElement {
         };
     }
     attachEvents(){
-        this.dom.editor.addEventListener("input", this.onUpdate);
+        this.dom.editor.addEventListener(this.#editorEvent, this.onUpdate);
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue !== newValue) {
@@ -40,9 +44,25 @@ export class WcEditor extends HTMLElement {
         }
     }
     onUpdate(e){
-        const value = e.target.value;
+        const value = accessProperty(e, this.#editorEventProp);
         this.dom.preview[this.#previewAttribute] = value;
     }
+    get ["editor-event"](){
+        return this.#editorEvent;
+    }
+    set ["editor-event"](value){
+        this.dom?.editor.removeEventListener(this.#editorEvent, this.onUpdate);
+        this.#editorEvent = value;
+        this.dom?.editor.addEventListener(this.#editorEvent, this.onUpdate);
+    }
+
+    get ["editor-event-prop"](){
+        return this.#editorEventProp;
+    }
+    set ["editor-event-prop"](value){
+        this.#editorEventProp = value;
+    }
+
     get ["preview-attribute"](){
         return this.#previewAttribute;
     }

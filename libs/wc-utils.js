@@ -1,5 +1,17 @@
 import { padArrayEnd } from "./array-utils.js";
 
+//Scalar
+
+export function parseBoolean(text){
+    if(typeof(text) === "boolean"){
+        return text;
+    }
+    if(text === null || text === undefined){
+        return false;
+    }
+    return true;
+}
+
 export function parseIntOrDefault(text, defaultValue = 0){
     if(typeof(text) !== "string"){
         return text;
@@ -10,6 +22,17 @@ export function parseIntOrDefault(text, defaultValue = 0){
     return parseInt(text, 10);
 }
 
+//Arrays
+
+export function parseArrayOrDefault(text, defaultValue = null){
+    if(typeof(text) === "string"){
+        return text?.trim()
+            ? text.split(",").map(x => x.trim())
+            : defaultValue
+    }
+    return text ?? defaultValue;
+}
+
 /**
  * 
  * @param {Array<number> | string} text 
@@ -17,13 +40,35 @@ export function parseIntOrDefault(text, defaultValue = 0){
  * @returns 
  */
 export function parseFloatArrayOrDefault(text, defaultValue = null) {
-    if(Array.isArray(text)){
-        return text;
-    }
-	return text?.trim()
+    if(typeof(text) === "string"){
+        return text?.trim()
 		? text.split(",").map(x => parseFloat(x.trim()))
 		: defaultValue
+    }
+	return text ?? defaultValue;
 }
+
+//Arrays of arrays
+
+export function parseArrayOfArraysOrDefault(text, defaultValue = null){
+    if(typeof(text) === "string"){
+        return text?.trim()
+            ? text.split(";").map(v => v.trim().split(",").map(x =>x.trim()))
+            : defaultValue
+    }
+    return text ?? defaultValue;
+}
+
+export function parseFloatArrayOfArraysOrDefault(text, defaultValue = null){
+    if(typeof(text) === "string"){
+        return text?.trim()
+            ? text.split(";").map(v => v.trim().split(",").map(x => parseFloat(x.trim())))
+            : defaultValue
+    }
+    return text ?? defaultValue;
+}
+
+// Length Arrays
 
 /**
  * 
@@ -49,6 +94,8 @@ export function parseFloatArrayWithLengthOrDefault(text, length, defaultValue = 
     }
     return array;
 }
+
+//Objects
 
 /**
  * 

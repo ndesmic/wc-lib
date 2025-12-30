@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Guassian Blur Demo</title>
+		<link rel="stylesheet" href="../../css/system.css">
+	</head>
+	<body class="center">
+		<a href="../../index.html">Back</a>
+		<main class="constrained-width constrained-height">
+			<div class="stack gap2 card full-width">
+				<h1>Gaussian Blur Demo</h1>
+                <ma-gaussian-blur-demo class="stack gap3">
+                    <div class="stack gap1">
+                        <label for="std">Standard deviation (X and Y)</label>
+                        <input type="range" min="0" max="5" step="0.1" id="std" class="std" value="1">
+                    </div>
+                    <div class="stack gap1">
+                        <h2>Gaussian</h2>
+                        <wc-js-convolution-canvas class="gaussian-demo" image="../../images/bird.png" ></wc-js-convolution-canvas>
+                        <h2>Repeated box blur</h2>
+                        <wc-js-convolution-canvas class="box-demo" image="../../images/bird.png"></wc-js-convolution-canvas>
+                        <!-- <wc-js-convolution-canvas class="svg"></wc-js-convolution-canvas> -->
+                    </div>
+                </div>
+            </ma-gaussian-blur-demo>
+		</main>
+        <script src="../../components/convolution-canvas/wc-js-convolution-canvas.js" type="module"></script>
+		<script src="./ma-gaussian-blur-demo.js" type="module"></script>
+	</body>
+</html>

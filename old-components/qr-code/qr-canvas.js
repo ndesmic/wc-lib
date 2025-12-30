@@ -1,5 +1,5 @@
 import { ArrayCanvas } from "./array-canvas.js"
-import { getPermutations } from "./utils.js";
+import { getPermutations } from "../../libs/array-utils.js";
 
 /**
  * 

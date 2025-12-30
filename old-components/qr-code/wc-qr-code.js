@@ -1,8 +1,7 @@
 import { drawQrCanvas } from "./canvas-utils.js";
 import { GaloisField } from "./galois-field.js";
 import { QrCanvas, masks } from "./qr-canvas.js";
-import { chunkArray, trimArrayStart } from "./utils.js";
-import { padArrayEnd, padArrayStart } from "../../libs/array-utils.js";
+import { padArrayEnd, padArrayStart, chunkArray, trimArrayStart } from "../../libs/array-utils.js";
 
 /**
  * @typedef {("numeric"|"alphanumeric"|"binary")} mode

@@ -1,4 +1,4 @@
-import { getBoxBlurKernels } from "../../libs/convolution-utils.js";
+import { getGaussianBoxBlurKernels } from "../../libs/convolution-utils.js";
 
 export class MaBlurConvolution extends HTMLElement {
     connectedCallback(){
@@ -24,7 +24,7 @@ export class MaBlurConvolution extends HTMLElement {
     onUpdate(){
         const stdX = parseFloat(this.dom.inputStdX.value);
         const stdY = parseFloat(this.dom.inputStdY.value);
-        const kernels = getBoxBlurKernels(stdX, stdY, 3);
+        const kernels = getGaussianBoxBlurKernels(stdX, stdY, 3);
         this.dom.output.value = JSON.stringify(kernels, null, 4);
     }
 }
