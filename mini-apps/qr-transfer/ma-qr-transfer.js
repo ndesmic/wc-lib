@@ -50,6 +50,7 @@ export class MaQrTransfer extends HTMLElement {
     }
     async onDetectBarcode(){
         if(this.#barcodeDetector){
+            const image = this.dom.cameraPreview.getBitmapImageSource();
             const barcodes = await this.#barcodeDetector.detect(image);
             for(const barcode of barcodes){
                 if(!this.#barcodesFound.has(barcode.rawValue)){

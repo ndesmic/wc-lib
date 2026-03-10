@@ -63,13 +63,17 @@ export class WcCameraPreview extends HTMLElement {
 		this.removeEventListener("click", this.onClick);
 		this.requestVideo();
 	}
-	getImage(){
+	getImageUrl(){
+		const canvas = this.getImage();
+		return canvas.toDataURL();
+	}
+	getBitmapImageSource(){
 		const canvas = document.createElement("canvas");
 		canvas.height = this.#height;
 		canvas.width = this.#width;
 		const ctx = canvas.getContext("2d");
 		ctx.drawImage(this.dom.preview, 0, 0);
-		return canvas.toDataURL();
+		return canvas;
 	}
 	set width(val){
 		this.#width = parseInt(val);
