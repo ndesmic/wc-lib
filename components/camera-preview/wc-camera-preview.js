@@ -8,15 +8,16 @@ export class WcCameraPreview extends HTMLElement {
 	#width = 320;
 	constructor() {
 		super();
-		this.bind(this);
+		this.bind();
 	}
-	bind(element) {
-		element.attachEvents = element.attachEvents.bind(element);
-		element.render = element.render.bind(element);
-		element.cacheDom = element.cacheDom.bind(element);
-		element.onClick = element.onClick.bind(element);
-		element.requestVideo = element.requestVideo.bind(element);
-		element.getImage = element.getImage.bind(element);
+	bind() {
+		this.attachEvents = this.attachEvents.bind(this);
+		this.render = this.render.bind(this);
+		this.cacheDom = this.cacheDom.bind(this);
+		this.onClick = this.onClick.bind(this);
+		this.requestVideo = this.requestVideo.bind(this);
+		this.getImageUrl = this.getImageUrl.bind(this);
+		this.getBitmapImageSource = this.getBitmapImageSource.bind(this);
 	}
 	render() {
 		this.attachShadow({ mode: "open" });
