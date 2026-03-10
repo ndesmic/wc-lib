@@ -1,6 +1,6 @@
-import { classifyFileType } from "./libs/file-tools.js";
-import { checkAABB, checkPointInside } from "./libs/geometry-utils.js";
-import { parseTextMap } from "./libs/keyvals.js";
+import { classifyFileType } from "../libs/file-tools.js";
+import { checkAABB, checkPointInside } from "../libs/geometry-utils.js";
+import { parseTextMap } from "../libs/keyvals.js";
 
 function getDocumentRect(element){
     const rect = element.getBoundingClientRect();
@@ -136,7 +136,6 @@ export class WcDirectoryListing extends HTMLElement {
     attachEvents(){
         this.addEventListener("pointerdown", this.onPointerDown);
         this.addEventListener("pointerup", this.onPointerUp);
-        this.addEventListener("pointermover", this.onPointerMove);
         this.addEventListener("pointercancel", this.onPointerCancel);
     }
     onPointerDown(e){

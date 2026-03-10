@@ -1,7 +1,5 @@
-import { drawQrCanvas } from "./canvas-utils.js";
-import { GaloisField } from "./galois-field.js";
-import { QrCanvas, masks } from "./qr-canvas.js";
 import { padArrayEnd, padArrayStart, chunkArray, trimArrayStart } from "../../libs/array-utils.js";
+import { GaloisField } from "./galois-field.js";
 
 /**
  * @typedef {("numeric"|"alphanumeric"|"binary")} mode
@@ -17,7 +15,6 @@ export const versionCapabilities = {
 		"H": [17, 34, 58, 82, 106, 139, 154, 202, 235, 288, 331, 374, 427, 468, 530, 602, 674, 746, 813, 919, 969, 1056]
 	},
 	"alphanumeric": {
-		"L": [25, 47, 77, 114, 154, 195, 224, 279, 335, 395, 468, 535, 619, 667, 758, 854, 938, 1046, 1153, 1249, 1352, 1460],
 		"M": [20, 38, 61, 90, 122, 154, 178, 221, 262, 311, 366, 419, 483, 528, 600, 656, 734, 816, 909, 970, 1035, 1134],
 		"Q": [16, 29, 47, 67, 87, 108, 125, 157, 189, 221, 259, 296, 352, 376, 426, 470, 531, 574, 644, 702, 742, 823],
 		"H": [10, 20, 35, 50, 64, 84, 93, 122, 143, 174, 200, 227, 259, 283, 321, 365, 408, 452, 493, 557, 587, 640]
@@ -171,11 +168,14 @@ export function getCharacterCountLength(version, mode) {
 			if (version < 10) return 10;
 			if (version >= 10 && version < 27) return 12;
 			if (version >= 27 && version < 41) return 14;
+            break;
 		}
-		case "alphanumeric":
+		case "alphanumeric": {
 			if (version < 10) return 9;
 			if (version >= 10 && version < 27) return 11;
 			if (version >= 27 && version < 41) return 13;
+            break;
+        }
 		case "binary":
 			if (version < 10) return 8;
 			if (version >= 10 && version < 41) return 16;
@@ -393,91 +393,3 @@ export function errorEncodePaddedPayload(paddedPayload, version, errorCorrection
 	const padBits = new Array(versionRemainderBits[version]).fill(0);
 	return [...interleavedBlocks, ...interleavedEcBlocks, ...padBits].flat();
 }
-
-if(globalThis.customElements){
-	customElements.define("wc-qr-code",
-		class extends HTMLElement {
-			#errorLevel;
-			#payload;
-			#mask;
-			#scale;
-			#dom;
-
-			static get observedAttributes() {
-				return ["payload", "errorlevel", "mask", "scale"]
-			}
-			constructor() {
-				super();
-				this.bind(this);
-			}
-			bind(element) {
-				element.cacheDom.bind(element);
-			}
-			connectedCallback() {
-				this.prerender();
-				this.cacheDom();
-				this.render();
-			}
-			prerender() {
-				this.attachShadow({ mode: "open" });
-				this.shadowRoot.innerHTML = `
-					<style>canvas { width: 100%; height: 100%; image-rendering: pixelated; }</style>
-					<canvas id="qr"></canvas>
-				`;
-			}
-			cacheDom() {
-				this.#dom = {
-					qr: this.shadowRoot.querySelector("#qr")
-				};
-			}
-			render() {
-				if (!this.#errorLevel || !this.#payload || !this.#dom) return;
-				const {
-					encodedData,
-					version
-				} = qrEncodeData(this.#payload, this.#errorLevel);
-				const matrix = QrCanvas.fromVersion(version);
-				matrix.drawPayloadData(encodedData);
-				const mask = this.#mask ?? matrix.getBestMask();
-				matrix.applyMask(masks[mask]);
-				matrix.drawFormatString(getFormatString(this.#errorLevel, mask));
-				if (version >= 7) {
-					matrix.drawVersionString(getVersionInfoString(version));
-				}
-				const scale = this.#scale ?? 1;
-
-				this.#dom.qr.height = matrix.height * scale;
-				this.#dom.qr.width = matrix.width * scale;
-				const context = this.#dom.qr.getContext("2d");
-				drawQrCanvas(context, matrix, { scale });
-			}
-			attributeChangedCallback(name, oldValue, newValue) {
-				switch (name) {
-					case "errorlevel": {
-						this.errorLevel = newValue;
-						break;
-					}
-					default: {
-						this[name] = newValue;
-					}
-				}
-			}
-			set errorLevel(value) {
-				this.#errorLevel = value;
-				this.render();
-			}
-			set payload(value) {
-				this.#payload = value;
-				this.render();
-			}
-			set mask(value) {
-				this.#mask = parseInt(value, 10);
-				this.render();
-			}
-			set scale(value) {
-				this.#scale = parseInt(value, 10);
-				this.render();
-			}
-		}
-	)
-};

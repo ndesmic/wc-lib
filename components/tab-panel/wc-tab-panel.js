@@ -80,6 +80,17 @@ export class WcTabPanel extends HTMLElement {
         content.classList.add("selected");
         tab.classList.add("selected");
         this.#selectedIndex = index;
+
+        const event = new CustomEvent("tab-changed", {
+            bubbles: true,
+            composed: true,
+            detail: { 
+                index,
+                content,
+                tab
+            }
+        });
+        this.dispatchEvent(event);
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue !== newValue) {

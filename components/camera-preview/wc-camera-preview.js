@@ -1,3 +1,6 @@
+//import systemCss from "../../css/system.css" with { type: "css" };
+import cameraPreviewCss from "./wc-camera-preview.css" with { type: "css" };
+
 export class WcCameraPreview extends HTMLElement {
 	static observedAttributes = ["height", "width"];
 	#stream;
@@ -17,10 +20,8 @@ export class WcCameraPreview extends HTMLElement {
 	}
 	render() {
 		this.attachShadow({ mode: "open" });
+		this.shadowRoot.adoptedStyleSheets.push(cameraPreviewCss);
 		this.shadowRoot.innerHTML = `
-            <style>
-                :host{ display: block; }
-            </style>
 			<video id="preview" width="${this.#width}" height="${this.#height}" autoplay></video>
 			<div id="message">Click To Play<div>
         `;

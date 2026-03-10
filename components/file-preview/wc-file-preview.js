@@ -1,4 +1,4 @@
-import { classifyFileType } from "../libs/file-tools.js";
+import { classifyFileType } from "../../libs/file-tools.js";
 
 export class WcFilePreview extends HTMLElement {
     connectedCallback(){

@@ -1,6 +1,8 @@
 {
     "tasks": {
-        "start": "deno -A jsr:@std/http/file-server ."
+        "start": "deno -A jsr:@std/http/file-server .",
+        "new:app": "deno run -A --unstable-raw-imports ./scripts/app/new-app.js",
+        "new:component": "deno run -A --unstable-raw-imports ./scripts/component/new-component.js"
     },
     "fmt": {
         "indentWidth": 1,
@@ -10,6 +12,7 @@
         "noImplicitAny": false
     },
     "imports": {
+        "@std/cli": "jsr:@std/cli@^1.0.27",
         "@std/expect": "jsr:@std/expect@^1.0.17",
         "@std/testing": "jsr:@std/testing@^1.0.16"
     }

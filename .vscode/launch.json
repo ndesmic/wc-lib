@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Test",
             "type": "node",
-            "program": "${workspaceFolder}/libs/image-sample-utils.test.js",
+            "program": "${workspaceFolder}/libs/string-templater.test.js",
             "cwd": "${workspaceFolder}",
             "env": {},
             "runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
@@ -19,6 +19,23 @@
                 "--inspect-wait",
                 "--allow-all"
             ],
+            "attachSimplePort": 9229
+        },
+        {
+            "request": "launch",
+            "name": "new:app",
+            "type": "node",
+            "program": "${workspaceFolder}/scripts/app/new.js",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
+            "runtimeArgs": [
+                "run",
+                "--unstable-raw-imports",
+                "--inspect-wait",
+                "-A"
+            ],
+            "args": ["foo"],
             "attachSimplePort": 9229
         }
     ]

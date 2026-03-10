@@ -4,15 +4,18 @@ import { getSingleOrArray } from "./array-utils.js";
  * Creates an element with props
  * @param {string} tag 
  * @param {{
- *  props: Record<string, any>,
- *  attrs: Record<string, any>,
- *  events: Record<string, function>,
- *  children: HTMLElement | HTMLElement[]
+ *  props?: Record<string, any>,
+ *  attrs?: Record<string, any>,
+ *  events?: Record<string, function>,
+ *  children?: HTMLElement | HTMLElement[]
+ *  namespace?: string
  * }} options
  * @returns 
  */
 export function createElement(tag, options){
-    const element = document.createElement(tag);
+    const element = options.namespace 
+      ? document.createElementNS(options.namespace, tag)
+      : document.createElement(tag);
     for(const [key, val] of Object.entries(options.props ?? {})){
         element[key] = val;
     }
@@ -33,6 +36,8 @@ export function createElement(tag, options){
     }
     return element;
 }
+
+export const createSvg = (tag, options) => createElement(tag, { ...options, namespace: "http://www.w3.org/2000/svg" });
 
 /**
  * Creates a list with items
@@ -75,4 +80,18 @@ export function createTable(rows, cols, options){
   }
   table.appendChild(tbody);
   return table;
+}
+
+/**
+ * 
+ * @param {HTMLElement} element 
+ * @param {Event} event 
+ * @returns 
+ */
+export function getEventRelativeTo(element, event) {
+  const rect = element.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top
+  };
 }

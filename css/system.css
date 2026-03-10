@@ -67,10 +67,11 @@
 
 	/*Parts*/
     --background: light-dark(var(--neutral-lightest), var(--neutral-dark-1));
-	--border: light-dark(var(--neutral-light-1), var(--neutral-medium));
+	--border: 1px solid light-dark(var(--neutral-light-1), var(--neutral-medium));
 	--text: light-dark(var(--neutral-darkest), var(--neutral-lightest));
 	--text-alt: var(--neutral-lightest);
 	--shadow: light-dark(var(--neutral-medium), var(--neutral-dark-2));
+	--ephemeral-border: 2px dotted var(--primary-medium);
 
     --corner-radius: 8px;
 
@@ -89,9 +90,9 @@
 	}
 }
 
-*,
-*::before,
-*::after {
+:where(*),
+:where(*)::before,
+:where(*)::after {
 	box-sizing: border-box;
 	position: relative;
 }
@@ -157,7 +158,7 @@ output,
 textarea {
 	display: inline-block;
 	color: var(--text);
-	border: 1px solid var(--border);
+	border: var(--border);
 	background-color: var(--background);
 	padding: 0.5rem;
 	min-block-size: 2.25rem; /*Not clear where the extra 0.25 comes from but needed to look correct*/
@@ -199,7 +200,7 @@ input[type='file'] {
 	}
 }
 label[file-label] {
-	border: 2px dotted var(--primary-medium);
+	border: var(--ephemeral-border);
 	display: block;
 	cursor: pointer;
 
@@ -265,7 +266,7 @@ button {
 		border-radius: 1rem;
 		inline-size: 4rem;
 		block-size: 2rem;
-		border: 1px solid var(--border);
+		border: var(--border);
 		padding: 0;
 		background: var(--complimentary-medium);
 		transition: 0.25s;
@@ -276,14 +277,14 @@ button {
 		border-radius: 1rem;
 		inline-size: 2rem;
 		block-size: calc(2rem - 2px);
-		border: 1px solid var(--border);
+		border: var(--border);
 		background: var(--background);
 		position: absolute;
 		top: 0;
 		left: 0;
 	}
 	&.toggle.on {
-		border: 1px solid var(--border);
+		border: var(--border);
 		background-color: var(--negative-medium)
 	}
 	&.toggle.on::after{
@@ -390,10 +391,18 @@ button {
 	height: 100%;
 }
 .constrained-width {
-	width: 1024px;
+	width: min(1024px, 100vw);
 }
 .constrained-height {
-	height: 768px;
+	height: min(768px, 100vh);
+}
+
+/*Utilities*/
+.no-select {
+	user-select: none;
+}
+.relative {
+	position: relative;
 }
 
 /*Themes*/
@@ -402,7 +411,7 @@ button {
 }
 .card {
     padding: 1rem;
-    border: 1px solid var(--border);
+    border: var(--border);
     background-color: var(--background);
     border-radius: var(--corner-radius);
 	overflow: hidden;
@@ -433,6 +442,6 @@ mc-swatch:not(:defined) {
 	display: inline-block;
     block-size: 4rem;
     inline-size: 4rem;
-    border: 1px solid var(--border);
+    border: var(--border);
 	background-color: attr(value type(<color>));
 }

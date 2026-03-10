@@ -1,4 +1,4 @@
-# {{componentKebabCase}}
+# {{prefixedComponentKebabCase}}
 
 -description-
 
@@ -24,8 +24,8 @@
 
 ## Events
 
-| name | payload |
-|-|-|
+| name | payload | description
+|-|-|-|
 
 ## Features
 

@@ -1,4 +1,5 @@
 - [x] include salt+iv in message
+    - [ ] update to mdenc ordering
 - [x] implement hints
 - [x] UI
     - [x] relative theme colors
@@ -6,6 +7,7 @@
 - [x] File mode
     - [x] File component
     - [x] File preview
+    - [ ] mdenc support
 - [x] Don't look for ids on ma components
 - [ ] Text mode: download as file
 - [x] File System mode
@@ -16,6 +18,7 @@
     - [x] encrypt file support
     - [x] delete file support
     - [ ] re-encrypt file support (old -> new passphrase, hint)
+    - [ ] mdenc support
 
 - [ ] wc-tab-panel
     - [ ] prerender mode

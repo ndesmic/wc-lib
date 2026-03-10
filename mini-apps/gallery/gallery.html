@@ -9,11 +9,12 @@
 	<main class="constrained-width constrained-height">
 		<div class="stack gap2 card full-width full-height">
             <h1>Gallery</h1>
-            <ma-gallery class="stack center gap3">
-                <input type="file" id="file">
+            <ma-gallery>
+                <wc-directory-picker class="directory-picker" id="directory-picker"></wc-directory-picker>
             </ma-gallery>
 		</div>
 	</main>
+	<script src="../../components/directory-picker/wc-directory-picker.js" type="module"></script>
     <script src="./ma-gallery.js" type="module"></script>
 </body>
 </html>

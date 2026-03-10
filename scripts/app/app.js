@@ -3,7 +3,6 @@ export class {{appTitleCase}} extends HTMLElement {
         this.bind(this);
         this.registerDom();
         this.attachEvents();
-        this.onColorInput();
     }
     bind(){
         
@@ -16,4 +15,4 @@ export class {{appTitleCase}} extends HTMLElement {
     }
 }
 
-customElements.define("{{appKebabCase}}", AppTitleCase);
+customElements.define("{{prefixedAppKebabCase}}", {{appTitleCase}});

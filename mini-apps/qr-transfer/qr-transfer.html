@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+	<title>QR Transfer</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../../css/system.css">
+	<link rel="stylesheet" href="./qr-transfer.css">
+</head>
+<body class="center">
+	<a href="../../index.html">Back</a>
+	<main class="constrained-width constrained-height">
+		<div class="stack gap2 card full-width full-height">
+            <h1>QR Transfer</h1>
+            <ma-qr-transfer>
+				<wc-tab-panel class="full-width">
+					<div slot="tab">Send</div>
+					<div slot="tab">Receive</div>
+					<div slot="content">
+						<div class="stack gap3">
+							<label for="qr-value">Value</label>
+							<input type="text" id="qr-value" class="qr-value">
+							<wc-qr-code errorlevel="Q"></wc-qr-code>
+						</div>
+					</div>
+					<div slot="content">
+						<div class="receive-content">
+							<wc-camera-preview class="camera-preview"></wc-camera-preview>
+							<ul class="barcode-values"></ul>
+						</div>
+					</div>
+				</wc-tab-panel>
+            </ma-qr-transfer>
+		</div>
+	</main>
+	<script src="../../components/qr-code/wc-qr-code.js" type="module"></script>
+	<script src="../../components/tab-panel/wc-tab-panel.js" type="module"></script>
+	<script src="../../components/camera-preview/wc-camera-preview.js" type="module"></script>
+    <script src="./ma-qr-transfer.js" type="module"></script>
+</body>
+</html>

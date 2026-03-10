@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Image Cropper</title>
+		<link rel="stylesheet" href="../../css/system.css">
+	</head>
+	<body class="center">
+		<a href="../../index.html">Back</a>
+		<main class="constrained-width constrained-height">
+			<div class="stack gap2 card full-width">
+				<h1>Image Cropper</h1>
+                <ma-image-cropper class="stack gap3">
+					<input type="file" id="input-file" class="input-file">
+					<div class="relative image-container">
+						<img id="image" class="image no-select"></canvas>
+					</div>
+                </ma-image-cropper>
+            </div>
+		</main>
+		<script src="../../components/rectangle-input/wc-rectangle-input.js" type="module"></script>
+		<script src="./ma-image-cropper.js" type="module"></script>
+	</body>
+</html>

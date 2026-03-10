@@ -1,0 +1,23 @@
+:host{ 
+    display: grid; 
+    box-sizing: border-box;
+    grid-template-columns: auto; 
+    grid-template-rows: auto; 
+    place-content: center;
+    border: var(--border);
+}
+:host(:hover) {
+    border: var(--ephemeral-border);
+    border-width: 1px;
+}
+#message { 
+    grid-column: 1 / 2; 
+    grid-row: 1 / 2; 
+    text-align: center;
+    place-self: center;
+}
+video {
+    grid-column: 1 / 2; 
+    grid-row: 1 / 2;
+    height: 100%;
+}
