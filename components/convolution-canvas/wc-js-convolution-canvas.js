@@ -1,9 +1,9 @@
 import { parseJsonOrDefault } from "../../libs/wc-utils.js";
 import { getSingleOrArray } from "../../libs/array-utils.js";
-import { loadImage } from "../../libs/image-utils.js";
-import { convolute } from "../../libs/convolution-utils.js";
+import { loadImage } from "../../libs/dom-utils.js";
+import { convolute } from "../../libs/graphics/convolution-utils.js";
 
-/** @typedef {import("../../libs/image-sample-utils.js").OobBehavior} OobBehavior */
+/** @typedef {import("../../libs/graphics/image-sample-utils.js").OobBehavior} OobBehavior */
 /** @typedef {import("../../types/tensor.d.ts").Tensor} Tensor */
 
 /***

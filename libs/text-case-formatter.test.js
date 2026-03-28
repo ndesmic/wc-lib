@@ -1,7 +1,7 @@
 import { describe } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import { TextCaseFormatter } from "../../simple-implementations/text-case-formatter.js";
-import { multiTest } from "../test-tools.js";
+import { TextCaseFormatter } from "./text-case-formatter.js";
+import { multiTest } from "./test-tools.js";
 
 describe("TextCaseFormatter", () => {
     describe("format", () => {

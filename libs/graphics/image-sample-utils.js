@@ -1,5 +1,5 @@
-import { clamp, getFractionalPart, mirrorWrap, wrap } from "./math-utils.js";
-import { lerpVector } from "./vector-utils.js";
+import { clamp, getFractionalPart, mirrorWrap, wrap } from "../math-utils.js";
+import { lerpVector } from "../vector-utils.js";
 /** @typedef {"clamp" | "wrap" | "mirror"} OobBehavior */
 
 /**
@@ -36,7 +36,7 @@ export function sample(imageData, col, row, oobBehavior) {
  * @param {number} value 
  * @param {number} min 
  * @param {number} max 
- * @param {OobBehavior} oobBehavior 
+ * @param {OobBehavior?} oobBehavior 
  * @returns 
  */
 function bound(value, min, max, oobBehavior){
@@ -45,7 +45,7 @@ function bound(value, min, max, oobBehavior){
             return wrap(value, min, max);
         }
         case "mirror": {
-            return mirrorWrap(valie, min, max);
+            return mirrorWrap(value, min, max);
         }
         case "clamp":
         default: {
@@ -59,7 +59,7 @@ function bound(value, min, max, oobBehavior){
  * @param {ImageData} imageData 
  * @param {number} row 
  * @param {number} col 
- * @param {OobBehavior} oobBehavior 
+ * @param {OobBehavior?} oobBehavior 
  * @returns 
  */
 export function getPx(imageData, col, row, oobBehavior){

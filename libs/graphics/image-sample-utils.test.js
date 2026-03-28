@@ -1,6 +1,6 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import { getPx, sample, setPx } from "./image-sample-utils.js";
+import { getPx, sample, setPx } from "../graphics/image-sample-utils.js";
 
 describe("image-sample-utils", () => {
 	const imageData = new ImageData(2, 2);

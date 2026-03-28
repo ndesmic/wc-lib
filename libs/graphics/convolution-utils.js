@@ -1,5 +1,5 @@
 import { sample, setPx } from "./image-sample-utils.js";
-/** @typedef {import("../types/tensor.d.ts").Tensor} Tensor */
+/** @typedef {import("../../types/tensor.d.ts").Tensor} Tensor */
 /** @typedef {import("./image-sample-utils.js").OobBehavior} OobBehavior */
 
 /**
@@ -79,11 +79,12 @@ export function getGaussianBoxBlurKernels(stdX, stdY, repetitions = 3){
 export function getGaussianBlurSVGAlgorithmKernels(stdX, stdY){
 	const width = get1DSVGAlgorithmKernelSizes(stdX);
 	const height = get1DSVGAlgorithmKernelSizes(stdY);
-
+	throw new Error("Unimplemented");
 }
 
 function get1DSVGAlgorithmKernelSizes(std){
 	const size = Math.floor(stdX * 3 * Math.sqrt(2 * Math.PI)/4, 0.5);
+	throw new Error("Unimplemented");
 }
 
 /**

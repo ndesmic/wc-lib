@@ -1,6 +1,6 @@
 import { parseFloatArrayOrDefault, parseFloatArrayWithLengthOrDefault, parseIntOrDefault } from "../../libs/wc-utils.js";
 import { pack } from "../../libs/buffer-utils.js";
-import { loadImage } from "../../libs/image-utils.js";
+import { loadImage } from "../../libs/loadImage.js";
 
 export class WcWgslConvolutionCanvas extends HTMLElement {
   #image;

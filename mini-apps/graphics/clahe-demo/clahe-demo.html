@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Contrast Limited Adaptive Histogram Equalization Demo</title>
+		<link rel="stylesheet" href="../../css/system.css">
+	</head>
+	<body class="center">
+		<a href="../../index.html">Back</a>
+		<main class="constrained-width constrained-height">
+			<div class="stack gap2 card full-width">
+				<h1>Contrast Limited Adaptive Histogram Equalization Demo</h1>
+                <ma-clahe-demo class="stack gap3">
+					<div>
+						<input type="file" class="image-input">
+					</div>
+					<div class="row gap2">
+						<div>
+							<h2>Original</h2>
+							<img class="original" />
+						</div>
+						<div>
+							<h2>CLAHE</h2>
+							<canvas class="clahe-canvas"></canvas>
+						</div>
+					</div>
+                </div>
+            </ma-clahe-demo>
+		</main>
+		<script src="./ma-clahe-demo.js" type="module"></script>
+	</body>
+</html>

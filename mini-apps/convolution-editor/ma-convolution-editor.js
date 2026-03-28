@@ -1,4 +1,4 @@
-import { getGaussianBoxBlurKernels, getGaussianBlurKernel } from "../../libs/convolution-utils.js";
+import { getGaussianBoxBlurKernels, getGaussianBlurKernel } from "../../libs/graphics/convolution-utils.js";
 
 export class MaConvolutionEditor extends HTMLElement {
     connectedCallback(){

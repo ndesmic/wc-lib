@@ -9,13 +9,12 @@
             "request": "launch",
             "name": "Test",
             "type": "node",
-            "program": "${workspaceFolder}/libs/string-templater.test.js",
+            "program": "${workspaceFolder}/libs/graphics/js-shader-utils.test.js",
             "cwd": "${workspaceFolder}",
             "env": {},
             "runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
             "runtimeArgs": [
                 "test",
-                "--unstable",
                 "--inspect-wait",
                 "--allow-all"
             ],
