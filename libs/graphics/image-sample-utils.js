@@ -1,4 +1,4 @@
-import { clamp, getFractionalPart, mirrorWrap, wrap } from "../math-utils.js";
+import { clamp, getFractionalPart, bound } from "../math-utils.js";
 import { lerpVector } from "../vector-utils.js";
 /** @typedef {"clamp" | "wrap" | "mirror"} OobBehavior */
 
@@ -29,29 +29,6 @@ export function sample(imageData, col, row, oobBehavior) {
 	const finalPx = lerpVector(rowStartPx, rowEndPx, rowFraction);
 
     return finalPx;
-}
-
-/**
- * Bounds a value between min and max using specified out-of-bounds behavior
- * @param {number} value 
- * @param {number} min 
- * @param {number} max 
- * @param {OobBehavior?} oobBehavior 
- * @returns 
- */
-function bound(value, min, max, oobBehavior){
-    switch(oobBehavior){
-        case "wrap": {
-            return wrap(value, min, max);
-        }
-        case "mirror": {
-            return mirrorWrap(value, min, max);
-        }
-        case "clamp":
-        default: {
-            return clamp(value, min, max);
-        }
-    }
 }
 
 /**

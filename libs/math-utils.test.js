@@ -1,6 +1,6 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import { getFractionalPart, lerp, clamp, wrap, mirrorWrap } from "./math-utils.js";
+import { getFractionalPart, lerp, clamp, wrapFloat, wrapInteger, mirrorWrap } from "./math-utils.js";
 
 describe("math-utils", () => {
     describe("clamp", () => {
@@ -12,20 +12,38 @@ describe("math-utils", () => {
 			expect(clamp(test[0][0], test[0][1], test[0][2])).toEqual(test[1]);
 		}))
 	});
-    describe("wrap", () => {
+    describe("wrapFloat", () => {
 		[
 			[[0.5, 0, 1], 0.5],
 			[[-0.25, 0, 1], 0.75],
 			[[1.25, 0, 1], 0.25],
+			[[5, 0, 10], 5],
+			[[-2, 0, 10], 8],
+			[[12, 0, 10], 2],
 		].forEach(test => it(`should get value ${test[1]} for min ${test[0][1]} and max ${test[0][2]} at value ${test[0][0]}`, () => {
-			expect(wrap(test[0][0], test[0][1], test[0][2])).toEqual(test[1]);
+			expect(wrapFloat(test[0][0], test[0][1], test[0][2])).toEqual(test[1]);
 		}))
 	});
-    describe("mirrorWrap", () => {
+	describe("wrapInteger", () => {
+		[
+			[[5, 0, 10], 5],
+			[[-2, 0, 10], 9],
+			[[12, 0, 10], 1],
+		].forEach(test => it(`should get value ${test[1]} for min ${test[0][1]} and max ${test[0][2]} at value ${test[0][0]}`, () => {
+			expect(wrapInteger(test[0][0], test[0][1], test[0][2])).toEqual(test[1]);
+		}))
+	});
+	describe("mirrorWrap", () => {
 		[
 			[[0.5, 0, 1], 0.5],
 			[[-0.25, 0, 1], 0.25],
 			[[1.25, 0, 1], 0.75],
+			[[5, 0, 10], 5],
+			[[-2, 0, 10], 2],
+			[[12, 0, 10], 8],
+			[[15, 10, 20], 15],
+			[[8, 10, 20], 12],
+			[[22, 10, 20], 18],
 		].forEach(test => it(`should get value ${test[1]} for min ${test[0][1]} and max ${test[0][2]} at value ${test[0][0]}`, () => {
 			expect(mirrorWrap(test[0][0], test[0][1], test[0][2])).toEqual(test[1]);
 		}))

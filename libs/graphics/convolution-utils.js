@@ -6,7 +6,7 @@ import { sample, setPx } from "./image-sample-utils.js";
  * Gets a gaussian blur kernel
  * @param {number} stdX 
  * @param {number} stdY 
- * @returns 
+ * @returns {Tensor}
  */
 export function getGaussianBlurKernel(stdX, stdY){
 	if(stdX === 0 && stdY === 0){
@@ -52,7 +52,7 @@ export function getGaussianBlurKernel(stdX, stdY){
  * @param {number} stdX 
  * @param {number} stdY 
  * @param {number} repetitions 
- * @returns 
+ * @returns {Tensor[]}
  */
 export function getGaussianBoxBlurKernels(stdX, stdY, repetitions = 3){
 	const xKernelSizes = get1DBoxBlurKernelSizes(stdX, repetitions);
@@ -112,9 +112,9 @@ export function get1DBoxBlurKernelSizes(std, repetitions = 3){
  * @param {ImageData} imageData
  * @param {Tensor} kernel 
  * @param {OobBehavior | "omit"}
- * @returns 
+ * @returns {ImageData}
  */
-export function convolute(imageData, kernel, oobBehavior){
+export function convoluteImage(imageData, kernel, oobBehavior = "clamp"){
 	const output = new ImageData(imageData.width, imageData.height);
 	const kRowMid = (kernel.shape[0] - 1) / 2;
 	const kColMid = (kernel.shape[1] - 1) / 2;

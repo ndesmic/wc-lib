@@ -1,7 +1,7 @@
 import { parseJsonOrDefault } from "../../libs/wc-utils.js";
 import { getSingleOrArray } from "../../libs/array-utils.js";
 import { loadImage } from "../../libs/dom-utils.js";
-import { convolute } from "../../libs/graphics/convolution-utils.js";
+import { convoluteImage } from "../../libs/graphics/convolution-utils.js";
 
 /** @typedef {import("../../libs/graphics/image-sample-utils.js").OobBehavior} OobBehavior */
 /** @typedef {import("../../types/tensor.d.ts").Tensor} Tensor */
@@ -15,7 +15,7 @@ function convoluteMultiple(imageData, kernels, oobBehavior) {
 	let lastOutput = imageData;
 
 	for(const kernel of kernels){
-		lastOutput = convolute(lastOutput, kernel, oobBehavior);
+		lastOutput = convoluteImage(lastOutput, kernel, oobBehavior);
 	}
 
 	return lastOutput;
