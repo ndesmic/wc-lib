@@ -1,4 +1,51 @@
+//Tensors should be (channel, col, row) because that's better if processed by webgpu but right now they are mostly row-major
 import { getFractionalPart, boundInteger, lerp } from "../math-utils.js";
+
+/**
+ * Gets the index into the values of a tensor given the dimensional indicies
+ * @param {number[]} colMajorIndices 
+ * @param {number[]} colMajorShape 
+ * @returns {number}
+ */
+export function getFlatIndex(colMajorIndices, colMajorShape) {
+	if (colMajorIndices.length != colMajorShape.length) throw new Error(`Indices count must match shape. indices length was ${colMajorIndices.length}, shape has length ${colMajorShape.length}.`);
+
+	const rowMajorShape = colMajorShape;
+	const rowMajorIndices = colMajorIndices;
+
+	let index = 0;
+	for (let i = 0; i < rowMajorShape.length; i++) {
+		index *= rowMajorShape[i];
+		index += rowMajorIndices[i];
+	}
+
+	return index;
+}
+
+/**
+ * Gets the dimensional indices of the tensor given the flat index into the values array
+ * @param {number} flatIndex 
+ * @param {number[]} colMajorShape 
+ * @returns {number[]}
+ */
+export function getDimensionalIndices(flatIndex, colMajorShape) {
+	const indices = [];
+	for (const size of colMajorShape) {
+		indices.push(flatIndex % size);
+		flatIndex = Math.floor(flatIndex / size);
+	}
+	return indices;
+}
+
+export function getValue(tensor, colMajorIndices){
+	const index = getFlatIndex(colMajorIndices, tensor.shape);
+	return tensor.values[index];
+}
+
+export function setValue(tensor, colMajorIndices, value){
+	const index = getFlatIndex(colMajorIndices, tensor.shape);
+	return tensor.values[index] = value;
+}
 
 //update for n-dimensions
 export function getBoundedIndices(tensor, indices, oobBehavior){
@@ -49,6 +96,7 @@ export function sampleTensor(tensor, index, oobBehavior) {
  * @returns {Tensor}
  */
 export function convoluteTensor(imageTensor, kernelTensor, oobBehavior = "clamp"){
+	if(imageTensor.shape.length < kernelTensor.shape.length) throw new Error("Kernel must have fewer dimensions than image tensor");
 	const output = { 
 		shape: [...imageTensor.shape],
 		values: new Array(imageTensor.values.length)  //this will need to be updated if there's a stride 

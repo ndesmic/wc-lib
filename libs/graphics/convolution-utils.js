@@ -1,3 +1,4 @@
+import { convoluteTensor } from "../tensor/tensor-utils.js";
 import { sample, setPx } from "./image-sample-utils.js";
 /** @typedef {import("../../types/tensor.d.ts").Tensor} Tensor */
 /** @typedef {import("./image-sample-utils.js").OobBehavior} OobBehavior */
@@ -150,4 +151,34 @@ export function convoluteImage(imageData, kernel, oobBehavior = "clamp"){
 		}
 	}
 	return output;
+}
+
+/**
+ * 
+ * @param {ImageData} imageData
+ * @returns {Tensor} 
+ */
+export function imageDataToTensor(imageData){
+	const size = imageData.width * imageData.height * 4;
+	const tensor = {
+		shape: [imageData.height, imageData.width, 4],
+		values: new Array(size)
+	}
+	for(let i = 0; i < imageData.length; i++){
+		const channelIndex = i % 4;
+		const index = Math.floor(i / 4);
+		channels[channelIndex][index] = imageData.data[i];
+	}
+	return channels;
+}
+
+export function convoluteImage2(){
+	const imageTensor = {
+		shape: [imageData.height, imageData.width],
+		values: imageData.data
+	};
+	//TODO seperate channels
+	const result = convoluteTensor(imageTensor, kernel, oobBehavior);
+	//TODO combine channels
+	return result;
 }
