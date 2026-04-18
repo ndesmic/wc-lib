@@ -1,6 +1,6 @@
-import { classifyFileType } from "../libs/file-tools.js";
-import { checkAABB, checkPointInside } from "../libs/geometry-utils.js";
-import { parseTextMap } from "../libs/keyvals.js";
+import { classifyFileType } from "../../libs/file-tools.js";
+import { checkAABB, checkPointInside } from "../../libs/geometry-utils.js";
+import { parseTextMap } from "../../formats/keyvals/keyvals.js";
 
 function getDocumentRect(element){
     const rect = element.getBoundingClientRect();

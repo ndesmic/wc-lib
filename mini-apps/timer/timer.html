@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>{{appTitleSpaced}}</title>
+		<title>Timer</title>
 		<link rel="stylesheet" href="../../css/system.css">
 	</head>
 	<body class="center">
 		<a href="../../index.html">Back</a>
 		<main class="constrained-width constrained-height">
 			<div class="stack gap2 card full-width">
-				<h1>{{appTitleSpaced}}</h1>
-                <{{prefixedAppKebabCase}}>
-                </{{prefixedAppKebabCase}}>
+				<h1>Timer</h1>
+                <ma-timer>
+					<div class="display">00:00</div>
+					<button class="toggle-button">Start</button>
+				</ma-timer>
             </div>
 		</main>
-		<script src="./{{prefixedAppKebabCase}}.js" type="module"></script>
+		<script src="./ma-timer.js" type="module"></script>
 	</body>
 </html>
