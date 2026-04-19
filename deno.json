@@ -2,7 +2,8 @@
     "tasks": {
         "start": "deno -A jsr:@std/http/file-server .",
         "new:app": "deno run -A --unstable-raw-imports ./scripts/app/new-app.js",
-        "new:component": "deno run -A --unstable-raw-imports ./scripts/component/new-component.js"
+        "new:component": "deno run -A --unstable-raw-imports ./scripts/component/new-component.js",
+        "test:current": "deno test -A ./libs/tensor/tensor-utils.test.js"
     },
     "fmt": {
         "indentWidth": 1,

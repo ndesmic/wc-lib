@@ -1,3 +1,8 @@
+//Tensors should be (channel, col, row)
+/**
+ * @typedef {import("../types/sample.d.ts").OobBehavior} OobBehavior
+ * */
+
 /**
  * Linearly Interpolates between two numbers
  * @param {number} start 
@@ -65,6 +70,24 @@ export function mirrorWrap(value, min = Number.MIN_SAFE_INTEGER, max = Number.MA
 	return min + normalized;
 }
 
+export function inRangeOrDefault(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER, defaultValue){
+	if(value < min || value > max){
+		return defaultValue;
+	}
+	return value;
+}
+
+export const UNDERFLOW = Symbol("underflow");
+export const OVERFLOW = Symbol("overflow");
+export function inRangeOrReport(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER){
+	if(value < min){
+		return UNDERFLOW;
+	} else if (value > max) {
+		return OVERFLOW;
+	}
+	return value;
+}
+
 /**
  * Bounds a float value between min and max using specified out-of-bounds behavior
  * @param {number} value 
@@ -73,13 +96,19 @@ export function mirrorWrap(value, min = Number.MIN_SAFE_INTEGER, max = Number.MA
  * @param {OobBehavior?} oobBehavior 
  * @returns 
  */
-export function bound(value, min, max, oobBehavior){
-	switch(oobBehavior){
+export function boundFloat(value, min, max, oobBehavior = { type: "clamp" }){
+	switch(oobBehavior.type){
 		case "wrap": {
 			return wrapFloat(value, min, max);
 		}
 		case "mirror": {
-			return mirrorWrapFloat(value, min, max);
+			return mirrorWrap(value, min, max);
+		}
+		case "constant": {
+			return inRangeOrDefault(value, min, max, oobBehavior.value);
+		}
+		case "report": {
+			return inRangeOrReport(value, min, max)
 		}
 		case "clamp":
 		default: {
@@ -97,13 +126,19 @@ export function bound(value, min, max, oobBehavior){
  * @param {OobBehavior?} oobBehavior 
  * @returns 
  */
-export function boundInteger(value, min, max, oobBehavior){
-	switch(oobBehavior){
+export function boundInteger(value, min, max, oobBehavior = { type: "clamp" }){
+	switch(oobBehavior.type){
 		case "wrap": {
 			return wrapInteger(value, min, max);
 		}
 		case "mirror": {
 			return mirrorWrap(value, min, max);
+		}
+		case "constant": {
+			return inRangeOrDefault(value, min, max, oobBehavior.value);
+		}
+		case "report": {
+			return inRangeOrReport(value, min, max)
 		}
 		case "clamp":
 		default: {

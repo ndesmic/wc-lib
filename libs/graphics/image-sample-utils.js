@@ -1,4 +1,4 @@
-import { clamp, getFractionalPart, bound } from "../math-utils.js";
+import { clamp, getFractionalPart, boundFloat } from "../math-utils.js";
 import { lerpVector } from "../vector-utils.js";
 /** @typedef {"clamp" | "wrap" | "mirror"} OobBehavior */
 
@@ -40,8 +40,8 @@ export function sample(imageData, col, row, oobBehavior) {
  * @returns 
  */
 export function getPx(imageData, col, row, oobBehavior){
-    const boundedCol = bound(Math.floor(col), 0, imageData.width - 1, oobBehavior);
-    const boundedRow = bound(Math.floor(row), 0, imageData.height - 1, oobBehavior);
+    const boundedCol = boundFloat(Math.floor(col), 0, imageData.width - 1, oobBehavior);
+    const boundedRow = boundFloat(Math.floor(row), 0, imageData.height - 1, oobBehavior);
     const offset = (boundedRow * imageData.width * 4) + (boundedCol * 4);
     return [
 		imageData.data[offset + 0] / 255,

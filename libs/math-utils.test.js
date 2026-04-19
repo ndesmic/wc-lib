@@ -1,53 +1,114 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import { getFractionalPart, lerp, clamp, wrapFloat, wrapInteger, mirrorWrap } from "./math-utils.js";
+import { getFractionalPart, lerp, clamp, wrapFloat, wrapInteger, mirrorWrap, boundInteger, boundFloat, inRangeOrDefault, inRangeOrReport, UNDERFLOW, OVERFLOW } from "./math-utils.js";
+import { multiTest } from "./test-tools.js";
 
 describe("math-utils", () => {
     describe("clamp", () => {
-		[
-			[[0.5, 0, 1], 0.5],
-			[[-1, 0, 1], 0],
-			[[2, 0, 1], 1],
-		].forEach(test => it(`should get value ${test[1]} for min ${test[0][1]} and max ${test[0][2]} at value ${test[0][0]}`, () => {
-			expect(clamp(test[0][0], test[0][1], test[0][2])).toEqual(test[1]);
-		}))
-	});
+        multiTest([
+            { args: [0.5, 0, 1], expected: 0.5, name: "should get value 0.5 for min 0 and max 1 at value 0.5" },
+            { args: [-1, 0, 1], expected: 0, name: "should get value 0 for min 0 and max 1 at value -1" },
+            { args: [2, 0, 1], expected: 1, name: "should get value 1 for min 0 and max 1 at value 2" },
+        ], test => {
+            expect(clamp(...test.args)).toEqual(test.expected);
+        })
+    });
     describe("wrapFloat", () => {
-		[
-			[[0.5, 0, 1], 0.5],
-			[[-0.25, 0, 1], 0.75],
-			[[1.25, 0, 1], 0.25],
-			[[5, 0, 10], 5],
-			[[-2, 0, 10], 8],
-			[[12, 0, 10], 2],
-		].forEach(test => it(`should get value ${test[1]} for min ${test[0][1]} and max ${test[0][2]} at value ${test[0][0]}`, () => {
-			expect(wrapFloat(test[0][0], test[0][1], test[0][2])).toEqual(test[1]);
-		}))
-	});
-	describe("wrapInteger", () => {
-		[
-			[[5, 0, 10], 5],
-			[[-2, 0, 10], 9],
-			[[12, 0, 10], 1],
-		].forEach(test => it(`should get value ${test[1]} for min ${test[0][1]} and max ${test[0][2]} at value ${test[0][0]}`, () => {
-			expect(wrapInteger(test[0][0], test[0][1], test[0][2])).toEqual(test[1]);
-		}))
-	});
-	describe("mirrorWrap", () => {
-		[
-			[[0.5, 0, 1], 0.5],
-			[[-0.25, 0, 1], 0.25],
-			[[1.25, 0, 1], 0.75],
-			[[5, 0, 10], 5],
-			[[-2, 0, 10], 2],
-			[[12, 0, 10], 8],
-			[[15, 10, 20], 15],
-			[[8, 10, 20], 12],
-			[[22, 10, 20], 18],
-		].forEach(test => it(`should get value ${test[1]} for min ${test[0][1]} and max ${test[0][2]} at value ${test[0][0]}`, () => {
-			expect(mirrorWrap(test[0][0], test[0][1], test[0][2])).toEqual(test[1]);
-		}))
-	});
+        multiTest([
+            { args: [0.5, 0, 1], expected: 0.5 },
+            { args: [-0.25, 0, 1], expected: 0.75 },
+            { args: [1.25, 0, 1], expected: 0.25 },
+            { args: [5, 0, 10], expected: 5 },
+            { args: [-2, 0, 10], expected: 8 },
+            { args: [12, 0, 10], expected: 2 },
+        ], test => {
+            expect(wrapFloat(...test.args)).toEqual(test.expected);
+        })
+    });
+    describe("wrapInteger", () => {
+        multiTest([
+            { args: [5, 0, 10], expected: 5 },
+            { args: [-2, 0, 10], expected: 9 },
+            { args: [12, 0, 10], expected: 1 },
+        ], test => {
+            expect(wrapInteger(...test.args)).toEqual(test.expected);
+        })
+    });
+    describe("mirrorWrap", () => {
+        multiTest([
+            { args: [0.5, 0, 1], expected: 0.5 },
+            { args: [-0.25, 0, 1], expected: 0.25 },
+            { args: [1.25, 0, 1], expected: 0.75 },
+            { args: [5, 0, 10], expected: 5 },
+            { args: [-2, 0, 10], expected: 2 },
+            { args: [12, 0, 10], expected: 8 },
+            { args: [15, 10, 20], expected: 15 },
+            { args: [8, 10, 20], expected: 12 },
+            { args: [22, 10, 20], expected: 18 },
+        ], test => {
+            expect(mirrorWrap(...test.args)).toEqual(test.expected);
+        })
+    });
+    describe("inRangeOrDefault", () => {
+        multiTest([
+            { args: [5, 0, 10, 99], expected: 5 },
+            { args: [-1, 0, 10, 99], expected: 99 },
+            { args: [11, 0, 10, 99], expected: 99 },
+        ], test => {
+            expect(inRangeOrDefault(...test.args)).toEqual(test.expected);
+        })
+    });
+    describe("inRangeOrReport", () => {
+        multiTest([
+            { args: [5, 0, 10, 99], expected: 5 },
+            { args: [-1, 0, 10, 99], expected: UNDERFLOW },
+            { args: [11, 0, 10, 99], expected: OVERFLOW },
+        ], test => {
+            expect(inRangeOrReport(...test.args)).toEqual(test.expected);
+        })
+    });
+	describe("boundFloat", () => {
+        multiTest([
+            { args: [0.5, 0, 1.0, { type: "clamp" }], expected: 0.5 },
+            { args: [-0.1, 0, 1.0, { type: "clamp" }], expected: 0 },
+            { args: [1.1, 0, 1.0, { type: "clamp" }], expected: 1.0 },
+            { args: [-0.1, 0, 1.0, { type: "wrap" }], expected: 0.9 },
+            { args: [1.1, 0, 1.0, { type: "wrap" }], expected: 0.1 },
+            { args: [-0.1, 0, 1.0, { type: "mirror" }], expected: 0.1 },
+            { args: [1.1, 0, 1.0, { type: "mirror" }], expected: 0.9 },
+            { args: [-0.1, 0, 1.0, { type: "constant", value: 99 }], expected: 99 },
+            { args: [1.1, 0, 1.0, {type: "constant", value: 99}], expected: 99 },
+        ], test => {
+            expect(boundFloat(...test.args)).toBeCloseTo(test.expected);
+        });
+        multiTest([
+            { args: [-0.1, 0, 1.0, { type: "report" }], expected: UNDERFLOW },
+            { args: [1.1, 0, 1.0, {type: "report" }], expected: OVERFLOW },
+        ], test => {
+            expect(boundFloat(...test.args)).toEqual(test.expected);
+        })
+    });
+	describe("boundInteger", () => {
+        multiTest([
+            { args: [5, 0, 10, { type: "clamp" }], expected: 5 },
+            { args: [-1, 0, 10, { type: "clamp" }], expected: 0 },
+            { args: [11, 0, 10, { type: "clamp" }], expected: 10 },
+            { args: [-1, 0, 10, { type: "wrap" }], expected: 10 },
+            { args: [11, 0, 10, { type: "wrap" }], expected: 0 },
+            { args: [-1, 0, 10, { type: "mirror" }], expected: 1 },
+            { args: [11, 0, 10, { type: "mirror" }], expected: 9 },
+            { args: [-1, 0, 10, { type: "constant", value: 99 }], expected: 99 },
+            { args: [11, 0, 10, { type: "constant", value: 99 }], expected: 99 }
+        ], test => {
+            expect(boundInteger(...test.args)).toEqual(test.expected);
+        });
+        multiTest([
+            { args: [-1, 0, 1.0, { type: "report" }], expected: UNDERFLOW },
+            { args: [11, 0, 1.0, { type: "report" }], expected: OVERFLOW },
+        ], test => {
+            expect(boundInteger(...test.args)).toEqual(test.expected);
+        })
+    });
     describe("getFractionalPart", () => {
         it("should get fractional part", () => {
             const result = getFractionalPart(1.11)
@@ -59,13 +120,13 @@ describe("math-utils", () => {
         });
     });
     describe("lerp", () => {
-		[
-			[[0, 1, 0.5], 0.5],
-			[[0, 2, 0.5], 1],
-			[[-1, 1, 0.5], 0],
-			[[0, 10, 0.75], 7.5]
-		].forEach(test => it(`should get value ${test[1]} for start ${test[0][0]} and end ${test[0][1]} at value ${test[0][2]}`, () => {
-			expect(lerp(test[0][0], test[0][1], test[0][2])).toEqual(test[1]);
-		}))
-	});
+        multiTest([
+            { args: [0, 1, 0.5], expected: 0.5 },
+            { args: [0, 2, 0.5], expected: 1 },
+            { args: [-1, 1, 0.5], expected: 0 },
+            { args: [0, 10, 0.75], expected: 7.5 }
+        ], test => {
+            expect(lerp(...test.args)).toEqual(test.expected);
+        })
+    });
 });

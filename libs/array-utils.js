@@ -88,7 +88,7 @@ export function chunkArray(array, lengthPerChunk) {
 
 /**
  * Gets an array filled with numbers from `start` to `end` stepping by `step`
- * @param {{ start?: number, end?: number, step?: number}} param0 
+ * @param {{ start?: number, end: number, step?: number}} param0 
  * @returns 
  */
 export function getRange({ start, end, step }) {
