@@ -168,7 +168,7 @@ export function getBoundedIndices(tensor, indices, oobMapping){
 	return indices.map((i, di) => boundInteger(Math.floor(i), 0, tensor.shape[di] - 1, oobMapping));
 }
 
-export function getBoundedValues(tensor, indices, oobIndexMapping = { type: "clamp" }, invalidIndexValueMap){
+export function getBoundedValue(tensor, indices, oobIndexMapping = { type: "clamp" }, invalidIndexValueMap){
 	const boundIndices = getBoundedIndices(tensor, indices, oobIndexMapping);
 	if(invalidIndexValueMap?.type === "constant"){
 		for(const index of boundIndices){
@@ -182,7 +182,7 @@ export function getBoundedValues(tensor, indices, oobIndexMapping = { type: "cla
 }
 
 /**
- * Samples a pixel from ImageData using bounding behavior and bilinear filtering (0-1 normalized)
+ * Samples a pixel from ImageData using bounding behavior and multilinear filtering (0-1 normalized)
  * todo: update for > 2 dimensions
  * @param {Tensor} imageData 
  * @param {number[]} index
@@ -190,24 +190,46 @@ export function getBoundedValues(tensor, indices, oobIndexMapping = { type: "cla
  * @returns 
  */
 export function sampleTensor(tensor, index, oobBehavior) {
-    const columnStartIndex = Math.floor(index[1]);
-    const columnEndIndex = Math.ceil(index[1]);
-    const columnFraction = getFractionalPart(index[1]);
+	const dimension = new Array(tensor.shape.length);
 
-    const rowStartIndex = Math.floor(index[0]);
-    const rowEndIndex = Math.ceil(index[0]);
-    const rowFraction = getFractionalPart(index[0]);
+	for(let i = 0; i < tensor.shape.length; i++){
+		const startIndex = Math.floor(index[i]); //todo: bound
+		const endIndex = Math.ceil(index[i]); //todo: bound
+		const fraction = getFractionalPart(index[i]);
+		dimension[i] = { 
+			startIndex,
+			endIndex,
+			fraction
+		};
+	}
+
+	const currentIndices = new Array(tensor.shape.length);
 	
-    const rowStartColumnStartPx = getBoundedValues(tensor, [rowStartIndex, columnStartIndex], oobBehavior);
-    const rowEndColumnStartPx = getBoundedValues(tensor, [rowEndIndex, columnStartIndex], oobBehavior);
-    const rowStartColumnEndPx = getBoundedValues(tensor, [rowStartIndex, columnEndIndex], oobBehavior);
-    const rowEndColumnEndPx = getBoundedValues(tensor, [rowEndIndex, columnEndIndex], oobBehavior);
+	function recursiveLerp(dim){
+		if(dim === tensor.shape.length - 1){
+			currentIndices[dim] = dimension[dim].startIndex;
+			const v0 = getBoundedValue(tensor, currentIndices, oobBehavior);
+			
+			currentIndices[dim] = dimension[dim].endIndex;
+			const v1 = getBoundedValue(tensor, currentIndices, oobBehavior);
 
-    const rowStartPx = lerp(rowStartColumnStartPx, rowStartColumnEndPx, columnFraction);
-    const rowEndPx = lerp(rowEndColumnStartPx, rowEndColumnEndPx, columnFraction);
-    const finalPx = lerp(rowStartPx, rowEndPx, rowFraction);
+			const t = dimension[dim].fraction;
 
-    return finalPx;
+			return lerp(v0, v1, t);
+		}
+
+		currentIndices[dim] = dimension[dim].startIndex;
+		const v0 = recursiveLerp(dim + 1);
+
+		currentIndices[dim] = dimension[dim].endIndex;
+		const v1 = recursiveLerp(dim + 1);
+
+		const t = dimension[dim].fraction;
+
+		return lerp(v0, v1, t);
+	}
+
+	return recursiveLerp(0);
 }
 
 export function iterateTensor(tensor, callback){

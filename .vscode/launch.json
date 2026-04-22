@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Test",
             "type": "node",
-            "program": "${workspaceFolder}/libs/math-utils.test.js",
+            "program": "${workspaceFolder}/libs/tensor/tensor-utils.test.js",
             "cwd": "${workspaceFolder}",
             "env": {},
             "runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
