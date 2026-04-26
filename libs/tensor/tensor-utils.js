@@ -1,22 +1,38 @@
 //Tensors should be (channel, col, row)
 /**
  * @typedef {import("../../types/sample.d.ts").OobBehavior} OobBehavior
+ * @typedef {import("../../types/sample.d.ts").InvalidIndexValueMapping} InvalidIndexValueMapping
+ * @typedef {import("../../types/tensor.d.ts").Tensor} Tensor
  * */
 import { getFractionalPart, boundInteger, lerp, UNDERFLOW, OVERFLOW } from "../math-utils.js";
 import { padArrayStart } from "../array-utils.js";
 
 /**
  * Checks if indices are within shape bounds
- * @param {number[]} indices 
- * @param {number[]} shape 
+ * @param {number[]} leftPackedIndices 
+ * @param {number[]} leftPackedShape 
  * @returns 
  */
-export function isValidIndexForShape(indices, shape){
-	if(indices.length != shape.length) return false;
-	if(indices.some((i, di) => i >= shape[di])) return false;
-	if(indices.some(i => i < 0)) return false;
+export function isValidDimensionalIndicesForShape(leftPackedIndices, leftPackedShape){
+	if(leftPackedIndices.length != leftPackedShape.length) return false;
+	if(leftPackedIndices.some((i, di) => i >= leftPackedShape[di])) return false;
+	if(leftPackedIndices.some(i => i < 0)) return false;
 	return true;
-}	
+}
+
+/**
+ * 
+ * @param {number} index 
+ * @param {number[]} leftPackedShape 
+ * @returns 
+ */
+export function isValidFlatIndexForShape(index, leftPackedShape){
+	const maxIndex = leftPackedShape.reduce((prod, x) => prod * x) - 1; //index starts at 0
+	if(index > maxIndex || index < 0){
+		return false;
+	}
+	return true;
+}
 
 /**
  * Converts a tensor from row-major to column-major order (or vice versa)
@@ -26,14 +42,14 @@ export function isValidIndexForShape(indices, shape){
 export function toColumnMajor(tensor) {
     const newValues = new Array(tensor.values.length);
     
-    iterateTensor(tensor, (value, dimensionalIndex, flatIndex) => {
+    iterateTensorLeftPacked(tensor, (value, dimensionalIndex, flatIndex) => {
         // Convert dimensional indices to column-major flat index
-        let colMajorIndex = 0;
+        let leftPackedIndex = 0;
         for (let i = 0; i < tensor.shape.length; i++) {
-            colMajorIndex *= tensor.shape[i];
-            colMajorIndex += dimensionalIndex[i];
+            leftPackedIndex *= tensor.shape[i];
+            leftPackedIndex += dimensionalIndex[i];
         }
-        newValues[colMajorIndex] = value;
+        newValues[leftPackedIndex] = value;
     });
     
     return {
@@ -49,10 +65,10 @@ export function toColumnMajor(tensor) {
  * @returns 
  */
 export function getDimensionalMultiRange({ start, end, step, shape }){
-	if(start && !isValidIndexForShape(start, shape)){
+	if(start && !isValidDimensionalIndicesForShape(start, shape)){
 		throw new Error(`Start value ${start} was not valid ${shape} (bounds are exclusive).`) 
 	}
-	if(end && !isValidIndexForShape(end, shape)){
+	if(end && !isValidDimensionalIndicesForShape(end, shape)){
 		throw new Error(`End value ${end} was not valid ${shape} (bounds are exclusive).`) 
 	}
 
@@ -64,7 +80,7 @@ export function getDimensionalMultiRange({ start, end, step, shape }){
 	const currentValue = start.slice();
 
 	function iterateInnerShape(dim){
-		if(dim === shape.length){
+		if(dim < 0){
 			result.push(currentValue.slice());
 			return
 		}
@@ -72,12 +88,12 @@ export function getDimensionalMultiRange({ start, end, step, shape }){
 		const low = start[dim];
 		const high = end[dim];
 
-		for(currentValue[dim] = low; currentValue[dim] <= high; currentValue[dim]++){
-			iterateInnerShape(dim + 1);
+		for(currentValue[dim] = low; currentValue[dim] <= high; currentValue[dim] ++){
+			iterateInnerShape(dim - 1);
 		}
 	}
 
-	iterateInnerShape(0);
+	iterateInnerShape(shape.length - 1);
 	return result;
 }
 
@@ -88,10 +104,10 @@ export function getDimensionalMultiRange({ start, end, step, shape }){
  * @returns 
  */
 export function getFlatMultiRange({ start, end, step, shape }){
-	if(start && !isValidIndexForShape(start, shape)){
+	if(start && !isValidDimensionalIndicesForShape(start, shape)){
 		throw new Error(`Start value ${start} was not valid ${shape} (bounds are exclusive).`) 
 	}
-	if(end && !isValidIndexForShape(end, shape)){
+	if(end && !isValidDimensionalIndicesForShape(end, shape)){
 		throw new Error(`End value ${end} was not valid ${shape} (bounds are exclusive).`) 
 	}
 
@@ -99,28 +115,30 @@ export function getFlatMultiRange({ start, end, step, shape }){
 	end = end ?? shape.map(x => x - 1);
 	step = step ?? 1;
 
-	const flatStart = getFlatIndex(start, shape);
-	const flatEnd = getFlatIndex(end, shape);
+	const flatStart = getFlatIndexleftPacked(start, shape);
+	const flatEnd = getFlatIndexleftPacked(end, shape);
 	const result = [];
 	for(let i = flatStart; i <= flatEnd; i += step){
-		result.push(getDimensionalIndices(i, shape));
+		result.push(getDimensionalIndicesleftPacked(i, shape));
 	}
 	return result;
 }
 
 /**
  * Gets the index into the values of a tensor given the dimensional indicies
- * @param {number[]} colMajorIndices 
- * @param {number[]} colMajorShape 
+ * @param {number[]} leftPackedIndices 
+ * @param {number[]} leftPackedShape 
  * @returns {number}
  */
-export function getFlatIndex(colMajorIndices, colMajorShape) {
-	if (colMajorIndices.length != colMajorShape.length) throw new Error(`Indices count must match shape. indices length was ${colMajorIndices.length}, shape has length ${colMajorShape.length}.`);
+export function getFlatIndexleftPacked(leftPackedIndices, leftPackedShape) {
+	if (!isValidDimensionalIndicesForShape(leftPackedIndices, leftPackedShape)){
+		throw new Error(`Indices ${leftPackedIndices} were not valid for ${leftPackedShape} (bounds are exclusive).`);
+	}
 
 	let index = 0;
-	for (let i = colMajorShape.length - 1; i >= 0; i--) {
-		index *= colMajorShape[i];
-		index += colMajorIndices[i];
+	for (let i = leftPackedShape.length - 1; i >= 0; i--) {
+		index *= leftPackedShape[i];
+		index += leftPackedIndices[i];
 	}
 
 	return index;
@@ -129,14 +147,18 @@ export function getFlatIndex(colMajorIndices, colMajorShape) {
 /**
  * Gets the dimensional indices of the tensor given the flat index into the values array
  * @param {number} flatIndex 
- * @param {number[]} colMajorShape 
+ * @param {number[]} leftPackedShape 
  * @returns {number[]}
  */
-export function getDimensionalIndices(flatIndex, colMajorShape) {
-	const indices = new Array(colMajorShape.length);
-	for (let i = colMajorShape.length - 1; i >= 0; i--) {
-		indices[i] = (flatIndex % colMajorShape[i]);
-		flatIndex = Math.floor(flatIndex / colMajorShape[i]);
+export function getDimensionalIndicesleftPacked(flatIndex, leftPackedShape) {
+	if (!isValidFlatIndexForShape(flatIndex, leftPackedShape)){
+		throw new Error(`Index ${flatIndex} was not valid for ${leftPackedShape} (bounds are exclusive).`);
+	}
+
+	const indices = new Array(leftPackedShape.length);
+	for (let i = 0; i < leftPackedShape.length; i++) {
+		indices[i] = (flatIndex % leftPackedShape[i]);
+		flatIndex = Math.floor(flatIndex / leftPackedShape[i]);
 	}
 	return indices;
 }
@@ -144,31 +166,46 @@ export function getDimensionalIndices(flatIndex, colMajorShape) {
 /**
  * Indexes into tensor at multi-index and returns value
  * @param {Tensor} tensor 
- * @param {number[]} colMajorIndices 
+ * @param {number[]} leftPackedIndices 
  * @returns 
  */
-export function getValue(tensor, colMajorIndices){
-	const index = getFlatIndex(colMajorIndices, tensor.shape);
+export function getValue(tensor, leftPackedIndices){
+	const index = getFlatIndexleftPacked(leftPackedIndices, tensor.shape);
 	return tensor.values[index];
 }
 
 /**
  * Indexes into tensor at multi-index and sets value
  * @param {Tensor} tensor 
- * @param {number[]} colMajorIndices 
+ * @param {number[]} leftPackedIndices 
  * @param {any} value 
  * @returns 
  */
-export function setValue(tensor, colMajorIndices, value){
-	const index = getFlatIndex(colMajorIndices, tensor.shape);
+export function setValue(tensor, leftPackedIndices, value){
+	const index = getFlatIndexleftPacked(leftPackedIndices, tensor.shape);
 	return tensor.values[index] = value;
 }
 
+/**
+ * 
+ * @param {Tensor} tensor 
+ * @param {number[]} indices 
+ * @param {OobBehavior} oobMapping 
+ * @returns 
+ */
 export function getBoundedIndices(tensor, indices, oobMapping){
 	return indices.map((i, di) => boundInteger(Math.floor(i), 0, tensor.shape[di] - 1, oobMapping));
 }
 
-export function getBoundedValue(tensor, indices, oobIndexMapping = { type: "clamp" }, invalidIndexValueMap){
+/**
+ * 
+ * @param {Tensor} tensor 
+ * @param {number[]} indices 
+ * @param {OobBehavior} oobIndexMapping 
+ * @param {InvalidIndexValueMapping} invalidIndexValueMap 
+ * @returns 
+ */
+export function getBoundedValue(tensor, indices, oobIndexMapping = { type: "clamp" }, invalidIndexValueMap = { type: "none" }){
 	const boundIndices = getBoundedIndices(tensor, indices, oobIndexMapping);
 	if(invalidIndexValueMap?.type === "constant"){
 		for(const index of boundIndices){
@@ -177,19 +214,20 @@ export function getBoundedValue(tensor, indices, oobIndexMapping = { type: "clam
 			}
 		}
 	}
-	const flatIndex = getFlatIndex(boundIndices, tensor.shape);
+	const flatIndex = getFlatIndexleftPacked(boundIndices, tensor.shape);
     return tensor.values[flatIndex];
 }
 
 /**
- * Samples a pixel from ImageData using bounding behavior and multilinear filtering (0-1 normalized)
- * todo: update for > 2 dimensions
+ * Samples a pixel from ImageData using bounding behavior and multilinear filtering
+ * todo: nearest neighbor option
  * @param {Tensor} imageData 
  * @param {number[]} index
  * @param {OobBehavior} oobBehavior 
+ * @param {InvalidIndexValueMapping} invalidIndexValueMap 
  * @returns 
  */
-export function sampleTensor(tensor, index, oobBehavior) {
+export function sampleTensor(tensor, index, oobBehavior, invalidIndexValueMap = { type: "none" }) {
 	const dimension = new Array(tensor.shape.length);
 
 	for(let i = 0; i < tensor.shape.length; i++){
@@ -208,10 +246,10 @@ export function sampleTensor(tensor, index, oobBehavior) {
 	function recursiveLerp(dim){
 		if(dim === tensor.shape.length - 1){
 			currentIndices[dim] = dimension[dim].startIndex;
-			const v0 = getBoundedValue(tensor, currentIndices, oobBehavior);
+			const v0 = getBoundedValue(tensor, currentIndices, oobBehavior, invalidIndexValueMap);
 			
 			currentIndices[dim] = dimension[dim].endIndex;
-			const v1 = getBoundedValue(tensor, currentIndices, oobBehavior);
+			const v1 = getBoundedValue(tensor, currentIndices, oobBehavior, invalidIndexValueMap);
 
 			const t = dimension[dim].fraction;
 
@@ -232,28 +270,27 @@ export function sampleTensor(tensor, index, oobBehavior) {
 	return recursiveLerp(0);
 }
 
-export function iterateTensor(tensor, callback){
+export function iterateTensorLeftPacked(tensor, callback){
 	const dimensionalIndex = new Array(tensor.shape.length).fill(0);
 
 	function iterateInnerShape(dim){
-		if(dim === tensor.shape.length){
+		if(dim < 0){
 			const dIndex = dimensionalIndex.slice();
-			const fIndex = getFlatIndex(dIndex, tensor.shape);
+			const fIndex = getFlatIndexleftPacked(dIndex, tensor.shape);
 			callback(tensor.values[fIndex], dIndex, fIndex);
 			return;
 		}
 
-		for(dimensionalIndex[dim] = 0; dimensionalIndex[dim] < tensor.shape[dim]; dimensionalIndex[dim]++){
-			iterateInnerShape(dim + 1);
-		}
+        for(dimensionalIndex[dim] = 0; dimensionalIndex[dim] < tensor.shape[dim]; dimensionalIndex[dim]++){
+            iterateInnerShape(dim - 1);
+        }
 	}
 
-	iterateInnerShape(0);
+	iterateInnerShape(tensor.shape.length - 1);
 }
 
 /**
- * Applies a convoltion kernel to image Tensor,
- * row major, shape: slow -> fast iterating
+ * Applies a convoltion kernel to image Tensor, left packed
  * TODO: add stride
  * TODO: add n-dimension
  * @param {Tensor} imageTensor
@@ -261,7 +298,7 @@ export function iterateTensor(tensor, callback){
  * @param {OobBehavior | "omit"}
  * @returns {Tensor}
  */
-export function convoluteTensor(imageTensor, kernelTensor, oobBehavior = "clamp"){
+export function convoluteTensor(imageTensor, kernelTensor, oobBehavior = { type: "clamp" }, invalidIndexValueMap = { type: "none" }){
 	if(imageTensor.shape.length < kernelTensor.shape.length) throw new Error("Kernel must have fewer dimensions than image tensor");
 	const oob = Array.isArray(oobBehavior)
 		? oobBehavior
@@ -275,7 +312,7 @@ export function convoluteTensor(imageTensor, kernelTensor, oobBehavior = "clamp"
 	const kRowMid = (kernelTensor.shape[0] - 1) / 2;
 	const kColMid = (kernelTensor.shape[1] - 1) / 2;
 
-	iterateTensor(imageTensor, (value, dIndex, fIndex) => {
+	iterateTensorLeftPacked(imageTensor, (value, dIndex, fIndex) => {
 		let sum = 0;
 
 		const [row, col] = dIndex;
@@ -288,7 +325,7 @@ export function convoluteTensor(imageTensor, kernelTensor, oobBehavior = "clamp"
 				const shouldOmit = [sampleRow, sampleCol].some((i, di) =>  ((i < 0 || i >= imageTensor.shape[di]) && normalizedOobBehavior[di] === "omit")); 
 				if(shouldOmit) continue;
 				
-				const value = sampleTensor(imageTensor, [sampleRow, sampleCol], oobBehavior);
+				const value = sampleTensor(imageTensor, [sampleRow, sampleCol], oobBehavior, invalidIndexValueMap);
 
 				const kernelValue = kernelTensor.values[kRow * kernelTensor.shape[0] + kCol];
 				sum += value * kernelValue;

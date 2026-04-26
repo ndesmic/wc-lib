@@ -4,3 +4,7 @@ export type OobBehavior =
     | { type: "mirror" }
     | { type: "report" }
     | { type: "constant", value: number }
+
+export type InvalidIndexValueMapping = 
+    | { type: "none" }
+    | { type: "constant", value: number }
