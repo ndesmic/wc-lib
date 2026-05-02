@@ -13,7 +13,19 @@ import {
 	getDimensionalMultiRange,
 	isValidDimensionalIndicesForShape,
 	isValidFlatIndexForShape,
-	toColumnMajor
+	toLeftPacked,
+	arrayToTensor,
+	areShapesEqual,
+	addTensor,
+	subtractTensor,
+	negateTensor,
+	elementWiseMultiplyTensor,
+	elementWiseDivideTensor,
+	constantAddTensor,
+	constantSubtractTensor,
+	constantMultiplyTensor,
+	constantDivideTensor,
+	tensorContains
 } from "./tensor-utils.js";
 import { multiTest } from "../test-tools.js";
 import { OVERFLOW, UNDERFLOW } from "../math-utils.js";
@@ -32,9 +44,9 @@ describe("tensor-utils", () => {
 			{ args: [[-1,1,1], [3,3,3]], expected: false },
 			{ args: [[1,1], [3,3,3]], expected: false },
 			{ args: [[1], [3,3,3]], expected: false },
-			{ args: [[1,1,1,1], [3,3,3]], expected: false },
+			{ args: [[1,1,1,1], [3,3,3]], expected: false }
 		], ({ args, expected }) => {
-			expect(isValidDimensionalIndicesForShape(...args)).toEqual(expected)
+			expect(isValidDimensionalIndicesForShape(...args)).toEqual(expected);
 		})
 	});
 	describe("isValidFlatIndexForShape", () => {
@@ -43,12 +55,22 @@ describe("tensor-utils", () => {
 			{ args: [13, [3,3,3]], expected: true },
 			{ args: [26, [3,3,3]], expected: true },
 			{ args: [27, [3,3,3]], expected: false },
-			{ args: [-1, [3,3,3]], expected: false },
+			{ args: [-1, [3,3,3]], expected: false }
 		], ({ args, expected }) => {
-			expect(isValidFlatIndexForShape(...args)).toEqual(expected)
-		})
+			expect(isValidFlatIndexForShape(...args)).toEqual(expected);
+		});
 	});
-	describe("toColumnMajor", () => {
+	describe("areShapesEquals", () => {
+		multiTest([
+			{ args: [[3,3,3], [3,3,3]], expected: true },
+			{ args: [[3,3], [3,3,3]], expected: false },
+			{ args: [[3,3,3,3], [3,3,3]], expected: false },
+			{ args: [[3,3,1], [3,3,3]], expected: false }
+		], ({ args, expected }) => {
+			expect(areShapesEqual(...args)).toEqual(expected);
+		});
+	});
+	describe("toLeftPacked", () => {
 		it("should convert row major tensor to col major", () => {
 			const tensor = {
 				shape: [2,2,2],
@@ -60,12 +82,96 @@ describe("tensor-utils", () => {
 					7,8
 				]
 			};
-			const result = toColumnMajor(tensor);
+			const result = toLeftPacked(tensor);
 			expect(result).toEqual({
 				shape: [2,2,2],
 				values: [1,5,3,7,2,6,4,8]
 			})
 		});
+	});
+	describe("arrayToTensor", () => {
+		it("should convert array to 1-d tensor", () => {
+			const array  = [1,2,3,4,5,6,7,8];
+			const tensor = arrayToTensor(array);
+
+			expect(tensor.values).toEqual([1,2,3,4,5,6,7,8]);
+			expect(tensor.shape).toEqual([8]);
+		});
+	});
+	describe("addTensor", () => {
+		multiTest([
+			{ args: [{ values: [1,1,1,1,1,1,1,1], shape: [2,2,2] }, { values: [1,1,1,1,1,1,1,1], shape: [2,2,2] }], expected: { values: [2,2,2,2,2,2,2,2], shape: [2,2,2] } },
+		], ({ args, expected }) => {
+            expect(addTensor(...args)).toEqual(expected);
+        });
+		it("should error if shapes don't match", () => {
+			expect(() => addTensor({ values: [1,1,1,1,1,1,1,1], shape: [2,2,2] }, { values: [1,1], shape: [2,2,1] })).toThrow("Shapes were not equal expected 2,2,2 but found 2,2,1");
+		});
+	});
+	describe("constantAddTensor", () => {
+		multiTest([
+			{ args: [{ values: [1,2,3,4,5,6,7,8], shape: [2,2,2] }, 1], expected: { values: [2,3,4,5,6,7,8,9], shape: [2,2,2] } },
+		], ({ args, expected }) => {
+            expect(constantAddTensor(...args)).toEqual(expected);
+        });
+	});
+	describe("subtractTensor", () => {
+		multiTest([
+			{ args: [{ values: [3,3,3,3,3,3,3,3], shape: [2,2,2] }, { values: [1,1,1,1,1,1,1,1], shape: [2,2,2] }], expected: { values: [2,2,2,2,2,2,2,2], shape: [2,2,2] } },
+		], ({ args, expected }) => {
+            expect(subtractTensor(...args)).toEqual(expected);
+        });
+		it("should error if shapes don't match", () => {
+			expect(() => subtractTensor({ values: [1,1,1,1,1,1,1,1], shape: [2,2,2] }, { values: [1,1], shape: [2,2,1] })).toThrow("Shapes were not equal expected 2,2,2 but found 2,2,1");
+		});
+	});
+	describe("constantSubtractTensor", () => {
+		multiTest([
+			{ args: [{ values: [1,2,3,4,5,6,7,8], shape: [2,2,2] }, 1], expected: { values: [0,1,2,3,4,5,6,7], shape: [2,2,2] } },
+		], ({ args, expected }) => {
+            expect(constantSubtractTensor(...args)).toEqual(expected);
+        });
+	});
+	describe("elementWiseMultiplyTensor", () => {
+		multiTest([
+			{ args: [{ values: [3,3,3,3,3,3,3,3], shape: [2,2,2] }, { values: [2,2,2,2,2,2,2,2], shape: [2,2,2] }], expected: { values: [6,6,6,6,6,6,6,6], shape: [2,2,2] } },
+		], ({ args, expected }) => {
+            expect(elementWiseMultiplyTensor(...args)).toEqual(expected);
+        });
+		it("should error if shapes don't match", () => {
+			expect(() => elementWiseMultiplyTensor({ values: [1,1,1,1,1,1,1,1], shape: [2,2,2] }, { values: [1,1], shape: [2,2,1] })).toThrow("Shapes were not equal expected 2,2,2 but found 2,2,1");
+		});
+	});
+	describe("constantMultiplyTensor", () => {
+		multiTest([
+			{ args: [{ values: [1,2,3,4,5,6,7,8], shape: [2,2,2] }, 2], expected: { values: [2,4,6,8,10,12,14,16], shape: [2,2,2] } },
+		], ({ args, expected }) => {
+            expect(constantMultiplyTensor(...args)).toEqual(expected);
+        });
+	});
+	describe("elementWiseDivideTensor", () => {
+		multiTest([
+			{ args: [{ values: [3,3,3,3,3,3,3,3], shape: [2,2,2] }, { values: [2,2,2,2,2,2,2,2], shape: [2,2,2] }], expected: { values: [1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5], shape: [2,2,2] } },
+		], ({ args, expected }) => {
+            expect(elementWiseDivideTensor(...args)).toEqual(expected);
+        });
+		it("should error if shapes don't match", () => {
+			expect(() => elementWiseMultiplyTensor({ values: [1,1,1,1,1,1,1,1], shape: [2,2,2] }, { values: [1,1], shape: [2,2,1] })).toThrow("Shapes were not equal expected 2,2,2 but found 2,2,1");
+		});
+	});
+	describe("constantDivideTensor", () => {
+		multiTest([
+			{ args: [{ values: [1,2,3,4,5,6,7,8], shape: [2,2,2] }, 2], expected: { values: [0.5,1,1.5,2,2.5,3,3.5,4], shape: [2,2,2] } },
+		], ({ args, expected }) => {
+            expect(constantDivideTensor(...args)).toEqual(expected);
+        });
+	});
+	describe("negateTensor", () => {
+		multiTest([
+			{ args: [{ values: [1,2,3,4,5,6,7,8], shape: [2,2,2] }], expected: { values: [-1,-2,-3,-4,-5,-6,-7,-8], shape: [2,2,2] } },
+		], ({ args, expected }) => {
+            expect(negateTensor(...args)).toEqual(expected);
+        });
 	});
 	describe("getFlatIndexleftPacked", () => {
         multiTest([
@@ -114,7 +220,7 @@ describe("tensor-utils", () => {
 		});
 	});
     describe("getValue", () => {
-        const tensor = toColumnMajor({
+        const tensor = toLeftPacked({
             shape: [2,2,2],
             values: [
 				1,2,
@@ -139,7 +245,7 @@ describe("tensor-utils", () => {
     });
 	describe("getBoundedIndices", () => {
 		describe("for 2 dimensions", () => {
-			const tensor = toColumnMajor({
+			const tensor = toLeftPacked({
 				shape: [3, 3],
 				values: [
 					0,1,2,
@@ -186,7 +292,7 @@ describe("tensor-utils", () => {
 	});
 	describe("getBoundedValue", () => {
 		describe("for 2 dimensions", () => {
-			const imageData = toColumnMajor({
+			const imageData = toLeftPacked({
 				shape: [3, 3],
 				values: [
 					0,1,2,
@@ -278,7 +384,7 @@ describe("tensor-utils", () => {
 			});
 		});
 		describe("for 3 dimensions", () => {
-			const imageData = toColumnMajor({
+			const imageData = toLeftPacked({
 				shape: [3, 3, 3],
 				values: [
 					0,1,2,
@@ -403,7 +509,7 @@ describe("tensor-utils", () => {
 	//TODO: Add 3d tests
 	describe("sampleTensor", () => {
 		describe("2d" , () => {
-			const imageData = toColumnMajor({
+			const imageData = toLeftPacked({
 				shape: [3, 3],
 				values: [
 					0,1,2,
@@ -446,7 +552,7 @@ describe("tensor-utils", () => {
 			});
 		});
 		describe("3d" , () => {
-			const imageData = toColumnMajor({
+			const imageData = toLeftPacked({
 				shape: [3, 3, 3],
 				values: [
 					1,2,3,
@@ -514,9 +620,9 @@ describe("tensor-utils", () => {
 			});
 		});
 	});
-	describe("iterateTensor", () => {
+	describe("iterateTensorLeftPacked", () => {
 		it("should iterate over a tensor (3d)", () => {
-			const tensor = toColumnMajor({
+			const tensor = toLeftPacked({
 				shape: [3,3,3],
 				values: [
 					1,2,3,
@@ -571,6 +677,77 @@ describe("tensor-utils", () => {
 			]);
 			expect(flatIndiciesVisited).toEqual([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]);
 			expect(valuesVisited).toEqual([1,10,19,4,13,22,7,16,25,2,11,20,5,14,23,8,17,26,3,12,21,6,15,24,9,18,27]);
+		});
+		it("should early exit if false was returned", () => {
+			const tensor = toLeftPacked({
+				shape: [3,3,3],
+				values: [
+					1,2,3,
+					4,5,6,
+					7,8,9,
+					
+					10,11,12,
+					13,14,15,
+					16,17,18,
+					
+					19,20,21,
+					22,23,24,
+					25,26,27
+				]
+			});
+			const valuesVisited = [];
+			const dimensionalIndiciesVisited = [];
+			const flatIndiciesVisited = [];
+			iterateTensorLeftPacked(tensor, (value, d, f) => {
+				valuesVisited.push(value);
+				dimensionalIndiciesVisited.push(d);
+				flatIndiciesVisited.push(f);
+				if(f === 6) {
+					return false;
+				}
+			});
+			expect(dimensionalIndiciesVisited).toEqual([
+				[0,0,0],
+				[1,0,0],
+				[2,0,0],
+				[0,1,0],
+				[1,1,0],
+				[2,1,0],
+				[0,2,0]
+			]);
+			expect(flatIndiciesVisited).toEqual([0,1,2,3,4,5,6]);
+			expect(valuesVisited).toEqual([1,10,19,4,13,22,7]);
+		});
+	});
+	describe("tensorContains", () => {
+		it("should return false if not found", () => {
+			const tensor = {
+				values: [2,4,6,8,10,12,14,16],
+				shape: [2,2,2]
+			};
+
+			const result = tensorContains(tensor, (v) => v === 3);
+			expect(result).toEqual(false);
+		});
+		it("should return true if found (and early return)", () => {
+			const tensor = {
+				values: [
+					2,4,
+					6,8,
+					
+					10,12,
+					14,16
+				],
+				shape: [2,2,2]
+			};
+
+			const indicesSearched = new Set();
+			const result = tensorContains(tensor, (v,d,f) => {
+				indicesSearched.add(f);
+				return v === 10;
+			});
+			expect(result).toEqual(true);
+			expect(indicesSearched.size).toEqual(5);
 		});
 	});
 	describe("getFlatMultiRange", () => {
@@ -820,31 +997,19 @@ describe("tensor-utils", () => {
 			const tensorMiddleOne = {
 				shape: [3, 3],
 				values: [
-					0,
-					0,
-					0,
-					0,
-					1,
-					0,
-					0,
-					0,
-					0,
-				],
+					0,0,0,
+					0,1,0,
+					0,0,0
+				]
 			};
 
 			const kernelCircleOnes = {
 				shape: [3, 3],
 				values: [
-					1,
-					1,
-					1,
-					1,
-					0,
-					1,
-					1,
-					1,
-					1,
-				],
+					1,1,1,
+					1,0,1,
+					1,1,1
+				]
 			};
 
 			const tensorTlBrOnes = {
@@ -880,57 +1045,39 @@ describe("tensor-utils", () => {
 			multiTest([
 				{
 					name: "center convoluted with donut ones",
-					args: [tensorMiddleOne, kernelCircleOnes, "omit"],
+					args: [tensorMiddleOne, kernelCircleOnes, { type: "omit" }],
 					expected: {
 						shape: [3, 3],
 						values: [
-							1,
-							1,
-							1,
-							1,
-							0,
-							1,
-							1,
-							1,
-							1,
+							1,1,1,
+							1,0,1,
+							1,1,1,
 						],
 					},
 				},
 				{
 					name: "corners convoluted with all ones, ommited",
-					args: [tensorTlBrOnes, kernelAllOnes, "omit"],
+					args: [tensorTlBrOnes, kernelAllOnes, { type: "omit" }],
 					expected: {
 						shape: [3, 3],
 						values: [
-							1,
-							1,
-							0,
-							1,
-							2,
-							1,
-							0,
-							1,
-							1,
-						],
+							1,1,0,
+							1,2,1,
+							0,1,1
+						]
 					}
 				},
 				{
 					name: "corner convoluted with all ones, clamped",
-					args: [tensorTlBrOnes, kernelAllOnes, "clamp"],
+					args: [tensorTlBrOnes, kernelAllOnes, { type: "clamp" }],
 					expected: {
 						shape: [3, 3],
 						values: [
-							4,
-							2,
-							0,
-							2,
-							2,
-							2,
-							0,
-							2,
-							4,
-						],
-					},
+							4,2,0,
+							2,2,2,
+							0,2,4
+						]
+					}
 				},
 				{
 					name: "corners convoluted with all ones, wrapped",
@@ -938,17 +1085,11 @@ describe("tensor-utils", () => {
 					expected: {
 						shape: [3, 3],
 						values: [
-							2,
-							2,
-							2,
-							2,
-							2,
-							2,
-							2,
-							2,
-							2,
-						],
-					},
+							2,2,2,
+							2,2,2,
+							2,2,2
+						]
+					}
 				},
 				{
 					name: "corners convoluted with all ones, mirrored",
@@ -956,17 +1097,11 @@ describe("tensor-utils", () => {
 					expected: {
 						shape: [3, 3],
 						values: [
-							1,
-							1,
-							0,
-							1,
-							2,
-							1,
-							0,
-							1,
-							1,
-						],
-					},
+							1,1,0,
+							1,2,1,
+							0,1,1
+						]
+					}
 				},
 				{
 					name: "corners convoluted with all ones, constant",
@@ -985,58 +1120,103 @@ describe("tensor-utils", () => {
 				expect(result).toEqual(expected);
 			});
 		});
-		// describe("should convolute 3d", () => {
-		// 	const tensorMiddleOne = {
-		// 		shape: [3, 3, 3],
-		// 		values: [
-		// 			0,0,0,
-		// 			0,0,0,
-		// 			0,0,0,
+		describe("should convolute 3d", () => {
+			const tensorMiddleOne = {
+				shape: [3, 3, 3],
+				values: [
+					0,0,0,
+					0,0,0,
+					0,0,0,
 
-		// 			0,0,0,
-		// 			0,1,0,
-		// 			0,0,0,
+					0,0,0,
+					0,1,0,
+					0,0,0,
 
-		// 			0,0,0,
-		// 			0,0,0,
-		// 			0,0,0
-		// 		]
-		// 	};
+					0,0,0,
+					0,0,0,
+					0,0,0
+				]
+			};
 
-		// 	const kernelShellOnes = {
-		// 		shape: [3, 3, 3],
-		// 		values: [
-		// 			1,1,1,
-		// 			1,1,1,
-		// 			1,1,1,
+			const kernelShellOnes = {
+				shape: [3, 3, 3],
+				values: [
+					1,1,1,
+					1,1,1,
+					1,1,1,
 
-		// 			1,1,1,
-		// 			1,0,1,
-		// 			1,1,1,
+					1,1,1,
+					1,0,1,
+					1,1,1,
 					
-		// 			1,1,1,
-		// 			1,1,1,
-		// 			1,1,1
-		// 		],
-		// 	};
+					1,1,1,
+					1,1,1,
+					1,1,1
+				]
+			};
 
-		// 	multiTest([
-		// 		{
-		// 			name: "center convoluted with donut ones",
-		// 			args: [tensorMiddleOne, kernelShellOnes, "omit"],
-		// 			expected: {
-		// 				shape: [3, 3],
-		// 				values: [
-		// 					1,1,1,
-		// 					1,0,1,
-		// 					1,1,1,
-		// 				],
-		// 			},
-		// 		},
-		// 	], ({ args, expected }) => {
-		// 		const result = convoluteTensor(...args);
-		// 		expect(result).toEqual(expected);
-		// 	});
-		// });
+			const tlfBrbOnes = {
+				shape: [3, 3, 3],
+				values: [
+					1,0,0,
+					0,0,0,
+					0,0,0,
+
+					0,0,0,
+					0,0,0,
+					0,0,0,
+					
+					0,0,0,
+					0,0,0,
+					0,0,1
+				],
+			};
+
+			multiTest([
+				{
+					name: "center one convoluted with shell ones",
+					args: [tensorMiddleOne, kernelShellOnes, { type: "omit" }],
+					expected: {
+						shape: [3, 3, 3],
+						values: [
+							1,1,1,
+							1,1,1,
+							1,1,1,
+
+							1,1,1,
+							1,0,1,
+							1,1,1,
+
+							1,1,1,
+							1,1,1,
+							1,1,1
+						]
+					}
+				},
+				{
+					name: "tlfBrb ones convoluted with shell ones",
+					args: [tlfBrbOnes, kernelShellOnes, { type: "clamp`" }],
+					expected: {
+						shape: [3, 3, 3],
+						values: [
+							7,4,0,
+							4,2,0,
+							0,0,0,
+
+							4,2,0,
+							2,2,2,
+							0,2,4,
+
+							0,0,0,
+							0,2,4,
+							0,4,7
+						]
+					}
+				},
+			], ({ args, expected }) => {
+				const result = convoluteTensor(...args);
+				expect(result).toEqual(expected);
+			});
+		});
 	});
 });

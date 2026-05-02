@@ -1,4 +1,4 @@
-import { Tokenizer } from "./tokenizer.js";
+import { Tokenizer } from "../../../components/code-highlighter/tokenizer.js";
 
 export const jsTokenizer = new Tokenizer([
 	{ matcher: "\n", type: "newline" },

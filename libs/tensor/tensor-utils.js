@@ -34,12 +34,22 @@ export function isValidFlatIndexForShape(index, leftPackedShape){
 	return true;
 }
 
+export function areShapesEqual(shapeA, shapeB){
+	if(shapeA.length !== shapeB.length) return false;
+	for(let i = 0; i < shapeA.length; i++){
+		if(shapeA[i] !== shapeB[i]){
+			return false;
+		}
+	}
+	return true;
+}
+
 /**
  * Converts a tensor from row-major to column-major order (or vice versa)
  * @param {Tensor} tensor 
  * @returns {Tensor}
  */
-export function toColumnMajor(tensor) {
+export function toLeftPacked(tensor) {
     const newValues = new Array(tensor.values.length);
     
     iterateTensorLeftPacked(tensor, (value, dimensionalIndex, flatIndex) => {
@@ -56,6 +66,10 @@ export function toColumnMajor(tensor) {
         shape: tensor.shape,
         values: newValues
     };
+}
+
+export function arrayToTensor(array){
+	return { values: [...array], shape: [array.length] };
 }
 
 /**
@@ -270,6 +284,11 @@ export function sampleTensor(tensor, index, oobBehavior, invalidIndexValueMap = 
 	return recursiveLerp(0);
 }
 
+/**
+ * Iterates the tensor in a left-packed order, if `false` is returned the iteration is ended early
+ * @param {Tensor} tensor 
+ * @param {(value: any, dimensionalIndices: number[], flatIndex: number) => void | false} callback 
+ */
 export function iterateTensorLeftPacked(tensor, callback){
 	const dimensionalIndex = new Array(tensor.shape.length).fill(0);
 
@@ -277,12 +296,14 @@ export function iterateTensorLeftPacked(tensor, callback){
 		if(dim < 0){
 			const dIndex = dimensionalIndex.slice();
 			const fIndex = getFlatIndexleftPacked(dIndex, tensor.shape);
-			callback(tensor.values[fIndex], dIndex, fIndex);
-			return;
+			return callback(tensor.values[fIndex], dIndex, fIndex);
 		}
 
         for(dimensionalIndex[dim] = 0; dimensionalIndex[dim] < tensor.shape[dim]; dimensionalIndex[dim]++){
-            iterateInnerShape(dim - 1);
+            const retVal = iterateInnerShape(dim - 1);
+			if(retVal === false){
+				return false;
+			}
         }
 	}
 
@@ -290,12 +311,167 @@ export function iterateTensorLeftPacked(tensor, callback){
 }
 
 /**
+ * 
+ * @param {Tensor} tensor 
+ * @param {(number, number[], number) => boolean} callback 
+ * @returns 
+ */
+export function tensorContains(tensor, callback){
+	let isFound = false;
+	iterateTensorLeftPacked(tensor, (value, dIndex, fIndex) => {
+		const result = callback(value, dIndex, fIndex);
+		if(result){
+			isFound = true;
+			return false;
+		}
+	});
+	return isFound;
+}
+
+/**
+ * Adds two tensors
+ * @param {Tensor} tensorA 
+ * @param {Tensor} tensorB 
+ * @returns 
+ */
+export function addTensor(tensorA, tensorB){
+	if(!areShapesEqual(tensorA.shape, tensorB.shape)){
+		throw new Error(`Shapes were not equal expected ${tensorA.shape} but found ${tensorB.shape}`);
+	}
+	const values = new Array(tensorA.values.length);
+	for(let i = 0; i < tensorA.values.length; i++){
+		values[i] = tensorA.values[i] + tensorB.values[i];
+	}
+	return { values, shape: [...tensorA.shape] };
+}
+
+/**
+ * Adds two tensors
+ * @param {Tensor} tensor 
+ * @param {number} value
+ * @returns 
+ */
+export function constantAddTensor(tensor, value){
+	const values = new Array(tensor.values.length);
+	for(let i = 0; i < tensor.values.length; i++){
+		values[i] = tensor.values[i] + value;
+	}
+	return { values, shape: [...tensor.shape] };
+}
+
+/**
+ * subtracts two tensors
+ * @param {Tensor} tensorA 
+ * @param {Tensor} tensorB 
+ * @returns 
+ */
+export function subtractTensor(tensorA, tensorB){
+	if(!areShapesEqual(tensorA.shape, tensorB.shape)){
+		throw new Error(`Shapes were not equal expected ${tensorA.shape} but found ${tensorB.shape}`);
+	}
+	const values = new Array(tensorA.values.length);
+	for(let i = 0; i < tensorA.values.length; i++){
+		values[i] = tensorA.values[i] - tensorB.values[i];
+	}
+	return { values, shape: [...tensorA.shape] };
+}
+
+/**
+ * subtract a constant from a tensor
+ * @param {Tensor} tensor 
+ * @param {number} value
+ * @returns 
+ */
+export function constantSubtractTensor(tensor, value){
+	const values = new Array(tensor.values.length);
+	for(let i = 0; i < tensor.values.length; i++){
+		values[i] = tensor.values[i] - value;
+	}
+	return { values, shape: [...tensor.shape] };
+}
+
+/**
+ * element-wise multiplies two tensors
+ * @param {Tensor} tensorA 
+ * @param {Tensor} tensorB 
+ * @returns 
+ */
+export function elementWiseMultiplyTensor(tensorA, tensorB){
+	if(!areShapesEqual(tensorA.shape, tensorB.shape)){
+		throw new Error(`Shapes were not equal expected ${tensorA.shape} but found ${tensorB.shape}`);
+	}
+	const values = new Array(tensorA.values.length);
+	for(let i = 0; i < tensorA.values.length; i++){
+		values[i] = tensorA.values[i] * tensorB.values[i];
+	}
+	return { values, shape: [...tensorA.shape] };
+}
+
+/**
+ * element-wise multiplies a tensor with a constant value
+ * @param {Tensor} tensor 
+ * @param {number} multiplicand
+ * @returns 
+ */
+export function constantMultiplyTensor(tensor, multiplicand){
+	const values = new Array(tensor.values.length);
+	for(let i = 0; i < tensor.values.length; i++){
+		values[i] = tensor.values[i] * multiplicand;
+	}
+	return { values, shape: [...tensor.shape] };
+}
+
+/**
+ * element-wise divides two tensors
+ * @param {Tensor} tensorA 
+ * @param {Tensor} tensorB 
+ * @returns 
+ */
+export function elementWiseDivideTensor(tensorA, tensorB){
+	if(!areShapesEqual(tensorA.shape, tensorB.shape)){
+		throw new Error(`Shapes were not equal expected ${tensorA.shape} but found ${tensorB.shape}`);
+	}
+	const values = new Array(tensorA.values.length);
+	for(let i = 0; i < tensorA.values.length; i++){
+		values[i] = tensorA.values[i] / tensorB.values[i];
+	}
+	return { values, shape: [...tensorA.shape] };
+}
+
+/**
+ * divides a tensor by a constant value
+ * @param {Tensor} tensorA 
+ * @param {number} denominator
+ * @returns 
+ */
+export function constantDivideTensor(tensor, denominator){
+	const values = new Array(tensor.values.length);
+	for(let i = 0; i < tensor.values.length; i++){
+		values[i] = tensor.values[i] / denominator;
+	}
+	return { values, shape: [...tensor.shape] };
+}
+
+/**
+ * Negates a tensor
+ * @param {Tensor} tensor 
+ * @returns 
+ */
+export function negateTensor(tensor){
+	const values = new Array(tensor.values.length);
+	for(let i = 0; i < tensor.values.length; i++){
+		values[i] = -tensor.values[i];
+	}
+	return { values, shape: [...tensor.shape] };
+}
+
+/**
  * Applies a convoltion kernel to image Tensor, left packed
  * TODO: add stride
- * TODO: add n-dimension
+ * TODO: tests for when kernel is smaller shape
  * @param {Tensor} imageTensor
  * @param {Tensor} kernel 
- * @param {OobBehavior | "omit"}
+ * @param {OobBehavior | { type: "omit"}
  * @returns {Tensor}
  */
 export function convoluteTensor(imageTensor, kernelTensor, oobBehavior = { type: "clamp" }, invalidIndexValueMap = { type: "none" }){
@@ -309,31 +485,32 @@ export function convoluteTensor(imageTensor, kernelTensor, oobBehavior = { type:
 		values: new Array(imageTensor.values.length)  //this will need to be updated if there's a stride 
 	};
 
-	const kRowMid = (kernelTensor.shape[0] - 1) / 2;
-	const kColMid = (kernelTensor.shape[1] - 1) / 2;
+	const kernelShape = arrayToTensor(kernelTensor.shape);
+	const kernelMid = constantDivideTensor(constantSubtractTensor(kernelShape, 1), 2);
 
 	iterateTensorLeftPacked(imageTensor, (value, dIndex, fIndex) => {
 		let sum = 0;
 
-		const [row, col] = dIndex;
+		const tensorIndices = arrayToTensor(dIndex);
 
-		for (let kRow = 0; kRow < kernelTensor.shape[1]; kRow++) { //this will need to be updated for > 2 kernel dimensions
-			const sampleRow = row + (-kRowMid + kRow);
-
-			for (let kCol = 0; kCol < kernelTensor.shape[0]; kCol++) {
-				const sampleCol = col + (-kColMid + kCol);
-				const shouldOmit = [sampleRow, sampleCol].some((i, di) =>  ((i < 0 || i >= imageTensor.shape[di]) && normalizedOobBehavior[di] === "omit")); 
-				if(shouldOmit) continue;
+		iterateTensorLeftPacked(kernelTensor, (kValue, kdIndex, kfIndex) => { //this will need to be updated for > 2 kernel dimensions
+			
+			const kernelIndices = arrayToTensor(kdIndex);
+			const sampleIndices = addTensor(tensorIndices, addTensor(negateTensor(kernelMid), kernelIndices))
+			
+			const shouldOmit = sampleIndices.values.some((i, di) =>  ((i < 0 || i >= imageTensor.shape[di]) && normalizedOobBehavior[di].type === "omit")); 
+			if(shouldOmit) return;
 				
-				const value = sampleTensor(imageTensor, [sampleRow, sampleCol], oobBehavior, invalidIndexValueMap);
+			const value = sampleTensor(imageTensor, sampleIndices.values, oobBehavior, invalidIndexValueMap);
+			const kernelValue = getValue(kernelTensor, kernelIndices.values);
 
-				const kernelValue = kernelTensor.values[kRow * kernelTensor.shape[0] + kCol];
-				sum += value * kernelValue;
-			}
-		}
+			sum += value * kernelValue;
+		});
 
-		output.values[row * kernelTensor.shape[1] + col] = sum;
+		setValue(output, tensorIndices.values, sum);
 	});
 
 	return output;
 }
+
+//convolute stack
