@@ -1,5 +1,3 @@
-
-
 export const END = Symbol("END");
 
 export function escapeRegExp(string) {
@@ -40,7 +38,7 @@ export class Tokenizer {
 				}
 			}
 			if(!hasMatch){
-				index++;
+				index++;Z
 				//yield { type: "Unknown", value: remaining[0] };
 				//throw new Error("Unexpected token");
 			}
