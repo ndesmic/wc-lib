@@ -18,7 +18,7 @@ styles.textContent = `
             &.clicked {
                 background-color: var(--primary-light-1);
                 opacity: 1.0;
-                color: var(--text);
+                color: var(--text-color);
 
                 &::before {
                     content: "copied!";
@@ -46,7 +46,7 @@ styles.textContent = `
                 background-color: var(--primary-medium);
                 opacity: 1.0;
                 border-radius: 0;
-                color: var(--text-alt);
+                color: var(--text-alt-color);
             }
         }
     }

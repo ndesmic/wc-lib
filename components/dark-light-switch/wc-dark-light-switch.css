@@ -1,0 +1,23 @@
+#theme-popover {
+	background: var(--background-color);
+	border: var(--border);
+	position: absolute;
+	margin: 0;
+	inset: auto;
+
+	top: anchor(bottom);
+	justify-self: anchor-center;
+	position-anchor: auto;
+	position-try-fallbacks: flip-block;
+}
+
+input:checked + span {
+	color: var(--primary-color);
+	fill: var(--primary-color);
+}
+
+label {
+	display: flex;
+	gap: 0.5rem;
+	cursor: pointer;
+}

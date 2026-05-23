@@ -11,9 +11,15 @@
 
 <body>
 	<h1>Camera Preview</h1>
-	<wc-camera-preview></wc-camera-preview>
-
+	<ma-camera-preview-example>
+		<wc-camera-preview></wc-camera-preview>
+		<label for="flip-x">
+			<span>Flip X</span>
+			<input type="checkbox" id="flip-x">
+		</label>
+	</ma-camera-preview-example>
 	<script src="./wc-camera-preview.js" type="module"></script>
+	<script src="./ma-camera-preview-example.js" type="module"></script>
 </body>
 
 </html>

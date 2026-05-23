@@ -95,6 +95,45 @@ export function parseFloatArrayWithLengthOrDefault(text, length, defaultValue = 
     return array;
 }
 
+//Date
+
+export function parseDateOrDefault(textOrDate){
+    if(typeof(textOrDate) === "string"){
+        const date = Date.parse(textOrDate);
+        if(Number.isNaN(date.value)){
+            return new Date();
+        }
+        return date;
+    }
+    return textOrDate;
+}
+
+export function parseInstantOrDefault(textOrInstant){
+    if(typeof(textOrInstant) === "string"){
+        try {
+            const instant = Temporal.Instant.from(textOrInstant);
+            return instant;
+        } catch(e) {
+            console.warn(`Instant failed to parse.  Got ${textOrDateTime} and failed with ${e}`);
+            return Temporal.Now.instant();
+        }
+    }
+    return textOrInstant
+}
+
+export function parsePlainDateTimeOrDefault(textOrDateTime){
+    if(typeof(textOrDateTime) === "string"){
+        try {
+            const instant = Temporal.PlainDateTime.from(textOrDateTime);
+            return instant;
+        } catch(e) {
+            console.warn(`PlainDateTime failed to parse.  Got ${textOrDateTime} and failed with ${e}`);
+            return Temporal.Now.plainDateTimeISO();
+        }
+    }
+    return textOrDateTime
+}
+
 //Objects
 
 /**
@@ -139,3 +178,45 @@ export function parseJsonOrThrow(text, isSilent = false){
     }
     return text;
 }
+
+export function register(Component) {
+	if(globalThis.customElements && !globalThis.customElements.get(Component.name)){
+		customElements.define(Component.name, Component);
+	}
+}
+
+export async function renderOuterHTML(name, componentUrlStem, props = {}) {
+    return `<${name} ${Object.entries(props).map(([k,v]) => `${k}="${v}"`).join(" ")}>
+        ${await renderInnerHTML(componentUrlStem, props)}
+    </${name}>`;
+}
+
+export async function renderInnerHTML(componentUrlStem, props) {
+	const renderPath = `${componentUrlStem}.render.js`;
+	return (await import(renderPath)).render(props);
+}
+
+export async function renderOuterHTMLNoProps(name, componentUrlStem, props = {}) {
+    return `<${name}>
+        ${await renderInnerHTML(componentUrlStem, props)}
+    </${name}>`;
+}
+
+export async function renderOuterHTMLNoPropsShadow(name, componentUrlStem, shadowMode = "open", props = {}) {
+	return `<${name}>
+		<template shadowrootmode="${shadowMode}">
+        ${await renderInnerHTML(componentUrlStem, props)}
+    </template>
+    </${name}>`;
+}
+
+export async function renderOuterHTMLNoPropsShadowWithStyles(name, componentUrl, shadowMode = "open", props = {}, styles = []) {
+	const componentUrlStem = componentUrl.split(".").slice(0, -1).join(".");
+	return `<${name}>
+		<template shadowrootmode="${shadowMode}">
+				${styles.map(s => `<link rel="stylesheet" href="${s}">`)}
+        ${await renderInnerHTML(componentUrlStem, props)}
+    </template>
+    </${name}>`;
+}
+

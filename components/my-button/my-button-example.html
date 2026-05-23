@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>My button Example</title>
+	<link rel="stylesheet" href="../../css/system.css">
+	</link>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+</head>
+
+<body>
+	<h1>My button</h1>
+    <my-button data-message="Hello prop"></my-button>
+    <script src="./my-button.js" type="module"></script>
+	<script type="module">
+		document.querySelector("my-button")["data-time"] = Temporal.PlainDateTime.from("2021-01-01");
+	</script>
+</body>
+</html>

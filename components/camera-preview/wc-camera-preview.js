@@ -1,11 +1,16 @@
 //import systemCss from "../../css/system.css" with { type: "css" };
+import { parseBoolean } from "../../libs/wc-utils.js";
 import cameraPreviewCss from "./wc-camera-preview.css" with { type: "css" };
 
 export class WcCameraPreview extends HTMLElement {
-	static observedAttributes = ["height", "width"];
+	static observedAttributes = ["height", "width", "flip-x"];
 	#stream;
 	#height = 240;
 	#width = 320;
+	#flipX = false;
+	#canvas;
+	#context;
+
 	constructor() {
 		super();
 		this.bind();
@@ -57,7 +62,9 @@ export class WcCameraPreview extends HTMLElement {
 		this.addEventListener("click", this.onClick)
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
-		this[name] = newValue;
+		if(oldValue != newValue){
+			this[name] = newValue;
+		}
 	}
 	onClick(){
 		this.dom.message.style.display = "none";
@@ -68,13 +75,18 @@ export class WcCameraPreview extends HTMLElement {
 		const canvas = this.getImage();
 		return canvas.toDataURL();
 	}
-	getBitmapImageSource(){
-		const canvas = document.createElement("canvas");
-		canvas.height = this.#height;
-		canvas.width = this.#width;
-		const ctx = canvas.getContext("2d");
-		ctx.drawImage(this.dom.preview, 0, 0);
-		return canvas;
+	getBitmapImageSource(flipX){
+		this.#canvas = document.createElement("canvas");
+		this.#canvas.height = this.#height;
+		this.#canvas.width = this.#width;
+
+		this.#context = canvas.getContext("2d");
+		if(flipX){
+			this.#context.translate(width, 0);
+			this.#context.scale(-1, 1);
+		}
+		this.#context.drawImage(this.dom.preview, 0, 0);
+		return this.#canvas;
 	}
 	set width(val){
 		this.#width = parseInt(val);
@@ -85,6 +97,17 @@ export class WcCameraPreview extends HTMLElement {
 		this.#height = parseInt(val);
 		this.dom.preview.height = this.#height;
 		this.requestVideo();
+	}
+	set ["flip-x"](value) {
+		const newValue = parseBoolean(value);
+		if (newValue !== this.#flipX) {
+			this.#flipX = newValue;
+			if (this.#flipX) {
+				this.dom.preview.style = "transform: scaleX(-1)";
+			} else {
+				this.dom.preview.style = "";
+			}
+		}
 	}
 }
 

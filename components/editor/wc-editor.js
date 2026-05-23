@@ -1,26 +1,31 @@
 import { accessProperty } from "../../libs/object-utils.js";
 
 export class WcEditor extends HTMLElement {
-    static observedAttributes = ["preview-attribute", "editor-event", "editor-event-prop"];
+    static observedAttributes = ["preview-attribute", "editor-event", "editor-event-prop", "editor-initial-prop"];
 
     #previewAttribute = "value";
     #editorEvent = "input";
     #editorEventProp = "target.value";
+    #editorInitialProp;
 
     connectedCallback(){
         this.bind();
         this.renderDom();
         this.registerDom();
         this.attachEvents();
+        if(this.#editorInitialProp){
+            this.updatePreview(accessProperty(this.dom.editor, this.#editorInitialProp)); //prime first render
+        }
     }
     bind(){
         this.onUpdate = this.onUpdate.bind(this);
+        this.updatePreview = this.updatePreview.bind(this);
     }
     renderDom(){
         this.shadow = this.attachShadow({ mode: "open" });
         this.shadow.innerHTML = `
                 <style>
-                    :host { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+                    :host { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto; gap: 1rem; }
                     slot[name=preview] { grid-row: 1 / 2; grid-column: 2 / 3; }
                     slot[name=editor] { grid-row: 1 / 2; grid-column: 1 / 2; }
                     textarea { white-space: pre-wrap; }
@@ -45,7 +50,15 @@ export class WcEditor extends HTMLElement {
     }
     onUpdate(e){
         const value = accessProperty(e, this.#editorEventProp);
-        this.dom.preview[this.#previewAttribute] = value;
+
+        this.updatePreview(value);
+    }
+    updatePreview(value){
+        if(typeof(this.dom.preview[this.#previewAttribute]) === "function"){
+            this.dom.preview[this.#previewAttribute](value);
+        } else {
+            this.dom.preview[this.#previewAttribute] = value;
+        }
     }
     get ["editor-event"](){
         return this.#editorEvent;
@@ -61,6 +74,13 @@ export class WcEditor extends HTMLElement {
     }
     set ["editor-event-prop"](value){
         this.#editorEventProp = value;
+    }
+
+    get ["editor-initial-prop"](){
+        return this.#editorInitialProp;
+    }
+    set ["editor-initial-prop"](value){
+        this.#editorInitialProp = value;
     }
 
     get ["preview-attribute"](){
