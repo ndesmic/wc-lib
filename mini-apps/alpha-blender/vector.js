@@ -2,7 +2,6 @@ export function getVectorMagnitude(vec) {
 	return Math.sqrt(vec.reduce((sum, x) => sum + x ** 2, 0));
 }
 
-
 export function addVector(a, b) {
 	return a.map((x, i) => x + b[i]);
 }
@@ -12,11 +11,11 @@ export function subtractVector(a, b) {
 }
 
 export function scaleVector(vec, s) {
-	return vec.map(x => x * s);
+	return vec.map((x) => x * s);
 }
 
 export function divideVector(vec, s) {
-	return vec.map(x => x / s);
+	return vec.map((x) => x / s);
 }
 
 export function normalizeVector(vec) {
@@ -28,7 +27,7 @@ export function crossVector(a, b) {
 	return [
 		a[1] * b[2] - a[2] * b[1],
 		a[2] * b[0] - a[0] * b[2],
-		a[0] * b[1] - a[1] * b[0]
+		a[0] * b[1] - a[1] * b[0],
 	];
 }
 
@@ -38,7 +37,7 @@ export function dotVector(a, b) {
 }
 
 export function invertVector(vec) {
-	return vec.map(x => -x);
+	return vec.map((x) => -x);
 }
 
 export function reflectVector(vec, normal) {

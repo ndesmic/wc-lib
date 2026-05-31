@@ -40,60 +40,60 @@ export class WcCameraPreview extends HTMLElement {
 	cacheDom() {
 		this.dom = {
 			preview: this.shadowRoot.querySelector("#preview"),
-			message: this.shadowRoot.querySelector("#message")
+			message: this.shadowRoot.querySelector("#message"),
 		};
 	}
-	async requestVideo(){
+	async requestVideo() {
 		try {
 			this.#stream = await navigator.mediaDevices.getUserMedia({
 				video: {
 					height: { min: this.#height },
-					width: { min: this.#width }
-				}
+					width: { min: this.#width },
+				},
 			});
-			this.dom.preview.srcObject= this.#stream;
-		} catch(e){
+			this.dom.preview.srcObject = this.#stream;
+		} catch (e) {
 			this.dom.message.textContent = e.message;
-			this.dom.message.style.display = "block"
+			this.dom.message.style.display = "block";
 			this.dom.preview.style.display = "none";
 		}
 	}
 	attachEvents() {
-		this.addEventListener("click", this.onClick)
+		this.addEventListener("click", this.onClick);
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
-		if(oldValue != newValue){
+		if (oldValue != newValue) {
 			this[name] = newValue;
 		}
 	}
-	onClick(){
+	onClick() {
 		this.dom.message.style.display = "none";
 		this.removeEventListener("click", this.onClick);
 		this.requestVideo();
 	}
-	getImageUrl(){
+	getImageUrl() {
 		const canvas = this.getImage();
 		return canvas.toDataURL();
 	}
-	getBitmapImageSource(flipX){
+	getBitmapImageSource(flipX) {
 		this.#canvas = document.createElement("canvas");
 		this.#canvas.height = this.#height;
 		this.#canvas.width = this.#width;
 
 		this.#context = canvas.getContext("2d");
-		if(flipX){
+		if (flipX) {
 			this.#context.translate(width, 0);
 			this.#context.scale(-1, 1);
 		}
 		this.#context.drawImage(this.dom.preview, 0, 0);
 		return this.#canvas;
 	}
-	set width(val){
+	set width(val) {
 		this.#width = parseInt(val);
 		this.dom.preview.width = this.#width;
 		this.requestVideo();
 	}
-	set height(val){
+	set height(val) {
 		this.#height = parseInt(val);
 		this.dom.preview.height = this.#height;
 		this.requestVideo();

@@ -1,27 +1,38 @@
 function squareGradient(stopDimensions, values) {
+	let currentStop = null;
 
-	let currentStop = null;  
-
-	for(let i = 0; i < values.length; i++){
+	for (let i = 0; i < values.length; i++) {
 		let stopIndex = 0;
 		while (stopDimensions[i][stopIndex + 1][4] < values[i]) {
 			stopIndex++;
 		}
 
 		const remainder = values[i] - stopDimensions[i][stopIndex][4];
-		const stopFraction = remainder / (stopDimensions[i][stopIndex + 1][4] - stopDimensions[i][stopIndex][4]);
+		const stopFraction = remainder /
+			(stopDimensions[i][stopIndex + 1][4] - stopDimensions[i][stopIndex][4]);
 
-		if(!currentStop){
-			currentStop = lerp(stopDimensions[i][stopIndex], stopDimensions[i][stopIndex + 1], stopFraction);
+		if (!currentStop) {
+			currentStop = lerp(
+				stopDimensions[i][stopIndex],
+				stopDimensions[i][stopIndex + 1],
+				stopFraction,
+			);
 		} else {
-			currentStop = add(currentStop, lerp(stopDimensions[i][stopIndex], stopDimensions[i][stopIndex + 1], stopFraction));
+			currentStop = add(
+				currentStop,
+				lerp(
+					stopDimensions[i][stopIndex],
+					stopDimensions[i][stopIndex + 1],
+					stopFraction,
+				),
+			);
 		}
 	}
 
 	return currentStop;
 }
 
-function lerp(pointA, pointB, normalValue){
+function lerp(pointA, pointB, normalValue) {
 	return [
 		pointA[0] + (pointB[0] - pointA[0]) * normalValue,
 		pointA[1] + (pointB[1] - pointA[1]) * normalValue,
@@ -30,7 +41,7 @@ function lerp(pointA, pointB, normalValue){
 	];
 }
 
-function add(a,b){
+function add(a, b) {
 	return [
 		a[0] + b[0],
 		a[1] + b[1],
@@ -39,8 +50,8 @@ function add(a,b){
 	];
 }
 
-function validateStopDimensions(stopDimensions){
-	for(const stops of stopDimensions){
+function validateStopDimensions(stopDimensions) {
+	for (const stops of stopDimensions) {
 		validateStops(stops);
 	}
 	return stopDimensions;
@@ -51,14 +62,16 @@ function validateStops(stops) {
 	for (const color of stops) {
 		if (color.length === 3) color.push(1);
 		for (const component of color) {
-			if (component < 0 || component > 1) throw `Color stop has out of range component: ${component}`;
+			if (component < 0 || component > 1) {
+				throw `Color stop has out of range component: ${component}`;
+			}
 		}
 	}
-	if (stops.every(color => color.length === 4)) {
+	if (stops.every((color) => color.length === 4)) {
 		const stopLength = 1 / (stops.length - 1);
-		stops.forEach((color, i) => color.push(i * stopLength))
+		stops.forEach((color, i) => color.push(i * stopLength));
 	}
-	if (stops.some(color => color.length === 4)) {
+	if (stops.some((color) => color.length === 4)) {
 		throw "Colors must either all have positions, or none have positions";
 	}
 	if (stops[0][4] !== 0) {
@@ -80,7 +93,7 @@ function validateStops(stops) {
 
 export class WcSquareGradient extends HTMLElement {
 	#stops = [];
-	static observedAttributes = ["stops",];
+	static observedAttributes = ["stops"];
 	constructor() {
 		super();
 		this.bind(this);
@@ -104,17 +117,25 @@ export class WcSquareGradient extends HTMLElement {
 	}
 	renderGradient() {
 		const context = this.dom.canvas.getContext("2d");
-		const imageData = context.getImageData(0, 0, this.dom.canvas.width, this.dom.canvas.height);
+		const imageData = context.getImageData(
+			0,
+			0,
+			this.dom.canvas.width,
+			this.dom.canvas.height,
+		);
 		for (let i = 0; i < this.dom.canvas.width; i++) {
-			for(let j = 0; j < this.dom.canvas.height; j++){
+			for (let j = 0; j < this.dom.canvas.height; j++) {
 				const color = squareGradient(this.#stops, [
 					(1.0 / this.dom.canvas.width) * i,
 					(1.0 / this.dom.canvas.height) * j,
 				]);
 				imageData.data[(j * this.dom.canvas.width * 4) + 4 * i] = color[0] * 255;
-				imageData.data[(j * this.dom.canvas.width * 4) + (4 * i) + 1] = color[1] * 255;
-				imageData.data[(j * this.dom.canvas.width * 4) + (4 * i) + 2] = color[2] * 255;
-				imageData.data[(j * this.dom.canvas.width * 4) + (4 * i) + 3] = color[3] * 255;
+				imageData.data[(j * this.dom.canvas.width * 4) + (4 * i) + 1] = color[1] *
+					255;
+				imageData.data[(j * this.dom.canvas.width * 4) + (4 * i) + 2] = color[2] *
+					255;
+				imageData.data[(j * this.dom.canvas.width * 4) + (4 * i) + 3] = color[3] *
+					255;
 			}
 		}
 		context.putImageData(imageData, 0, 0);
@@ -128,7 +149,7 @@ export class WcSquareGradient extends HTMLElement {
 	cacheDom() {
 		this.dom = {
 			canvas: this.shadowRoot.querySelector("canvas"),
-			slider: this.shadowRoot.querySelector("input")
+			slider: this.shadowRoot.querySelector("input"),
 		};
 	}
 	attachEvents() {
@@ -138,18 +159,20 @@ export class WcSquareGradient extends HTMLElement {
 	}
 	set stops(val) {
 		if (val.startsWith("#")) {
-			this.#stops = validateStopDimensions(val.split(",").map(x => {
-				x = x.trim();
-				if (x.startsWith("#")) {
-					const hex = x.trim().slice(1);
-					return [
-						parseInt(hex.substring(0, 2), 16) / 255,
-						parseInt(hex.substring(2, 4), 16) / 255,
-						parseInt(hex.substring(4, 6), 16) / 255,
-						hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
-					];
-				}
-			}));
+			this.#stops = validateStopDimensions(
+				val.split(",").map((x) => {
+					x = x.trim();
+					if (x.startsWith("#")) {
+						const hex = x.trim().slice(1);
+						return [
+							parseInt(hex.substring(0, 2), 16) / 255,
+							parseInt(hex.substring(2, 4), 16) / 255,
+							parseInt(hex.substring(4, 6), 16) / 255,
+							hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255,
+						];
+					}
+				}),
+			);
 		} else if (val.startsWith("[")) {
 			this.#stops = validateStopDimensions(JSON.parse(val));
 		}

@@ -3,7 +3,7 @@ function loadImage(url) {
 		const image = new Image();
 		image.src = url;
 		image.onload = () => res(image);
-		image.onerror = e => {
+		image.onerror = (e) => {
 			console.log(e);
 			rej(e);
 		};
@@ -12,7 +12,9 @@ function loadImage(url) {
 
 function bindAttribute(context, attributes, attributeName, size, program) {
 	program = program ?? context.getParameter(context.CURRENT_PROGRAM);
-	attributes = attributes instanceof Float32Array ? attributes : new Float32Array(attributes);
+	attributes = attributes instanceof Float32Array
+		? attributes
+		: new Float32Array(attributes);
 
 	const attributeLocation = context.getAttribLocation(program, attributeName);
 	if (attributeLocation === -1) return; //bail if it doesn't exist in the shader
@@ -22,7 +24,14 @@ function bindAttribute(context, attributes, attributeName, size, program) {
 	context.bufferData(context.ARRAY_BUFFER, attributes, context.STATIC_DRAW);
 
 	context.enableVertexAttribArray(attributeLocation);
-	context.vertexAttribPointer(attributeLocation, size, context.FLOAT, false, 0, 0);
+	context.vertexAttribPointer(
+		attributeLocation,
+		size,
+		context.FLOAT,
+		false,
+		0,
+		0,
+	);
 }
 
 function compileShader(context, text, type) {
@@ -31,22 +40,58 @@ function compileShader(context, text, type) {
 	context.compileShader(shader);
 
 	if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) {
-		throw new Error(`Failed to compile ${type === context.VERTEX_SHADER ? "vertex" : "fragment"} shader: ${context.getShaderInfoLog(shader)}`);
+		throw new Error(
+			`Failed to compile ${
+				type === context.VERTEX_SHADER ? "vertex" : "fragment"
+			} shader: ${context.getShaderInfoLog(shader)}`,
+		);
 	}
 	return shader;
 }
 
-function createDataTexture(context, data, textureIndex = 1, width = 32, height = 32) {
+function createDataTexture(
+	context,
+	data,
+	textureIndex = 1,
+	width = 32,
+	height = 32,
+) {
 	context.activeTexture(context.TEXTURE0 + textureIndex);
 	const texture = context.createTexture();
 	context.bindTexture(context.TEXTURE_2D, texture);
 
-	context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
-	context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
-	context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.NEAREST);
-	context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.NEAREST);
+	context.texParameteri(
+		context.TEXTURE_2D,
+		context.TEXTURE_WRAP_S,
+		context.CLAMP_TO_EDGE,
+	);
+	context.texParameteri(
+		context.TEXTURE_2D,
+		context.TEXTURE_WRAP_T,
+		context.CLAMP_TO_EDGE,
+	);
+	context.texParameteri(
+		context.TEXTURE_2D,
+		context.TEXTURE_MIN_FILTER,
+		context.NEAREST,
+	);
+	context.texParameteri(
+		context.TEXTURE_2D,
+		context.TEXTURE_MAG_FILTER,
+		context.NEAREST,
+	);
 
-	context.texImage2D(context.TEXTURE_2D, 0, context.R32F, width, height, 0, context.RED, context.FLOAT, data);
+	context.texImage2D(
+		context.TEXTURE_2D,
+		0,
+		context.R32F,
+		width,
+		height,
+		0,
+		context.RED,
+		context.FLOAT,
+		data,
+	);
 }
 
 function createTexture(context, image, textureIndex = 0) {
@@ -54,18 +99,47 @@ function createTexture(context, image, textureIndex = 0) {
 	const texture = context.createTexture();
 	context.bindTexture(context.TEXTURE_2D, texture);
 
-	context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
-	context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
-	context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.NEAREST);
-	context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.NEAREST);
+	context.texParameteri(
+		context.TEXTURE_2D,
+		context.TEXTURE_WRAP_S,
+		context.CLAMP_TO_EDGE,
+	);
+	context.texParameteri(
+		context.TEXTURE_2D,
+		context.TEXTURE_WRAP_T,
+		context.CLAMP_TO_EDGE,
+	);
+	context.texParameteri(
+		context.TEXTURE_2D,
+		context.TEXTURE_MIN_FILTER,
+		context.NEAREST,
+	);
+	context.texParameteri(
+		context.TEXTURE_2D,
+		context.TEXTURE_MAG_FILTER,
+		context.NEAREST,
+	);
 
-	context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
+	context.texImage2D(
+		context.TEXTURE_2D,
+		0,
+		context.RGBA,
+		context.RGBA,
+		context.UNSIGNED_BYTE,
+		image,
+	);
 }
 
 const indentityKernel = new Int32Array([
-	0, 0, 0,
-	0, 1, 0,
-	0, 0, 0
+	0,
+	0,
+	0,
+	0,
+	1,
+	0,
+	0,
+	0,
+	0,
 ]);
 
 export class WcGlSlConvolutionCanvas extends HTMLElement {
@@ -78,7 +152,9 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 	#kernelHeight = 3;
 	#height = 240;
 	#width = 320;
-	ready = new Promise(res => { this.#setReady = res; });
+	ready = new Promise((res) => {
+		this.#setReady = res;
+	});
 	constructor() {
 		super();
 		this.bind(this);
@@ -113,11 +189,10 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 	cacheDom() {
 		this.dom = {
 			canvas: this.shadowRoot.querySelector("canvas"),
-			message: this.shadowRoot.querySelector("#message")
+			message: this.shadowRoot.querySelector("#message"),
 		};
 	}
 	attachEvents() {
-
 	}
 	bootGpu() {
 		this.context = this.dom.canvas.getContext("webgl2");
@@ -128,30 +203,58 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 	}
 	createIndicies() {
 		const indicies = new Uint16Array([
-			0, 1, 2,
-			0, 2, 3
+			0,
+			1,
+			2,
+			0,
+			2,
+			3,
 		]);
 		const indexBuffer = this.context.createBuffer();
 		this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, indexBuffer);
-		this.context.bufferData(this.context.ELEMENT_ARRAY_BUFFER, indicies, this.context.STATIC_DRAW);
+		this.context.bufferData(
+			this.context.ELEMENT_ARRAY_BUFFER,
+			indicies,
+			this.context.STATIC_DRAW,
+		);
 	}
 	createAttributes() {
-		bindAttribute(this.context, [
-			-1.0, -1.0,
-			1.0, -1.0,
-			1.0, 1.0,
-			-1.0, 1.0
-		], "aPosition", 2);
-		bindAttribute(this.context, [
-			0.0, 1.0,
-			1.0, 1.0,
-			1.0, 0.0,
-			0.0, 0.0
-		], "aUv", 2);
+		bindAttribute(
+			this.context,
+			[
+				-1.0,
+				-1.0,
+				1.0,
+				-1.0,
+				1.0,
+				1.0,
+				-1.0,
+				1.0,
+			],
+			"aPosition",
+			2,
+		);
+		bindAttribute(
+			this.context,
+			[
+				0.0,
+				1.0,
+				1.0,
+				1.0,
+				1.0,
+				0.0,
+				0.0,
+				0.0,
+			],
+			"aUv",
+			2,
+		);
 	}
 	compileShaders() {
 		this.#program = this.context.createProgram();
-		const vertexShader = compileShader(this.context, `#version 300 es
+		const vertexShader = compileShader(
+			this.context,
+			`#version 300 es
 				precision highp float;
 				in vec3 aPosition;
 				in vec2 aUv;
@@ -174,9 +277,13 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 					gl_Position = vec4(aPosition, 1.0);
 					uv = aUv;
 				}
-			`, this.context.VERTEX_SHADER);
+			`,
+			this.context.VERTEX_SHADER,
+		);
 
-		const fragmentShader = compileShader(this.context, `#version 300 es
+		const fragmentShader = compileShader(
+			this.context,
+			`#version 300 es
 				precision highp float;
 				
 				in vec2 uv;
@@ -205,7 +312,9 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 					
 					glColor = vec4(sum, 1.0);
 				}
-		`, this.context.FRAGMENT_SHADER);
+		`,
+			this.context.FRAGMENT_SHADER,
+		);
 
 		this.context.attachShader(this.#program, vertexShader);
 		this.context.attachShader(this.#program, fragmentShader);
@@ -220,14 +329,27 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 		this.context.uniform1i(imgLocation, 0);
 
 		if (!this.#kernel) return;
-		createDataTexture(this.context, this.#kernel, 1, this.#kernelWidth, this.#kernelWidth);
+		createDataTexture(
+			this.context,
+			this.#kernel,
+			1,
+			this.#kernelWidth,
+			this.#kernelWidth,
+		);
 		const dataLocation = this.context.getUniformLocation(this.#program, "kernel");
 		this.context.uniform1i(dataLocation, 1);
 	}
 	render() {
 		this.context.viewport(0, 0, this.dom.canvas.width, this.dom.canvas.height);
-		this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
-		this.context.drawElements(this.context.TRIANGLES, 6, this.context.UNSIGNED_SHORT, 0);
+		this.context.clear(
+			this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT,
+		);
+		this.context.drawElements(
+			this.context.TRIANGLES,
+			6,
+			this.context.UNSIGNED_SHORT,
+			0,
+		);
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
 		if (newValue !== oldValue) {
@@ -237,7 +359,7 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 	set image(value) {
 		this.ready //can't be bothered to make this parallel
 			.then(() => loadImage(value))
-			.then(img => {
+			.then((img) => {
 				this.dom.canvas.width = img.naturalWidth;
 				this.dom.canvas.height = img.naturalHeight;
 				this.#image = img;
@@ -248,9 +370,7 @@ export class WcGlSlConvolutionCanvas extends HTMLElement {
 			});
 	}
 	set kernel(val) {
-		const valMatrix = typeof (val) === "string"
-			? JSON.parse(val)
-			: val;
+		const valMatrix = typeof val === "string" ? JSON.parse(val) : val;
 
 		const width = valMatrix[0].length;
 		const height = valMatrix.length;

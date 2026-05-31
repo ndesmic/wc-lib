@@ -6,21 +6,21 @@ function degreesToRadians(deg) {
 	return deg * (Math.PI / 180);
 }
 
-export function writePixelRect(imageData, x, y, color, width = 1, height = 1){
+export function writePixelRect(imageData, x, y, color, width = 1, height = 1) {
 	const offsetX = Math.floor(width / 2);
 	const offsetY = Math.floor(height / 2);
-	for(let i = 0; i < width; i++){
-		for(let j = 0; j < height; j++){
+	for (let i = 0; i < width; i++) {
+		for (let j = 0; j < height; j++) {
 			writePixel(imageData, x + i - offsetX, y + j - offsetY, color);
 		}
 	}
 }
-export function writePixel(imageData, x, y, color){
+export function writePixel(imageData, x, y, color) {
 	const index = (imageData.width * 4 * y) + (x * 4);
-	imageData.data[index] = color[0] * 255; 
-	imageData.data[index + 1] = color[1] * 255; 
-	imageData.data[index + 2] = color[2] * 255; 
-	imageData.data[index + 3] = color[3] * 255; 
+	imageData.data[index] = color[0] * 255;
+	imageData.data[index + 1] = color[1] * 255;
+	imageData.data[index + 2] = color[2] * 255;
+	imageData.data[index + 3] = color[3] * 255;
 }
 
 function parseColor(val) {
@@ -31,7 +31,7 @@ function parseColor(val) {
 			parseInt(hex.substring(0, 2), 16) / 255,
 			parseInt(hex.substring(2, 4), 16) / 255,
 			parseInt(hex.substring(4, 6), 16) / 255,
-			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
+			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255,
 		];
 	} else if (trimmedVal.startsWith("[")) {
 		return JSON.parse(trimmedVal);
@@ -39,7 +39,8 @@ function parseColor(val) {
 }
 
 function hexFromFloat(color) {
-	return "#" + color.map(c => (c * 255).toString(16).padStart(2, "0")).join("");
+	return "#" +
+		color.map((c) => (c * 255).toString(16).padStart(2, "0")).join("");
 }
 
 const TWO_PI = Math.PI * 2;
@@ -53,7 +54,7 @@ export function normalizeAngle(angle) {
 function rotate(position, angle) {
 	return [
 		Math.cos(angle) * position[0] - Math.sin(angle) * position[1],
-		Math.sin(angle) * position[0] + Math.cos(angle) * position[1]
+		Math.sin(angle) * position[0] + Math.cos(angle) * position[1],
 	];
 }
 
@@ -67,10 +68,23 @@ export class WcSuperellipse extends HTMLElement {
 	#ry = 100;
 	#p = 1;
 	#angle = 0;
-	#precision = 0.01; 
-	#color = [1,0,0,1];
+	#precision = 0.01;
+	#color = [1, 0, 0, 1];
 	#thickness = 1;
-	static observedAttributes = ["height", "width", "cx", "cy", "r", "rx", "ry", "p", "angle", "precision", "color", "thickness"];
+	static observedAttributes = [
+		"height",
+		"width",
+		"cx",
+		"cy",
+		"r",
+		"rx",
+		"ry",
+		"p",
+		"angle",
+		"precision",
+		"color",
+		"thickness",
+	];
 	constructor() {
 		super();
 		this.bind(this);
@@ -90,39 +104,85 @@ export class WcSuperellipse extends HTMLElement {
 		this.attachEvents = this.attachEvents.bind(element);
 		this.renderSquircle = this.renderSquircle.bind(element);
 	}
-	renderSquircle(){
+	renderSquircle() {
 		const context = this.dom.canvas.getContext("2d");
-		
+
 		//draw background
 		context.clearRect(0, 0, this.dom.canvas.width, this.dom.canvas.height);
 
-		const imageData = context.getImageData(0, 0, this.dom.canvas.width, this.dom.canvas.height);
+		const imageData = context.getImageData(
+			0,
+			0,
+			this.dom.canvas.width,
+			this.dom.canvas.height,
+		);
 
-		if(this.#precision > 0){
+		if (this.#precision > 0) {
 			context.fillStyle = hexFromFloat(this.#color);
 			const ht = this.#thickness / 2;
-			for(let t = 0; t < Math.PI * 2; t += this.#precision){
+			for (let t = 0; t < Math.PI * 2; t += this.#precision) {
 				const angle = normalizeAngle(t + this.#angle);
-				const r = (this.#rx * this.#ry) / (Math.abs(this.#ry * Math.cos(angle)) ** this.#p + Math.abs(this.#rx * Math.sin(angle)) ** this.#p ) ** (1/this.#p);
-				const [x,y] = polarToCartesian(r, t, this.#cx, this.#cy);
-				context.fillRect(x-ht,y+ht,this.#thickness,this.#thickness);
+				const r = (this.#rx * this.#ry) /
+					(Math.abs(this.#ry * Math.cos(angle)) ** this.#p +
+							Math.abs(this.#rx * Math.sin(angle)) ** this.#p) ** (1 / this.#p);
+				const [x, y] = polarToCartesian(r, t, this.#cx, this.#cy);
+				context.fillRect(x - ht, y + ht, this.#thickness, this.#thickness);
 			}
 		} else {
-			for(let i = this.#cx - this.#r; i < this.#cx + this.#r; i++){
+			for (let i = this.#cx - this.#r; i < this.#cx + this.#r; i++) {
 				const x = i - this.#cx;
-				const y = this.#ry * ((1 - Math.abs(x / this.#rx) ** this.#p) ** (1/this.#p));
-				const [tx,ty] = rotate([x,y], this.#angle, this.#cx, this.#cy).map(x => Math.floor(x));
-				const [tx2, ty2] = rotate([x, -y], this.#angle, this.#cx, this.#cy).map(x => Math.floor(x));
-				writePixelRect(imageData, tx - this.#cx, this.#cy - ty, this.#color, this.#thickness, this.#thickness);
-				writePixelRect(imageData, tx2 - this.#cx, this.#cy - ty2, this.#color, this.#thickness, this.#thickness);
+				const y = this.#ry *
+					((1 - Math.abs(x / this.#rx) ** this.#p) ** (1 / this.#p));
+				const [tx, ty] = rotate([x, y], this.#angle, this.#cx, this.#cy).map((x) =>
+					Math.floor(x)
+				);
+				const [tx2, ty2] = rotate([x, -y], this.#angle, this.#cx, this.#cy).map(
+					(x) => Math.floor(x),
+				);
+				writePixelRect(
+					imageData,
+					tx - this.#cx,
+					this.#cy - ty,
+					this.#color,
+					this.#thickness,
+					this.#thickness,
+				);
+				writePixelRect(
+					imageData,
+					tx2 - this.#cx,
+					this.#cy - ty2,
+					this.#color,
+					this.#thickness,
+					this.#thickness,
+				);
 			}
 			for (let i = this.#cx - this.#r; i < this.#cy + this.#r; i++) {
 				const y = i - this.#cx;
-				const x = Math.floor(this.#rx * ((1 - Math.abs(y / this.#ry) ** this.#p) ** (1 / this.#p)))
-				const [tx, ty] = rotate([x, y], this.#angle, this.#cx, this.#cy).map(x => Math.floor(x));
-				const [tx2, ty2] = rotate([-x, y], this.#angle, this.#cx, this.#cy).map(x => Math.floor(x));
-				writePixelRect(imageData, tx - this.#cx, this.#cy - ty, this.#color, this.#thickness, this.#thickness);
-				writePixelRect(imageData, tx2 - this.#cx, this.#cy - ty2, this.#color, this.#thickness, this.#thickness);
+				const x = Math.floor(
+					this.#rx * ((1 - Math.abs(y / this.#ry) ** this.#p) ** (1 / this.#p)),
+				);
+				const [tx, ty] = rotate([x, y], this.#angle, this.#cx, this.#cy).map((x) =>
+					Math.floor(x)
+				);
+				const [tx2, ty2] = rotate([-x, y], this.#angle, this.#cx, this.#cy).map(
+					(x) => Math.floor(x),
+				);
+				writePixelRect(
+					imageData,
+					tx - this.#cx,
+					this.#cy - ty,
+					this.#color,
+					this.#thickness,
+					this.#thickness,
+				);
+				writePixelRect(
+					imageData,
+					tx2 - this.#cx,
+					this.#cy - ty2,
+					this.#color,
+					this.#thickness,
+					this.#thickness,
+				);
 			}
 			context.putImageData(imageData, 0, 0);
 		}
@@ -135,7 +195,7 @@ export class WcSuperellipse extends HTMLElement {
 	cacheDom() {
 		this.dom = {
 			canvas: this.shadowRoot.querySelector("canvas"),
-			slider: this.shadowRoot.querySelector("input")
+			slider: this.shadowRoot.querySelector("input"),
 		};
 	}
 	attachEvents() {
@@ -149,36 +209,36 @@ export class WcSuperellipse extends HTMLElement {
 	set height(val) {
 		this.#height = parseFloat(val);
 	}
-	set cx(val){
+	set cx(val) {
 		this.#cx = parseInt(val);
 	}
-	set cy(val){
+	set cy(val) {
 		this.#cy = parseInt(val);
 	}
-	set r(val){
+	set r(val) {
 		this.#r = parseFloat(val);
 		this.#rx = this.#r;
 		this.#ry = this.#r;
 	}
-	set rx(val){
+	set rx(val) {
 		this.#rx = parseFloat(val);
 	}
-	set ry(val){
+	set ry(val) {
 		this.#ry = parseFloat(val);
 	}
-	set p(val){
+	set p(val) {
 		this.#p = parseFloat(val);
 	}
-	set precision(val){
+	set precision(val) {
 		this.#precision = val === "pixel" ? 0 : parseFloat(val);
 	}
-	set color(val){
+	set color(val) {
 		this.#color = parseColor(val);
 	}
-	set thickness(val){
+	set thickness(val) {
 		this.#thickness = parseInt(val);
 	}
-	set angle(val){
+	set angle(val) {
 		this.#angle = degreesToRadians(parseFloat(val));
 		this.renderSquircle();
 	}

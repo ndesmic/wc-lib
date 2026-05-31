@@ -2,16 +2,21 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="./system.css">
+    <link rel="stylesheet" href="/css/system.css">
 </head>
 
-<body>
-    <div class="stack gap1 stretch">
+<body class="stack center">
+	<h1>Components</h1>
+    <div class="stack gap1 stretch constrained-width">
+		<wc-theme-picker></wc-theme-picker>
+		<div class="card neutral">Hello World!</div>
         <div class="card warn">Hello World!</div>
         <div class="card info">Hello World!</div>
         <div class="card error">Hello World!</div>
         <div class="card success">Hello World!</div>
         <button>Button</button>
+		<button class="secondary">Secondary Button</button>
+		<button class="tertiary">Tertiary Button</button>
         <input type="file">
         <label file-label>
             <input type="file">
@@ -31,9 +36,21 @@
         <wc-unhide-password-decorator attached>
             <input type="password" id="p-password-attach">
         </wc-unhide-password-decorator>
+		<input type="date" id="date">
+		<ul>
+			<li>List Item 1</li>
+			<li>List Item 2</li>
+			<li>List Item 3</li>
+		</ul>
+		<ol>
+			<li>List Item 1</li>
+			<li>List Item 2</li>
+			<li>List Item 3</li>
+		</ol>
     </div>
-    <script src="../shared/components/wc-copy-button-decorator.js" type="module"></script>
-    <script src="../shared/components/wc-unhide-password-decorator.js" type="module"></script>
+    <script src="/components/wc-copy-button-decorator.js" type="module"></script>
+    <script src="/components/wc-unhide-password-decorator.js" type="module"></script>
+	<script src="/components/theme-picker/wc-theme-picker.js" type="module"></script>
 </body>
 
 </html>

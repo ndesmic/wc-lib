@@ -52,7 +52,7 @@ class WcSpoiler extends HTMLElement {
 			labelButton: this.shadowRoot.querySelector("#label-button"),
 			buttonText: this.shadowRoot.querySelector("#button-text"),
 			liveArea: this.shadowRoot.querySelector("#live-area"),
-			slot: this.shadowRoot.querySelector("slot")
+			slot: this.shadowRoot.querySelector("slot"),
 		};
 	}
 	attributeChangedCallback(name, oldValue, newValue) {

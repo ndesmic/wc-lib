@@ -2,7 +2,7 @@ import { createElement } from "../../libs/dom-utils.js";
 import systemCss from "../../css/system.css" with { type: "css" };
 
 function argsToString(args) {
-	return args.map(arg => arg.toString()).join(", ");
+	return args.map((arg) => arg.toString()).join(", ");
 }
 
 export class WcDomConsole extends HTMLElement {
@@ -28,8 +28,8 @@ export class WcDomConsole extends HTMLElement {
 				return (...args) => {
 					originalMethod(...args);
 					webConsole[prop](...args);
-				}
-			}
+				};
+			},
 		});
 	}
 	bind() {}
@@ -42,7 +42,7 @@ export class WcDomConsole extends HTMLElement {
 	}
 	registerDom() {
 		this.dom = {
-			messages: this.shadow.querySelector("#messages")
+			messages: this.shadow.querySelector("#messages"),
 		};
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
@@ -51,13 +51,28 @@ export class WcDomConsole extends HTMLElement {
 		}
 	}
 	log(...args) {
-		this.dom.messages.append(createElement("li", { attrs: { class: "neutral" }, children: argsToString(args) }));
+		this.dom.messages.append(
+			createElement("li", {
+				attrs: { class: "neutral" },
+				children: argsToString(args),
+			}),
+		);
 	}
 	warn(...args) {
-		this.dom.messages.append(createElement("li", { attrs: { class: "warn" }, children: argsToString(args) }));
+		this.dom.messages.append(
+			createElement("li", {
+				attrs: { class: "warn" },
+				children: argsToString(args),
+			}),
+		);
 	}
 	error(...args) {
-		this.dom.messages.append(createElement("li", { attrs: { class: "error" }, children: argsToString(args) }))
+		this.dom.messages.append(
+			createElement("li", {
+				attrs: { class: "error" },
+				children: argsToString(args),
+			}),
+		);
 	}
 }
 

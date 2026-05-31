@@ -1,16 +1,15 @@
 /**
- * Trims only lines from the text  
- * @param {string} text 
- * @returns 
+ * Trims only lines from the text
+ * @param {string} text
+ * @returns
  */
 export function trimLines(text) {
 	return text.replace(/^(\r?\n)+/us, "")
-		.replace(/(\r?\n)+$/us, "")
+		.replace(/(\r?\n)+$/us, "");
 }
 
 /**
- * dedents the text based on first line
- * @param {string} text 
+ * @param {string} text
  */
 export function dedent(text) {
 	const lines = text.split("\n");
@@ -28,7 +27,7 @@ export function dedent(text) {
 		return text;
 	}
 	const regExp = new RegExp(`^${spacingChar}{${count}}`, "us");
-	return lines.map(line => line.replace(regExp, "")).join("\n");
+	return lines.map((line) => line.replace(regExp, "")).join("\n");
 }
 
 const htmlEntityRegExp = /(?=&)(.*?)(?<=;)/gus;
@@ -36,10 +35,10 @@ const htmlEntities = {
 	"gt": ">",
 	"lt": "<",
 	"amp": "&",
-	"nbsp": "\u00a0"
+	"nbsp": "\u00a0",
 };
 export function decodeHtml(text) {
-	return text.replace(htmlEntityRegExp, value => {
+	return text.replace(htmlEntityRegExp, (value) => {
 		const entity = value.replace(/^&/, "").replace(/;$/, "");
 		const entityString = htmlEntities[entity];
 		if (entityString) {

@@ -41,12 +41,16 @@ export class GaloisField {
 	}
 	mul(x, y) {
 		if (x === 0 || y === 0) return 0;
-		return this.expTable[(this.logTable[x] + this.logTable[y]) % (this.length - 1)];
+		return this
+			.expTable[(this.logTable[x] + this.logTable[y]) % (this.length - 1)];
 	}
 	div(x, y) {
 		if (y === 0) throw `Tried to divide by zero`;
 		if (x === 0) return 0;
-		return this.expTable[((this.logTable[x] + this.length) - this.logTable[y]) % this.length];
+		return this
+			.expTable[
+				((this.logTable[x] + this.length) - this.logTable[y]) % this.length
+			];
 	}
 	pow(x, p) {
 		return this.expTable[(this.logTable[x] * p) % this.length];
@@ -62,7 +66,7 @@ export class GaloisField {
 	}
 	//https://en.wikipedia.org/wiki/Synthetic_division#Expanded_synthetic_division
 	//dividend / divisor
-	polyDiv(dividend, divisor) { 
+	polyDiv(dividend, divisor) {
 		let out = [...dividend];
 		//const normalizer = y[0];
 		for (let i = 0; i < dividend.length - (divisor.length - 1); i++) {

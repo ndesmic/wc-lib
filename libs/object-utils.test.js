@@ -12,15 +12,15 @@ describe("object-utils", () => {
 			const result = accessProperty({ a: { b: "b" } }, "a.b");
 			expect(result).toBe("b");
 		});
-        it("accesses property with number", () => {
+		it("accesses property with number", () => {
 			const result = accessProperty(["foo", "bar", "baz"], "1");
 			expect(result).toBe("bar");
 		});
-        it("accesses deep property with number", () => {
+		it("accesses deep property with number", () => {
 			const result = accessProperty({ a: ["foo", "bar", "baz"] }, "a.1");
 			expect(result).toBe("bar");
 		});
-        it("accesses property with function", () => {
+		it("accesses property with function", () => {
 			const result = accessProperty({ a: { b: "bar" } }, (obj) => obj.a.b);
 			expect(result).toBe("bar");
 		});

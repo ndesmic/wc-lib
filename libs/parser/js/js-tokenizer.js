@@ -62,10 +62,10 @@ export const jsTokenizer = new Tokenizer([
 	{ matcher: "<=", type: "less-than-equal" },
 	{ matcher: ">", type: "greater-than-equal" },
 	{ matcher: ">=", type: "greater-than-equal" },
-	{ matcher: "\"", type: "double-quote" },
-	{ matcher: "\'", type: "single-quote" },
+	{ matcher: '"', type: "double-quote" },
+	{ matcher: "'", type: "single-quote" },
 	{ matcher: "`", type: "backtick" },
 	{ matcher: ".", type: "dot" },
 	{ matcher: /^[0-9]\.?[0-9]?/, type: "number-literal" },
-	{ matcher: /^[a-zA-Z]+/, type: "identifier" }
+	{ matcher: /^[a-zA-Z]+/, type: "identifier" },
 ]);

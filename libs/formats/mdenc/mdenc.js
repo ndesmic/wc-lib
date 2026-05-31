@@ -70,13 +70,13 @@ export async function decryptBytes(bytes, passphrase) {
 }
 
 //---
-	function stringToArray(str) {
-		const result = [];
-		for (let i = 0; i < str.length; i++) {
-			result.push(str.charCodeAt(i));
-		}
-		return new Uint8Array(result);
+function stringToArray(str) {
+	const result = [];
+	for (let i = 0; i < str.length; i++) {
+		result.push(str.charCodeAt(i));
 	}
+	return new Uint8Array(result);
+}
 
 async function deriveKey2(password) {
 	const buffer = textEncoder.encode(password);
@@ -107,59 +107,57 @@ async function deriveKey2(password) {
 }
 
 async function decryptFromBytes(encryptedBytes, password) {
-		try {
+	try {
+		// extract iv
+		const vector = encryptedBytes.slice(0, vectorSize);
 
-			// extract iv
-			const vector = encryptedBytes.slice(0,vectorSize);
+		// extract encrypted text
+		const encryptedTextBytes = encryptedBytes.slice(vectorSize);
 
-			// extract encrypted text
-			const encryptedTextBytes = encryptedBytes.slice(vectorSize);
+		const key = await deriveKey2(password);
 
-			const key = await deriveKey2(password);
+		// decrypt into bytes
+		const decryptedBytes = await crypto.subtle.decrypt(
+			{ name: "AES-GCM", iv: vector },
+			key,
+			encryptedTextBytes,
+		);
 
-			// decrypt into bytes
-			const decryptedBytes = await crypto.subtle.decrypt(
-				{name: 'AES-GCM', iv: vector},
-				key,
-				encryptedTextBytes
-			);
-
-			// convert bytes to text
-			const decryptedText = utf8Decoder.decode(decryptedBytes);
-			return decryptedText;
-		} catch (e) {
-			//console.error(e);
-			return null;
-		}
+		// convert bytes to text
+		const decryptedText = utf8Decoder.decode(decryptedBytes);
+		return decryptedText;
+	} catch (e) {
+		//console.error(e);
+		return null;
 	}
+}
 
-	async function decryptFromBase64(base64Encoded, password) {
-		try {
+async function decryptFromBase64(base64Encoded, password) {
+	try {
+		const bytesToDecode = stringToArray(atob(base64Encoded));
 
-			const bytesToDecode = stringToArray(atob(base64Encoded));
-			
-			return await decryptFromBytes(bytesToDecode, password);
+		return await decryptFromBytes(bytesToDecode, password);
 
-			// // extract iv
-			// const vector = bytesToDecode.slice(0,vectorSize);
+		// // extract iv
+		// const vector = bytesToDecode.slice(0,vectorSize);
 
-			// // extract encrypted text
-			// const encryptedTextBytes = bytesToDecode.slice(vectorSize);
+		// // extract encrypted text
+		// const encryptedTextBytes = bytesToDecode.slice(vectorSize);
 
-			// const key = await this.deriveKey(password);
+		// const key = await this.deriveKey(password);
 
-			// // decrypt into bytes
-			// let decryptedBytes = await crypto.subtle.decrypt(
-			// 	{name: 'AES-GCM', iv: vector},
-			// 	key,
-			// 	encryptedTextBytes
-			// );
+		// // decrypt into bytes
+		// let decryptedBytes = await crypto.subtle.decrypt(
+		// 	{name: 'AES-GCM', iv: vector},
+		// 	key,
+		// 	encryptedTextBytes
+		// );
 
-			// // convert bytes to text
-			// let decryptedText = utf8Decoder.decode(decryptedBytes);
-			// return decryptedText;
-		} catch (e) {
-			//console.error(e);
-			return null;
-		}
+		// // convert bytes to text
+		// let decryptedText = utf8Decoder.decode(decryptedBytes);
+		// return decryptedText;
+	} catch (e) {
+		//console.error(e);
+		return null;
 	}
+}

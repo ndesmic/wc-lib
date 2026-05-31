@@ -1,5 +1,4 @@
 /**
- *
  * @param {Array} array
  * @param {number} length
  * @param {any} element
@@ -14,7 +13,6 @@ export function padArrayStart(array, length, element = 0) {
 }
 
 /**
- *
  * @param {Array} array
  * @param {number} length
  * @param {any} element
@@ -28,12 +26,12 @@ export function padArrayEnd(array, length, element = 0) {
 	return result;
 }
 
-export function getValuesFromEntriesRecursive(entries){
-	return entries.map(keyval => {
-		if(!Array.isArray(keyval)){
+export function getValuesFromEntriesRecursive(entries) {
+	return entries.map((keyval) => {
+		if (!Array.isArray(keyval)) {
 			return keyval;
 		}
-		if(Array.isArray(keyval[1])){
+		if (Array.isArray(keyval[1])) {
 			return getValuesFromEntriesRecursive(keyval[1]);
 		}
 		return keyval[1];
@@ -45,8 +43,8 @@ export function getValuesFromEntriesRecursive(entries){
  * @param {T | T[]} val
  * @returns
  */
-export function getSingleOrArray(val){
-	if(Array.isArray(val)){
+export function getSingleOrArray(val) {
+	if (Array.isArray(val)) {
 		return val;
 	}
 	return [val];
@@ -58,10 +56,10 @@ export function getSingleOrArray(val){
  * @param {any} element
  * @returns
  */
-export function trimArrayStart(array, element = 0){
+export function trimArrayStart(array, element = 0) {
 	const result = array.slice(0);
-	while(result[0] === element){
-		result.shift()
+	while (result[0] === element) {
+		result.shift();
 	}
 	return result;
 }
@@ -110,7 +108,10 @@ export function getRange({ start, end, step }) {
 export function getPermutations(items, size) {
 	size ??= items.length;
 	if (size > items.length) return [];
-	if (size === 1) return items.map(x => [x]);
-	return items.flatMap(x =>
-		getPermutations(items.filter(v => x !== v), size - 1).map(item => [x, ...item]));
+	if (size === 1) return items.map((x) => [x]);
+	return items.flatMap((x) =>
+		getPermutations(items.filter((v) => x !== v), size - 1).map(
+			(item) => [x, ...item],
+		)
+	);
 }

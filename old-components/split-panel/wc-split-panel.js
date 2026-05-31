@@ -1,4 +1,9 @@
-export function fireEvent(element, eventName, bubbles = true, cancelable = true) {
+export function fireEvent(
+	element,
+	eventName,
+	bubbles = true,
+	cancelable = true,
+) {
 	const event = new Event(eventName, { bubbles, cancelable });
 	return element.dispatchEvent(event);
 }
@@ -52,7 +57,7 @@ export class WcSplitPanel extends HTMLElement {
 	}
 	cacheDom() {
 		this.dom = {
-			median: this.shadowRoot.querySelector("#median")
+			median: this.shadowRoot.querySelector("#median"),
 		};
 	}
 	attachEvents() {
@@ -76,12 +81,16 @@ export class WcSplitPanel extends HTMLElement {
 		if (this.direction === "row") {
 			const newMedianLeft = e.clientX - this.left;
 			const median = this.dom.median.getBoundingClientRect().width;
-			this.style.gridTemplateColumns = `calc(${newMedianLeft}px - ${median / 2}px) ${median}px 1fr`;
+			this.style.gridTemplateColumns = `calc(${newMedianLeft}px - ${
+				median / 2
+			}px) ${median}px 1fr`;
 		}
 		if (this.direction === "column") {
 			const newMedianTop = e.clientY - this.top;
 			const median = this.dom.median.getBoundingClientRect().height;
-			this.style.gridTemplateRows = `calc(${newMedianTop}px - ${median / 2}px) ${median}px 1fr`;
+			this.style.gridTemplateRows = `calc(${newMedianTop}px - ${
+				median / 2
+			}px) ${median}px 1fr`;
 		}
 	}
 	attributeChangedCallback(name, oldValue, newValue) {

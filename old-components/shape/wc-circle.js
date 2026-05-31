@@ -28,19 +28,23 @@ export class WcCircle extends HTMLElement {
 		this.attachEvents = this.attachEvents.bind(element);
 		this.renderSquircle = this.renderSquircle.bind(element);
 	}
-	renderSquircle(){
+	renderSquircle() {
 		const context = this.dom.canvas.getContext("2d");
-		
+
 		//draw background
 		context.clearRect(0, 0, this.dom.canvas.width, this.dom.canvas.height);
 
-		const imageData = context.getImageData(0, 0, this.dom.canvas.width, this.dom.canvas.height);
-
+		const imageData = context.getImageData(
+			0,
+			0,
+			this.dom.canvas.width,
+			this.dom.canvas.height,
+		);
 
 		context.fillStyle = "#ff0000";
-		for(let t = 0; t < Math.PI * 2; t += 0.01){
-			const [x,y] = polarToCartesian(this.#r, t, this.#cx, this.#cy);
-			context.fillRect(x,y,1,1);
+		for (let t = 0; t < Math.PI * 2; t += 0.01) {
+			const [x, y] = polarToCartesian(this.#r, t, this.#cx, this.#cy);
+			context.fillRect(x, y, 1, 1);
 		}
 	}
 	connectedCallback() {
@@ -51,7 +55,7 @@ export class WcCircle extends HTMLElement {
 	cacheDom() {
 		this.dom = {
 			canvas: this.shadowRoot.querySelector("canvas"),
-			slider: this.shadowRoot.querySelector("input")
+			slider: this.shadowRoot.querySelector("input"),
 		};
 	}
 	attachEvents() {
@@ -65,13 +69,13 @@ export class WcCircle extends HTMLElement {
 	set height(val) {
 		this.#height = parseFloat(val);
 	}
-	set cx(val){
+	set cx(val) {
 		this.#cx = parseInt(val);
 	}
-	set cy(val){
+	set cy(val) {
 		this.#cy = parseInt(val);
 	}
-	set r(val){
+	set r(val) {
 		this.#r = parseFloat(val);
 	}
 }

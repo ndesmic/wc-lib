@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Travel Form</title>
+		<link rel="stylesheet" href="/css/system.css">
+		<link rel="stylesheet" href="/css/neu.css">
+		<link rel="stylesheet" href="travel-form.css">
+	</head>
+	<body>
+		<main class="constrained-width constrained-height article">
+			<header class="row gap2">
+				<h1>Travel Corp</h1>
+				<wc-theme-picker></wc-theme-picker>
+			</header>
+			<wc-tab-panel>
+				<span slot="tab" title="Flights" class="neu-seg">Flights</span>
+				<span slot="tab" title="Hotels">Hotels</span>
+				<span slot="tab" title="Trains">Trains</span>
+				<span slot="tab" title="Cars">Cars</span>
+				
+				<div slot="content">
+					<form slot="content" id="flights" class="neu-extrude">
+						<label id="flight-depart-location" class="stack align-start gap1">
+							<div>Departing</div>
+							<input type="text" class="full-width">
+						</label>
+						<label id="flight-arrive-location" class="stack align-start gap1">
+							<div>Arriving</div>
+							<input type="text" class="full-width">
+						</label>
+						<input type="date" id="flight-depart-date">
+						<input type="date" id="flight-arrive-date">
+						<button id="flight-submit">Search Flights</button>
+					</form>
+				</div>
+				<div slot="content" class="tab-panel">
+					Hotels
+				</div>
+				<div slot="content" class="tab-panel">
+					Trains
+				</div>
+				<div slot="content" class="tab-panel">
+					Cars
+				</div>
+			</wc-tab-panel>
+		</main>
+		<script src="/components/tab-panel/wc-tab-panel.js" type="module"></script>
+		<script src="/components/theme-picker/wc-theme-picker.js" type="module"></script>
+	</body>
+</html>

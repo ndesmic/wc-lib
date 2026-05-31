@@ -1,5 +1,5 @@
 function hyphenCaseToCamelCase(text) {
-	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
+	return text.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
 function compileShader(context, text, type) {
@@ -8,7 +8,9 @@ function compileShader(context, text, type) {
 	context.compileShader(shader);
 
 	if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) {
-		throw new Error(`Failed to compile shader: ${context.getShaderInfoLog(shader)}`);
+		throw new Error(
+			`Failed to compile shader: ${context.getShaderInfoLog(shader)}`,
+		);
 	}
 	return shader;
 }
@@ -20,7 +22,9 @@ function compileProgram(context, vertexShader, fragmentShader) {
 	context.linkProgram(program);
 
 	if (!context.getProgramParameter(program, context.LINK_STATUS)) {
-		throw new Error(`Failed to compile WebGL program: ${context.getProgramInfoLog(program)}`);
+		throw new Error(
+			`Failed to compile WebGL program: ${context.getProgramInfoLog(program)}`,
+		);
 	}
 
 	return program;
@@ -41,9 +45,23 @@ class WcGraphGl extends HTMLElement {
 	#continuous = false;
 
 	#defaultSize = 4;
-	#defaultColor = [1,0,0,1];
+	#defaultColor = [1, 0, 0, 1];
 
-	static observedAttributes = ["points", "func", "step", "width", "height", "xmin", "xmax", "ymin", "ymax", "default-size", "default-color", "continuous", "thickness"];
+	static observedAttributes = [
+		"points",
+		"func",
+		"step",
+		"width",
+		"height",
+		"xmin",
+		"xmax",
+		"ymin",
+		"ymax",
+		"default-size",
+		"default-color",
+		"continuous",
+		"thickness",
+	];
 	constructor() {
 		super();
 		this.bind(this);
@@ -51,7 +69,7 @@ class WcGraphGl extends HTMLElement {
 	bind(element) {
 		element.attachEvents.bind(element);
 	}
-	connectedCallback(){
+	connectedCallback() {
 		this.attachShadow({ mode: "open" });
 		this.canvas = document.createElement("canvas");
 		this.shadowRoot.appendChild(this.canvas);
@@ -63,10 +81,10 @@ class WcGraphGl extends HTMLElement {
 		this.attachEvents();
 	}
 	render() {
-		if(!this.context) return;
+		if (!this.context) return;
 		let points;
 		let colors;
-		if(this.#func){
+		if (this.#func) {
 			points = [];
 			colors = [];
 			for (let x = this.#xmin; x < this.#xmax; x += this.#step) {
@@ -80,7 +98,9 @@ class WcGraphGl extends HTMLElement {
 		}
 
 		//Setup WebGL shaders
-		const vertexShader = compileShader(this.context, `
+		const vertexShader = compileShader(
+			this.context,
+			`
 			attribute vec3 aVertexPosition;
 			attribute vec4 aVertexColor;
 			uniform vec4 uBounds;
@@ -96,16 +116,22 @@ class WcGraphGl extends HTMLElement {
 				gl_Position = vec4(mix(-1.0,1.0,inverseLerp(uBounds.x, uBounds.y, aVertexPosition.x)), mix(-1.0,1.0,inverseLerp(uBounds.z, uBounds.w, aVertexPosition.y)), 1.0, 1.0);
 				vColor = aVertexColor;
 			}
-		`, this.context.VERTEX_SHADER);
+		`,
+			this.context.VERTEX_SHADER,
+		);
 
-		const fragmentShader = compileShader(this.context, `
+		const fragmentShader = compileShader(
+			this.context,
+			`
 			varying mediump vec4 vColor;
 			void main() {
 				gl_FragColor = vColor;
 			}
-		`, this.context.FRAGMENT_SHADER);
+		`,
+			this.context.FRAGMENT_SHADER,
+		);
 
-		const program = compileProgram(this.context, vertexShader, fragmentShader)
+		const program = compileProgram(this.context, vertexShader, fragmentShader);
 
 		this.context.useProgram(program);
 
@@ -115,99 +141,189 @@ class WcGraphGl extends HTMLElement {
 			this.context.bindBuffer(this.context.ARRAY_BUFFER, positionBuffer);
 
 			const positions = new Float32Array([
-				(this.#xmax + this.#xmin) / 2, this.#ymin, 10,
-				(this.#xmax + this.#xmin) / 2, this.#ymax, 10,
-				this.#xmin, (this.#ymax + this.#ymin) / 2, 10,
-				this.#xmax, (this.#ymax + this.#ymin) / 2, 10
+				(this.#xmax + this.#xmin) / 2,
+				this.#ymin,
+				10,
+				(this.#xmax + this.#xmin) / 2,
+				this.#ymax,
+				10,
+				this.#xmin,
+				(this.#ymax + this.#ymin) / 2,
+				10,
+				this.#xmax,
+				(this.#ymax + this.#ymin) / 2,
+				10,
 			]);
-			this.context.bufferData(this.context.ARRAY_BUFFER, positions, this.context.STATIC_DRAW);
+			this.context.bufferData(
+				this.context.ARRAY_BUFFER,
+				positions,
+				this.context.STATIC_DRAW,
+			);
 
-			const positionLocation = this.context.getAttribLocation(program, "aVertexPosition");
+			const positionLocation = this.context.getAttribLocation(
+				program,
+				"aVertexPosition",
+			);
 			this.context.enableVertexAttribArray(positionLocation);
-			this.context.vertexAttribPointer(positionLocation, 3, this.context.FLOAT, false, 0, 0);
+			this.context.vertexAttribPointer(
+				positionLocation,
+				3,
+				this.context.FLOAT,
+				false,
+				0,
+				0,
+			);
 
 			const colorBuffer = this.context.createBuffer();
 			this.context.bindBuffer(this.context.ARRAY_BUFFER, colorBuffer);
 
 			const colorsArray = new Float32Array([
-				0,0,0,1,
-				0,0,0,1,
-				0,0,0,1,
-				0,0,0,1
+				0,
+				0,
+				0,
+				1,
+				0,
+				0,
+				0,
+				1,
+				0,
+				0,
+				0,
+				1,
+				0,
+				0,
+				0,
+				1,
 			]);
-			this.context.bufferData(this.context.ARRAY_BUFFER, colorsArray, this.context.STATIC_DRAW);
+			this.context.bufferData(
+				this.context.ARRAY_BUFFER,
+				colorsArray,
+				this.context.STATIC_DRAW,
+			);
 
-			const colorLocation = this.context.getAttribLocation(program, "aVertexColor");
+			const colorLocation = this.context.getAttribLocation(
+				program,
+				"aVertexColor",
+			);
 			this.context.enableVertexAttribArray(colorLocation);
-			this.context.vertexAttribPointer(colorLocation, 4, this.context.FLOAT, false, 0, 0);
+			this.context.vertexAttribPointer(
+				colorLocation,
+				4,
+				this.context.FLOAT,
+				false,
+				0,
+				0,
+			);
 
-			const bounds = new Float32Array([this.#xmin, this.#xmax, this.#ymin, this.#ymax]);
+			const bounds = new Float32Array([
+				this.#xmin,
+				this.#xmax,
+				this.#ymin,
+				this.#ymax,
+			]);
 			const boundsLocation = this.context.getUniformLocation(program, "uBounds");
 			this.context.uniform4fv(boundsLocation, bounds);
 
-			this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
+			this.context.clear(
+				this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT,
+			);
 			this.context.drawArrays(this.context.LINES, 0, points.length);
 		}
-		
+
 		//setup vertices
 		const positionBuffer = this.context.createBuffer();
 		this.context.bindBuffer(this.context.ARRAY_BUFFER, positionBuffer);
 
 		const positions = new Float32Array(points.flat());
-		this.context.bufferData(this.context.ARRAY_BUFFER, positions, this.context.STATIC_DRAW);
+		this.context.bufferData(
+			this.context.ARRAY_BUFFER,
+			positions,
+			this.context.STATIC_DRAW,
+		);
 
-		const positionLocation = this.context.getAttribLocation(program, "aVertexPosition");
+		const positionLocation = this.context.getAttribLocation(
+			program,
+			"aVertexPosition",
+		);
 		this.context.enableVertexAttribArray(positionLocation);
-		this.context.vertexAttribPointer(positionLocation, 3, this.context.FLOAT, false, 0, 0);
+		this.context.vertexAttribPointer(
+			positionLocation,
+			3,
+			this.context.FLOAT,
+			false,
+			0,
+			0,
+		);
 
 		//setup color
 		const colorBuffer = this.context.createBuffer();
 		this.context.bindBuffer(this.context.ARRAY_BUFFER, colorBuffer);
 
 		const colorsArray = new Float32Array(colors.flat());
-		this.context.bufferData(this.context.ARRAY_BUFFER, colorsArray, this.context.STATIC_DRAW);
+		this.context.bufferData(
+			this.context.ARRAY_BUFFER,
+			colorsArray,
+			this.context.STATIC_DRAW,
+		);
 
 		const colorLocation = this.context.getAttribLocation(program, "aVertexColor");
 		this.context.enableVertexAttribArray(colorLocation);
-		this.context.vertexAttribPointer(colorLocation, 4, this.context.FLOAT, false, 0, 0);
+		this.context.vertexAttribPointer(
+			colorLocation,
+			4,
+			this.context.FLOAT,
+			false,
+			0,
+			0,
+		);
 
 		//setup bounds
-		const bounds = new Float32Array([this.#xmin, this.#xmax, this.#ymin, this.#ymax]);
+		const bounds = new Float32Array([
+			this.#xmin,
+			this.#xmax,
+			this.#ymin,
+			this.#ymax,
+		]);
 		const boundsLocation = this.context.getUniformLocation(program, "uBounds");
 		this.context.uniform4fv(boundsLocation, bounds);
 
 		//draw
-		if(this.#continuous){
+		if (this.#continuous) {
 			this.context.lineWidth(this.#thickness);
-			console.log(this.context.getParameter(this.context.ALIASED_LINE_WIDTH_RANGE));
+			console.log(
+				this.context.getParameter(this.context.ALIASED_LINE_WIDTH_RANGE),
+			);
 			this.context.drawArrays(this.context.LINE_STRIP, 0, points.length);
 		}
 
 		this.context.drawArrays(this.context.POINTS, 0, points.length);
 	}
 	attachEvents() {
-
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
 		this[hyphenCaseToCamelCase(name)] = newValue;
 	}
 	set points(value) {
-		if (typeof (value) === "string") {
+		if (typeof value === "string") {
 			value = JSON.parse(value);
 		}
 
-		this.#points = value.map(p => [
+		this.#points = value.map((p) => [
 			p[0],
 			p[1],
-			p[6] ?? this.#defaultSize
+			p[6] ?? this.#defaultSize,
 		]);
 
-		this.#colors = value.map(p => p.length > 2 ? [
-			p[2],
-			p[3],
-			p[4],
-			p[5]
-		] : this.#defaultColor);
+		this.#colors = value.map((p) =>
+			p.length > 2
+				? [
+					p[2],
+					p[3],
+					p[4],
+					p[5],
+				]
+				: this.#defaultColor
+		);
 
 		this.render();
 	}
@@ -261,7 +377,7 @@ class WcGraphGl extends HTMLElement {
 		this.#defaultSize = parseFloat(value);
 	}
 	set defaultColor(value) {
-		if(typeof(value) === "string"){
+		if (typeof value === "string") {
 			this.#defaultColor = JSON.parse(value);
 		} else {
 			this.#defaultColor = value;

@@ -7,25 +7,24 @@
 ### Attributes
 
 | name | type | description | default |
-|-|-|-|-|
-
+| ---- | ---- | ----------- | ------- |
 
 ### Props
 
 | name | type | description | default |
-|-|-|-|-|
+| ---- | ---- | ----------- | ------- |
 
 ### CSS vars
 
 | name | type | description | default |
-|-|-|-|-|
+| ---- | ---- | ----------- | ------- |
 
 ## Outputs
 
 ## Events
 
-| name | payload | description
-|-|-|-|
+| name | payload | description |
+| ---- | ------- | ----------- |
 
 ## Features
 

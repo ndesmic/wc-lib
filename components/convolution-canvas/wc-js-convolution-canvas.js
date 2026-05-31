@@ -9,12 +9,12 @@ import { convoluteImage } from "../../libs/graphics/convolution-utils.js";
 /***
  * @param {ImageData} imageData
  * @param {Tensor[]} kernels
- * @param {OobBehavior | "omit"} oobBehavior }  
+ * @param {OobBehavior | "omit"} oobBehavior }
  */
 function convoluteMultiple(imageData, kernels, oobBehavior) {
 	let lastOutput = imageData;
 
-	for(const kernel of kernels){
+	for (const kernel of kernels) {
 		lastOutput = convoluteImage(lastOutput, kernel, oobBehavior);
 	}
 
@@ -22,13 +22,19 @@ function convoluteMultiple(imageData, kernels, oobBehavior) {
 }
 
 const identityKernel3x3 = {
-	shape: [3,3],
+	shape: [3, 3],
 	values: [
-		0, 0, 0,
-		0, 1, 0,
-		0, 0, 0
-	]
-}
+		0,
+		0,
+		0,
+		0,
+		1,
+		0,
+		0,
+		0,
+		0,
+	],
+};
 
 export class WcJsConvolutionCanvas extends HTMLElement {
 	#image;
@@ -67,18 +73,20 @@ export class WcJsConvolutionCanvas extends HTMLElement {
 	connectedCallback() {
 		this.createShadowDom();
 		this.cacheDom();
-		this.#context = this.dom.canvas.getContext("2d", { willReadFrequently: true });
+		this.#context = this.dom.canvas.getContext("2d", {
+			willReadFrequently: true,
+		});
 		this.update();
 	}
 	cacheDom() {
 		this.dom = {
 			canvas: this.shadowRoot.querySelector("canvas"),
-			status: this.shadowRoot.querySelector("status")
+			status: this.shadowRoot.querySelector("status"),
 		};
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
 		if (oldValue !== newValue) {
-			this[name] = newValue
+			this[name] = newValue;
 		}
 	}
 	update() {
@@ -87,23 +95,38 @@ export class WcJsConvolutionCanvas extends HTMLElement {
 
 		this.#context.clearRect(0, 0, this.dom.canvas.width, this.dom.canvas.height);
 		if (this.#image) {
-			this.#context.drawImage(this.#image, 0, 0, this.dom.canvas.width, this.dom.canvas.height);
+			this.#context.drawImage(
+				this.#image,
+				0,
+				0,
+				this.dom.canvas.width,
+				this.dom.canvas.height,
+			);
 		}
 
-		const imageData = this.#context.getImageData(0, 0, this.dom.canvas.width, this.dom.canvas.height);
-		const convolutedImageData = convoluteMultiple(imageData, this.#kernels, this.#edges ? { x: this.#edges, y: this.#edges } : undefined);
+		const imageData = this.#context.getImageData(
+			0,
+			0,
+			this.dom.canvas.width,
+			this.dom.canvas.height,
+		);
+		const convolutedImageData = convoluteMultiple(
+			imageData,
+			this.#kernels,
+			this.#edges ? { x: this.#edges, y: this.#edges } : undefined,
+		);
 		this.#context.putImageData(convolutedImageData, 0, 0);
 	}
 	set image(val) {
 		loadImage(val)
-			.then(img => {
+			.then((img) => {
 				this.#image = img;
 				this.dom.canvas.width = img.naturalWidth;
 				this.dom.canvas.height = img.naturalHeight;
 				this.update();
 			})
-			.catch(e => {
-				if(this.dom?.status){
+			.catch((e) => {
+				if (this.dom?.status) {
 					this.dom.status.textContent = e.toString();
 				}
 			});
@@ -111,11 +134,11 @@ export class WcJsConvolutionCanvas extends HTMLElement {
 	set edges(val) {
 		this.#edges = val.trim();
 	}
-	set kernels(val){
+	set kernels(val) {
 		const parsedValue = parseJsonOrDefault(val);
-		if(!parsedValue) return;
+		if (!parsedValue) return;
 		const value = getSingleOrArray(parsedValue);
-		if(!value.every(k => k.values.length === (k.shape[0] * k.shape[1]))){
+		if (!value.every((k) => k.values.length === (k.shape[0] * k.shape[1]))) {
 			//throw new Error("kernel values are not valid.");
 			return;
 		}

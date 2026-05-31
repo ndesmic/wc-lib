@@ -28,16 +28,16 @@ describe("image-sample-utils", () => {
 	describe("getPx", () => {
 		it("should get pixel value", () => {
 			expect(getPx(imageData, 0, 0)).toEqual([1, 0, 0, 1]);
-            expect(getPx(imageData, 1, 0)).toEqual([0, 1, 0, 1]);
-            expect(getPx(imageData, 0, 1)).toEqual([0, 0, 1, 1]);
-            expect(getPx(imageData, 1, 1)).toEqual([1, 1, 0, 1]);
+			expect(getPx(imageData, 1, 0)).toEqual([0, 1, 0, 1]);
+			expect(getPx(imageData, 0, 1)).toEqual([0, 0, 1, 1]);
+			expect(getPx(imageData, 1, 1)).toEqual([1, 1, 0, 1]);
 		});
-        it("should get pixel value (clamped)", () => {
+		it("should get pixel value (clamped)", () => {
 			expect(getPx(imageData, -1, 0)).toEqual([1, 0, 0, 1]);
-            expect(getPx(imageData, 2, 0)).toEqual([0, 1, 0, 1]);
-            expect(getPx(imageData, 0, -1)).toEqual([1, 0, 0, 1]);
-            expect(getPx(imageData, 0, 2)).toEqual([0, 0, 1, 1]);
+			expect(getPx(imageData, 2, 0)).toEqual([0, 1, 0, 1]);
+			expect(getPx(imageData, 0, -1)).toEqual([1, 0, 0, 1]);
+			expect(getPx(imageData, 0, 2)).toEqual([0, 0, 1, 1]);
 		});
-        //TODO End behavior
+		//TODO End behavior
 	});
 });

@@ -19,10 +19,10 @@ export function classifyFileType(ext, customTypes = []) {
 	} else if (archive.includes(ext)) {
 		return "archive";
 	}
-    for(const [typeExts, type] of customTypes){
-        if(typeExts.includes(ext)){
-            return type;
-        }
-    }
-    return "generic";
+	for (const [typeExts, type] of customTypes) {
+		if (typeExts.includes(ext)) {
+			return type;
+		}
+	}
+	return "generic";
 }

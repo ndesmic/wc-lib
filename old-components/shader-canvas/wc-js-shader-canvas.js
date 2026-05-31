@@ -46,42 +46,54 @@ export class WcJsShaderCanvas extends HTMLElement {
 	}
 	cacheDom() {
 		this.dom = {
-			canvas: this.shadowRoot.querySelector("canvas")
+			canvas: this.shadowRoot.querySelector("canvas"),
 		};
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
 		if (oldValue !== newValue) {
-			this[name] = newValue
+			this[name] = newValue;
 		}
 	}
 	update() {
 		const program = this.#mod
 			? this.#mod.default
 			: this.textContent.trim() !== ""
-				? new Function(["color", "Matrix", "Globals", "attributes"], this.textContent)
-				: null;
+			? new Function(
+				["color", "Matrix", "Globals", "attributes"],
+				this.textContent,
+			)
+			: null;
 
 		if (!program || !this.#context) return;
-		if (this.#hasImage && !this.#image) return
+		if (this.#hasImage && !this.#image) return;
 		this.#context.clearRect(0, 0, this.#width, this.#height);
 		if (this.#image) {
 			this.#context.drawImage(this.#image, 0, 0, this.#width, this.#height);
 		}
 
 		const imageData = this.#context.getImageData(0, 0, this.#width, this.#height);
-		const originalImageData = new ImageData(imageData.data.slice(0), imageData.width, imageData.height);
+		const originalImageData = new ImageData(
+			imageData.data.slice(0),
+			imageData.width,
+			imageData.height,
+		);
 
 		let i = 0;
 		while (i < imageData.data.length) {
 			const data = imageData.data;
 			const y = Math.floor(i / (imageData.width * 4));
 			const x = Math.floor(i / 4) % imageData.width;
-			const pixel = program([
-				data[i] / 255,
-				data[i + 1] / 255,
-				data[i + 2] / 255,
-				data[i + 3] / 255,
-			], Matrix, this.#globals, { x, y, imageData: originalImageData });
+			const pixel = program(
+				[
+					data[i] / 255,
+					data[i + 1] / 255,
+					data[i + 2] / 255,
+					data[i + 3] / 255,
+				],
+				Matrix,
+				this.#globals,
+				{ x, y, imageData: originalImageData },
+			);
 			data[i] = Math.floor(pixel[0] * 255);
 			data[i + 1] = Math.floor(pixel[1] * 255);
 			data[i + 2] = Math.floor(pixel[2] * 255);
@@ -93,14 +105,14 @@ export class WcJsShaderCanvas extends HTMLElement {
 	set image(val) {
 		this.#hasImage = !!val;
 		loadImage(val)
-			.then(img => {
+			.then((img) => {
 				this.#image = img;
 				this.update();
 			});
 	}
 	set src(val) {
 		import(new URL(val, window.location.href).toString())
-			.then(mod => {
+			.then((mod) => {
 				this.#mod = mod;
 				this.update();
 			});
@@ -120,7 +132,7 @@ export class WcJsShaderCanvas extends HTMLElement {
 		}
 	}
 	set globals(val) {
-		val = typeof (val) === "object" ? val : JSON.parse(val);
+		val = typeof val === "object" ? val : JSON.parse(val);
 		this.#globals = val;
 		this.update();
 	}

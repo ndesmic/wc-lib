@@ -30,7 +30,10 @@
 						>
 					</div>
 					<div class="stack stretch gap1 buttons">
-						<button id="decrypt-file-system-picker" class="decrypt-file-system-picker">
+						<button
+							id="decrypt-file-system-picker"
+							class="decrypt-file-system-picker"
+						>
 							📂 Open filesystem
 						</button>
 						<button id="encrypt-file-button" class="encrypt-file-button">
@@ -44,16 +47,25 @@
 						</button>
 					</div>
 				</div>
-                <div class="three-one-grid constrained-height">
-                    <wc-directory-listing icon-map="crypt:🔒"></wc-directory-listing>
-                    <wc-file-preview class="full-height overflow-y"></wc-file-preview>
-                </div>
+				<div class="three-one-grid constrained-height">
+					<wc-directory-listing icon-map="crypt:🔒"></wc-directory-listing>
+					<wc-file-preview class="full-height overflow-y"></wc-file-preview>
+				</div>
 				<output id="decrypt-fs-output" class="decrypt-fs-output"></output>
 			</ma-decrypt-file-system>
 		</div>
-        <script src="./ma-decrypt-file-system.js" type="module"></script>
-        <script src="../../components/directory-listing/wc-directory-listing.js" type="module"></script>
-        <script src="../../components/file-preview/wc-file-preview.js" type="module"></script>
-		<script src="../../components/wc-unhide-password-decorator.js" type="module"></script>
+		<script src="./ma-decrypt-file-system.js" type="module"></script>
+		<script
+			src="../../components/directory-listing/wc-directory-listing.js"
+			type="module"
+		></script>
+		<script
+			src="../../components/file-preview/wc-file-preview.js"
+			type="module"
+		></script>
+		<script
+			src="../../components/wc-unhide-password-decorator.js"
+			type="module"
+		></script>
 	</body>
 </html>

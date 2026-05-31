@@ -1,23 +1,24 @@
-function parseBasedInt(str){
-	if(str.startsWith("0x")){
+function parseBasedInt(str) {
+	if (str.startsWith("0x")) {
 		return parseInt(str.slice(2), 16);
 	}
-	if(str.startsWith("0b")){
+	if (str.startsWith("0b")) {
 		return parseInt(str.slice(2), 2);
 	}
 	return parseInt(str, 10);
 }
 
-customElements.define("wc-font-preview",
+customElements.define(
+	"wc-font-preview",
 	class extends HTMLElement {
 		#range = "0x00-0xFFFF";
 		static observedAttributes = ["range"];
 
-		constructor(){
+		constructor() {
 			super();
-			this.bind(this); 
+			this.bind(this);
 		}
-		bind(element){
+		bind(element) {
 			element.attachEvents = element.attachEvents.bind(element);
 			element.drop = element.drop.bind(element);
 			element.render = element.render.bind(element);
@@ -26,12 +27,12 @@ customElements.define("wc-font-preview",
 			element.dragover = element.dragover.bind(element);
 			element.dragleave = element.dragleave.bind(element);
 		}
-		connectedCallback(){
+		connectedCallback() {
 			this.render();
 			this.cacheDom();
 			this.attachEvents();
 		}
-		render(){
+		render() {
 			this.attachShadow({ mode: "open" });
 			this.shadowRoot.innerHTML = `
 				<style>
@@ -47,23 +48,23 @@ customElements.define("wc-font-preview",
 				<div id="container"></div>
 			`;
 		}
-		cacheDom(){
+		cacheDom() {
 			this.dom = {
 				container: this.shadowRoot.querySelector("#container"),
-				title: this.shadowRoot.querySelector("#title")
+				title: this.shadowRoot.querySelector("#title"),
 			};
 		}
-		renderTable(){
-			if(!this.dom) return;
+		renderTable() {
+			if (!this.dom) return;
 			this.dom.container.innerHTML = "";
 			const split = this.#range.split("-");
 			const start = parseBasedInt(split[0]);
-			const end = parseBasedInt(split[1]); 
+			const end = parseBasedInt(split[1]);
 			const paragraphLength = Math.min((end - start) / 16);
 			const table = document.createElement("table");
 
 			for (let paragraph = 0; paragraph < paragraphLength; paragraph++) {
-				const row = document.createElement("tr")
+				const row = document.createElement("tr");
 
 				for (let byte = 0; byte < 16; byte++) {
 					const col = document.createElement("td");
@@ -79,18 +80,18 @@ customElements.define("wc-font-preview",
 
 			this.dom.container.appendChild(table);
 		}
-		attachEvents(){
+		attachEvents() {
 			this.addEventListener("dragover", this.dragover);
 			this.addEventListener("dragleave", this.dragleave);
 			this.addEventListener("drop", this.drop);
 		}
-		async drop(e){
+		async drop(e) {
 			e.preventDefault();
 			this.classList.remove("dragover");
 			const file = e.dataTransfer.files[0];
 			const split = file.name.split(".");
 			let ext = split[split.length - 1];
-			if(ext === "ttf"){
+			if (ext === "ttf") {
 				ext = "truetype";
 			}
 			const url = URL.createObjectURL(file);
@@ -107,7 +108,7 @@ customElements.define("wc-font-preview",
 			style.id = "font-style";
 
 			const oldStyle = this.querySelector("#font-style");
-			if(oldStyle){
+			if (oldStyle) {
 				oldStyle.parentNode.removeChild(oldStyle);
 			}
 
@@ -115,22 +116,22 @@ customElements.define("wc-font-preview",
 			this.dom.title.textContent = file.name;
 			this.renderTable();
 		}
-		dragover(e){
+		dragover(e) {
 			e.preventDefault();
 			e.stopPropagation();
 			this.classList.add("dragover");
 		}
-		dragleave(e){
+		dragleave(e) {
 			e.preventDefault();
 			e.stopPropagation();
 			this.classList.remove("dragover");
 		}
-		attributeChangedCallback(name, oldValue, newValue){
+		attributeChangedCallback(name, oldValue, newValue) {
 			this[name] = newValue;
 		}
-		set range(value){
+		set range(value) {
 			this.#range = value;
 			this.renderTable();
 		}
-	}
+	},
 );

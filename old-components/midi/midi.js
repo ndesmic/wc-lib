@@ -7,25 +7,25 @@ export function getString(dataView, offset, length) {
 	return str;
 }
 
-function assert(actual, expected){
-	if(actual != expected){
+function assert(actual, expected) {
+	if (actual != expected) {
 		throw new Error(`Failed assertion: got ${actual}, expected ${expected}`);
 	}
 }
 
 const statusMap = {
-	0b1000 : "NOTE_OFF",
-	0b1001 : "NOTE_ON",
-	0b1010 : "POLYPHONIC_PRESSURE",
+	0b1000: "NOTE_OFF",
+	0b1001: "NOTE_ON",
+	0b1010: "POLYPHONIC_PRESSURE",
 	0b1011: "CONTROLLER_CHANGE",
-	0b1100 : "PROGRAM_CHANGE",
-	0b0101 : "CHANNEL_PRESSURE",
-	0b1110 : "PITCH_BEND",
-	0b1111 : "SYSTEM_EXCLUSIVE"
+	0b1100: "PROGRAM_CHANGE",
+	0b0101: "CHANNEL_PRESSURE",
+	0b1110: "PITCH_BEND",
+	0b1111: "SYSTEM_EXCLUSIVE",
 };
 
-export class MidiFile{
-	constructor(arrayBuffer){
+export class MidiFile {
+	constructor(arrayBuffer) {
 		this.arrayBuffer = arrayBuffer;
 		this.dataView = new DataView(this.arrayBuffer);
 		this.type = getString(this.dataView, 0, 4);
@@ -35,10 +35,10 @@ export class MidiFile{
 		this.fileFormat = this.dataView.getUint16(8); //0 - single, 1 - multitrack, 2 - multitrack async
 		this.trackCount = this.dataView.getUint16(10);
 		this.ticksPerQuarterNote = this.dataView.getUint16(12);
-		
+
 		this.tracks = [];
 		let i = 14;
-		while(i < this.arrayBuffer.byteLength && i < 100){
+		while (i < this.arrayBuffer.byteLength && i < 100) {
 			const track = {};
 			track.type = getString(this.dataView, i, 4);
 			i += 4;
@@ -46,24 +46,24 @@ export class MidiFile{
 			i += 4;
 			track.events = [];
 			let j = 0;
-			while(j < track.length){
-				const byte =  this.dataView.getUint8(i+j);
+			while (j < track.length) {
+				const byte = this.dataView.getUint8(i + j);
 				j += 1;
 
-				if(byte >> 7 === 0){
+				if (byte >> 7 === 0) {
 					const event = {};
 					event.status = byte >> 4;
 					event.channel = byte & 0x0000000F;
 					event.type = statusMap[event.status];
-					
-					switch(event.type){
+
+					switch (event.type) {
 						case "NOTE_ON":
-							event.pitch = this.dataView.getUint8(i+j);
+							event.pitch = this.dataView.getUint8(i + j);
 							j += 1;
-							event.velocity = this.dataView.getUint8(i+j);
+							event.velocity = this.dataView.getUint8(i + j);
 							j += 1;
 
-							if(event.velocity === 0){
+							if (event.velocity === 0) {
 								event.type = "NOTE_OFF";
 							}
 							break;
@@ -95,20 +95,19 @@ export class MidiFile{
 							event.pitchBend2 = this.dataView.getUint8(i + j);
 							j += 1;
 						default:
-							event.type = "UNKNOWN"
+							event.type = "UNKNOWN";
 					}
 
 					track.events.push(event);
-				} else if(byte === 0xff){
+				} else if (byte === 0xff) {
 					console.log("RESET!");
 				} else {
 					throw "Unexpected status event";
 				}
 			}
 			this.tracks.push(track);
-			
+
 			console.log("#", this.tracks);
 		}
-		
 	}
 }

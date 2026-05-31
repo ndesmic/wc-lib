@@ -6,12 +6,12 @@ export class WcDirectoryPicker extends HTMLElement {
 	#handle;
 	#handleName;
 
-    static observedAttributes = ["handle-name"];
+	static observedAttributes = ["handle-name"];
 
-    constructor(){
-        super();
-        this.#idb = new IdbStorage();
-    }
+	constructor() {
+		super();
+		this.#idb = new IdbStorage();
+	}
 
 	async connectedCallback() {
 		this.bind(this);
@@ -19,10 +19,10 @@ export class WcDirectoryPicker extends HTMLElement {
 		this.registerDom();
 		this.attachEvents();
 
-        this.#handleName = this.getAttribute("handle-name");
+		this.#handleName = this.getAttribute("handle-name");
 		if (this.#handleName) {
 			this.#handle = await this.#idb.get(this.#handleName);
-            this.onDirectorySelected();
+			this.onDirectorySelected();
 		}
 	}
 	bind() {
@@ -30,7 +30,7 @@ export class WcDirectoryPicker extends HTMLElement {
 	}
 	renderDom() {
 		this.attachShadow({ mode: "open" });
-        this.shadowRoot.adoptedStyleSheets.push(systemCss);
+		this.shadowRoot.adoptedStyleSheets.push(systemCss);
 		this.shadowRoot.innerHTML = `
             <button id="open-btn">Open Directory</button>
         `;
@@ -45,9 +45,9 @@ export class WcDirectoryPicker extends HTMLElement {
 	}
 	async openDirectory() {
 		this.#handle = await showDirectoryPicker();
-        if(this.#handleName){
-		    await this.#idb.set(this.#handleName, this.#handle);
-        }
+		if (this.#handleName) {
+			await this.#idb.set(this.#handleName, this.#handle);
+		}
 		this.onDirectorySelected();
 	}
 	onDirectorySelected() {

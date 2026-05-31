@@ -1,15 +1,15 @@
 :host {
-    position: fixed !important;
-    display: block;
+	position: fixed !important;
+	display: block;
 }
 #panel {
-    display: block;
-    width: 400px;
-    border: var(--border);
-    border-radius: var(--border-radius);
+	display: block;
+	width: 400px;
+	border: var(--border);
+	border-radius: var(--border-radius);
 }
 #handle {
-    height: 2rem;
-    background: var(--neutral-light-2);
-    cursor: move;
+	height: 2rem;
+	background: var(--neutral-light-2);
+	cursor: move;
 }

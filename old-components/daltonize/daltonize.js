@@ -1,20 +1,37 @@
-
 var CVDMatrix = { // Color Vision Deficiency
 	"Protanope": [ // reds are greatly reduced (1% men)
-		0.0, 2.02344, -2.52581,
-		0.0, 1.0, 0.0,
-		0.0, 0.0, 1.0
+		0.0,
+		2.02344,
+		-2.52581,
+		0.0,
+		1.0,
+		0.0,
+		0.0,
+		0.0,
+		1.0,
 	],
 	"Deuteranope": [ // greens are greatly reduced (1% men)
-		1.0, 0.0, 0.0,
-		0.494207, 0.0, 1.24827,
-		0.0, 0.0, 1.0
+		1.0,
+		0.0,
+		0.0,
+		0.494207,
+		0.0,
+		1.24827,
+		0.0,
+		0.0,
+		1.0,
 	],
 	"Tritanope": [ // blues are greatly reduced (0.003% population)
-		1.0, 0.0, 0.0,
-		0.0, 1.0, 0.0,
-		-0.395913, 0.801109, 0.0
-	]
+		1.0,
+		0.0,
+		0.0,
+		0.0,
+		1.0,
+		0.0,
+		-0.395913,
+		0.801109,
+		0.0,
+	],
 };
 
 const Daltonize = function (image, options) {
@@ -29,7 +46,7 @@ const Daltonize = function (image, options) {
 	try {
 		var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height),
 			data = imageData.data;
-	} catch (e) { }
+	} catch (e) {}
 	// Apply Daltonization
 	var cvd = CVDMatrix[type],
 		cvd_a = cvd[0],
@@ -98,7 +115,6 @@ function loadImage(url) {
 	});
 }
 
-
 export class WcDaltonize extends HTMLElement {
 	#width;
 	#height;
@@ -128,11 +144,11 @@ export class WcDaltonize extends HTMLElement {
 		Daltonize(
 			image,
 			{
-				callback: canvas => {
+				callback: (canvas) => {
 					this.shadowRoot.appendChild(canvas);
 				},
-				type: "Deuteranope"
-			}
+				type: "Deuteranope",
+			},
 		);
 	}
 	async connectedCallback() {
@@ -144,7 +160,7 @@ export class WcDaltonize extends HTMLElement {
 	}
 	cacheDom() {
 		this.dom = {
-			canvas: this.shadowRoot.querySelector("canvas")
+			canvas: this.shadowRoot.querySelector("canvas"),
 		};
 	}
 	attachEvents() {

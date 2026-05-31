@@ -45,10 +45,15 @@ export class WcChat extends HTMLElement {
 			text,
 			time: Temporal.Now.plainDateTimeISO(),
 			attachments: [],
-			from: "user"
+			from: "user",
 		});
 		this.dom.chatInput.value = "";
-		this.dom.chatList.append(createElement("li", { children: text, attrs: { class: "chat-message user"} }));
+		this.dom.chatList.append(
+			createElement("li", {
+				children: text,
+				attrs: { class: "chat-message user" },
+			}),
+		);
 		this.dom.chatList.scrollTop = this.dom.chatList.scrollHeight;
 	}
 	addRemoteMessage(text, from) {
@@ -56,9 +61,14 @@ export class WcChat extends HTMLElement {
 			text,
 			time: Temporal.Now.plainDateTimeISO(),
 			attachments: [],
-			from
+			from,
 		});
-		this.dom.chatList.append(createElement("li", { children: text, attrs: { class: "chat-message remote"} }));
+		this.dom.chatList.append(
+			createElement("li", {
+				children: text,
+				attrs: { class: "chat-message remote" },
+			}),
+		);
 		this.dom.chatList.scrollTop = this.dom.chatList.scrollHeight;
 	}
 	attributeChangedCallback(name, oldValue, newValue) {

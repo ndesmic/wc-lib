@@ -69,52 +69,60 @@ styles.textContent = `
 document.head.appendChild(styles);
 
 export class WcUnhidePasswordDecorator extends HTMLElement {
-    connectedCallback(){
-        this.bind();
-        this.renderDom();
-        this.attachEvents();
-    }
-    bind(){
-        this.onUnhideClick = this.onUnhideClick.bind(this);
-        this.onPasswordInput = this.onPasswordInput.bind(this);
-        this.onTextInput = this.onTextInput.bind(this);
-    }
-    renderDom(){
-        this.dom = {};
-        this.dom.passwordInput = this.querySelector("input[type='password']");
+	connectedCallback() {
+		this.bind();
+		this.renderDom();
+		this.attachEvents();
+	}
+	bind() {
+		this.onUnhideClick = this.onUnhideClick.bind(this);
+		this.onPasswordInput = this.onPasswordInput.bind(this);
+		this.onTextInput = this.onTextInput.bind(this);
+	}
+	renderDom() {
+		this.dom = {};
+		this.dom.passwordInput = this.querySelector("input[type='password']");
 
-        if(!this.dom.passwordInput.id){
-            console.warn("The decorated input element had no id. Unhide password decorator will not work.");
-        }
+		if (!this.dom.passwordInput.id) {
+			console.warn(
+				"The decorated input element had no id. Unhide password decorator will not work.",
+			);
+		}
 
-        this.dom.unhide = document.createElement("button");
-        this.dom.unhide.classList.add("wc-unhide-password-decorator-button");
-        this.append(this.dom.unhide);
+		this.dom.unhide = document.createElement("button");
+		this.dom.unhide.classList.add("wc-unhide-password-decorator-button");
+		this.append(this.dom.unhide);
 
-        this.dom.textInput = document.createElement("input");
-        this.dom.id = `${this.dom.passwordInput.id}-text-input`;
-        this.dom.textInput.type = "text";
-        this.dom.textInput.classList.add("wc-unhide-password-decorator-text");
-        this.append(this.dom.textInput);
+		this.dom.textInput = document.createElement("input");
+		this.dom.id = `${this.dom.passwordInput.id}-text-input`;
+		this.dom.textInput.type = "text";
+		this.dom.textInput.classList.add("wc-unhide-password-decorator-text");
+		this.append(this.dom.textInput);
 
-        this.dom.passwordInput.style.anchorName = `--${this.dom.passwordInput.id}-anchor`;
-        this.dom.unhide.style.positionAnchor = `--${this.dom.passwordInput.id}-anchor`;
-        this.dom.textInput.style.positionAnchor = `--${this.dom.passwordInput.id}-anchor`;
-    }
-    attachEvents(){
-        this.dom.unhide.addEventListener("click", this.onUnhideClick);
-        this.dom.passwordInput.addEventListener("input", this.onPasswordInput);
-        this.dom.textInput.addEventListener("input", this.onTextInput);
-    }
-    onUnhideClick(){
-        this.toggleAttribute("show");
-    }
-    onPasswordInput(e){
-        this.dom.textInput.value = e.target.value;
-    }
-    onTextInput(e){
-        this.dom.passwordInput.value = e.target.value;
-    }
+		this.dom.passwordInput.style.anchorName =
+			`--${this.dom.passwordInput.id}-anchor`;
+		this.dom.unhide.style.positionAnchor =
+			`--${this.dom.passwordInput.id}-anchor`;
+		this.dom.textInput.style.positionAnchor =
+			`--${this.dom.passwordInput.id}-anchor`;
+	}
+	attachEvents() {
+		this.dom.unhide.addEventListener("click", this.onUnhideClick);
+		this.dom.passwordInput.addEventListener("input", this.onPasswordInput);
+		this.dom.textInput.addEventListener("input", this.onTextInput);
+	}
+	onUnhideClick() {
+		this.toggleAttribute("show");
+	}
+	onPasswordInput(e) {
+		this.dom.textInput.value = e.target.value;
+	}
+	onTextInput(e) {
+		this.dom.passwordInput.value = e.target.value;
+	}
 }
 
-customElements.define("wc-unhide-password-decorator", WcUnhidePasswordDecorator);
+customElements.define(
+	"wc-unhide-password-decorator",
+	WcUnhidePasswordDecorator,
+);

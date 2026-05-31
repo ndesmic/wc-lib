@@ -1,5 +1,5 @@
 function hyphenCaseToCamelCase(text) {
-	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
+	return text.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
 function getVectorMagnitude(vec) {
@@ -7,7 +7,7 @@ function getVectorMagnitude(vec) {
 }
 
 function divideVector(vec, s) {
-	return vec.map(x => x / s);
+	return vec.map((x) => x / s);
 }
 
 function subtractVector(a, b) {
@@ -23,7 +23,7 @@ function normalizeVector(vec) {
 }
 
 function negateVector(vec) {
-	return vec.map(x => x * -1);
+	return vec.map((x) => x * -1);
 }
 
 function dotVector(a, b) {
@@ -80,81 +80,113 @@ export class WcCanvasLine extends HTMLElement {
 				const delta = normalizeVector(subtractVector(next, current));
 
 				positions.push(
-					current[0], current[1],
-					current[0], current[1]
+					current[0],
+					current[1],
+					current[0],
+					current[1],
 				);
 				normals.push(
-					delta[1], -delta[0],
-					-delta[1], delta[0]
+					delta[1],
+					-delta[0],
+					-delta[1],
+					delta[0],
 				);
 				cornerDirections.push(
 					-1,
-					1
+					1,
 				);
 				previousTangents.push(
-					-delta[0], -delta[1],
-					-delta[0], -delta[1] 
+					-delta[0],
+					-delta[1],
+					-delta[0],
+					-delta[1],
 				);
 				nextTangents.push(
-					delta[0], delta[1],
-					delta[0], delta[1]
+					delta[0],
+					delta[1],
+					delta[0],
+					delta[1],
 				);
 			} else if (prev && !next) { //end of line
 				const delta = normalizeVector(subtractVector(current, prev));
 
 				positions.push(
-					current[0], current[1],
-					current[0], current[1]
+					current[0],
+					current[1],
+					current[0],
+					current[1],
 				);
 				normals.push(
-					delta[1], -delta[0],
-					-delta[1], delta[0]
+					delta[1],
+					-delta[0],
+					-delta[1],
+					delta[0],
 				);
 				cornerDirections.push(
 					-1,
-					1
+					1,
 				);
 				previousTangents.push(
-					-delta[0], -delta[1],
-					-delta[0], -delta[1]
+					-delta[0],
+					-delta[1],
+					-delta[0],
+					-delta[1],
 				);
 				nextTangents.push(
-					delta[0], delta[1],
-					delta[0], delta[1]
+					delta[0],
+					delta[1],
+					delta[0],
+					delta[1],
 				);
 			} else { //between lines
 				const nextTangent = normalizeVector(subtractVector(next, current));
 				const previousTangent = normalizeVector(subtractVector(prev, current));
 
 				positions.push(
-					current[0], current[1],
-					current[0], current[1],
-					current[0], current[1],
-					current[0], current[1]
+					current[0],
+					current[1],
+					current[0],
+					current[1],
+					current[0],
+					current[1],
+					current[0],
+					current[1],
 				);
 				normals.push(
-					-previousTangent[1], previousTangent[0], 
-					previousTangent[1], -previousTangent[0],
-					-previousTangent[1], previousTangent[0],
-					previousTangent[1], -previousTangent[0]
+					-previousTangent[1],
+					previousTangent[0],
+					previousTangent[1],
+					-previousTangent[0],
+					-previousTangent[1],
+					previousTangent[0],
+					previousTangent[1],
+					-previousTangent[0],
 				);
 				cornerDirections.push(
 					-1,
 					1,
 					-1,
-					1
-				); 
+					1,
+				);
 				previousTangents.push(
-					previousTangent[0], previousTangent[1], 
-					previousTangent[0], previousTangent[1],
-					previousTangent[0], previousTangent[1],
-					previousTangent[0], previousTangent[1]
+					previousTangent[0],
+					previousTangent[1],
+					previousTangent[0],
+					previousTangent[1],
+					previousTangent[0],
+					previousTangent[1],
+					previousTangent[0],
+					previousTangent[1],
 				);
 				nextTangents.push(
-					nextTangent[0], nextTangent[1], 
-					nextTangent[0], nextTangent[1],
-					nextTangent[0], nextTangent[1],
-					nextTangent[0], nextTangent[1]
+					nextTangent[0],
+					nextTangent[1],
+					nextTangent[0],
+					nextTangent[1],
+					nextTangent[0],
+					nextTangent[1],
+					nextTangent[0],
+					nextTangent[1],
 				);
 			}
 		}
@@ -170,12 +202,17 @@ export class WcCanvasLine extends HTMLElement {
 		for (let i = 0; i < positions.length; i += 2) {
 			const position = [positions[i], positions[i + 1]];
 			const normal = normalizeVector([normals[i], normals[i + 1]]);
-			const previousTangent = normalizeVector([previousTangents[i], previousTangents[i + 1]]);
+			const previousTangent = normalizeVector([
+				previousTangents[i],
+				previousTangents[i + 1],
+			]);
 			const nextTangent = normalizeVector([nextTangents[i], nextTangents[i + 1]]);
 			const cornerDirection = cornerDirections[i / 2];
 
 			let normalMiter = normalizeVector(addVector(nextTangent, previousTangent));
-			normalMiter = (isNaN(normalMiter[0]) || normalMiter[0] == Infinity) ? normal : normalMiter;
+			normalMiter = (isNaN(normalMiter[0]) || normalMiter[0] == Infinity)
+				? normal
+				: normalMiter;
 
 			const isOutsideEdge = dotVector(normal, normalMiter) < 0;
 
@@ -187,8 +224,8 @@ export class WcCanvasLine extends HTMLElement {
 			const miterLength = 1 / dotVector(normal, normalMiter) * this.#thickness;
 			let x;
 			let y;
-			
-			if(Math.abs(miterLength) > maxMiterLength && isOutsideEdge) {
+
+			if (Math.abs(miterLength) > maxMiterLength && isOutsideEdge) {
 				const bevelDirection = normalizeVector(addVector(normalMiter, normal));
 				const bevelLength = 1 / dotVector(normal, bevelDirection) * this.#thickness;
 				x = sx + (bevelDirection[0] * bevelLength) * cornerDirection;
@@ -244,7 +281,7 @@ export class WcCanvasLine extends HTMLElement {
 	}
 	cacheDom() {
 		this.dom = {
-			canvas: this.shadowRoot.querySelector("canvas")
+			canvas: this.shadowRoot.querySelector("canvas"),
 		};
 	}
 	attachEvents() {

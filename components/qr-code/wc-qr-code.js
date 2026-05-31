@@ -1,6 +1,10 @@
 import { drawQrCanvas } from "./canvas-utils.js";
-import { QrCanvas, masks } from "./qr-canvas.js";
-import { qrEncodeData, getFormatString, getVersionInfoString } from "./qr-utils.js";
+import { masks, QrCanvas } from "./qr-canvas.js";
+import {
+	getFormatString,
+	getVersionInfoString,
+	qrEncodeData,
+} from "./qr-utils.js";
 import QrCodeCss from "./wc-qr-code.css" with { type: "css" };
 
 export class WcQrCode extends HTMLElement {
@@ -10,7 +14,7 @@ export class WcQrCode extends HTMLElement {
 	#scale;
 	#dom;
 	static get observedAttributes() {
-		return ["value", "errorlevel", "mask", "scale"]
+		return ["value", "errorlevel", "mask", "scale"];
 	}
 	constructor() {
 		super();
@@ -33,14 +37,14 @@ export class WcQrCode extends HTMLElement {
 	}
 	cacheDom() {
 		this.#dom = {
-			qr: this.shadowRoot.querySelector("#qr")
+			qr: this.shadowRoot.querySelector("#qr"),
 		};
 	}
 	render() {
 		if (!this.#errorLevel || !this.#value || !this.#dom) return;
 		const {
 			encodedData,
-			version
+			version,
 		} = qrEncodeData(this.#value, this.#errorLevel);
 		const matrix = QrCanvas.fromVersion(version);
 		matrix.drawPayloadData(encodedData);
@@ -85,6 +89,6 @@ export class WcQrCode extends HTMLElement {
 	}
 }
 
-if(customElements){
+if (customElements) {
 	customElements.define("wc-qr-code", WcQrCode);
 }

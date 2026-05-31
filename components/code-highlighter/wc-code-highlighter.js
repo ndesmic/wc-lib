@@ -1,6 +1,6 @@
 import { jsTokenizer } from "../../libs/parser/js/js-tokenizer.js";
 import { jsTokensToDom } from "../../libs/parser/js/js-tokens-to-dom.js";
-import { dedent, decodeHtml } from "../../libs/string-utils.js";
+import { decodeHtml, dedent } from "../../libs/string-utils.js";
 
 class WcCodeHighlighter extends HTMLElement {
 	#value;
@@ -40,17 +40,18 @@ class WcCodeHighlighter extends HTMLElement {
 		this.cacheDom();
 		this.attachEvents();
 		const hasValue = !!this.dom.innerTemplate.innerHTML.trim();
-		this.#value = hasValue ? dedent(lineTrim(decodeHtml(this.dom.innerTemplate.innerHTML))) : "";
+		this.#value = hasValue
+			? dedent(lineTrim(decodeHtml(this.dom.innerTemplate.innerHTML)))
+			: "";
 		this.highlightSyntax();
 	}
 	cacheDom() {
 		this.dom = {
 			output: this.shadowRoot.querySelector("#output"),
-			innerTemplate: this.querySelector("template")
+			innerTemplate: this.querySelector("template"),
 		};
 	}
 	attachEvents() {
-
 	}
 	highlightSyntax() {
 		const tokens = jsTokenizer.getTokens(this.#value);

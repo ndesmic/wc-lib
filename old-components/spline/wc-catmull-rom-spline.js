@@ -5,7 +5,7 @@ function catmullRomSpline(points, t) {
 	const p2 = points[i + 2];
 	const p3 = points[i + 3];
 
-	if(points.length <= i + 3){ //out of bounds then clamp
+	if (points.length <= i + 3) { //out of bounds then clamp
 		return points[points.length - 2];
 	}
 
@@ -22,7 +22,7 @@ function catmullRomSpline(points, t) {
 	];
 }
 
-function parseColor(val){
+function parseColor(val) {
 	const trimmedVal = val.trim();
 	if (trimmedVal.startsWith("#")) {
 		const hex = trimmedVal.trim().slice(1);
@@ -30,48 +30,53 @@ function parseColor(val){
 			parseInt(hex.substring(0, 2), 16) / 255,
 			parseInt(hex.substring(2, 4), 16) / 255,
 			parseInt(hex.substring(4, 6), 16) / 255,
-			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
+			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255,
 		];
 	} else if (trimmedVal.startsWith("[")) {
 		return JSON.parse(trimmedVal);
 	}
 }
 
-function hexFromFloat(color){
-	return "#" + color.map(c => (c * 255).toString(16).padStart(2, "0")).join("");
+function hexFromFloat(color) {
+	return "#" +
+		color.map((c) => (c * 255).toString(16).padStart(2, "0")).join("");
 }
 
 function hyphenCaseToCamelCase(text) {
-	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
+	return text.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
-
-function inRadius(x,y,r, tx,ty){
-	return Math.sqrt((x - tx)**2 + (y - ty)**2) <= r;
+function inRadius(x, y, r, tx, ty) {
+	return Math.sqrt((x - tx) ** 2 + (y - ty) ** 2) <= r;
 }
 
-function approximateCurve(curveFunction, min, max, delta){
+function approximateCurve(curveFunction, min, max, delta) {
 	const points = [];
-	for(let t = min; t <= max; t += delta){
+	for (let t = min; t <= max; t += delta) {
 		points.push(curveFunction(t));
 	}
 	return points;
 }
 
-function measureSegments(segs){
+function measureSegments(segs) {
 	const lengths = [0]; //first point is always at position 0
 	let lastPoint = segs[0];
-	for(let i = 1; i < segs.length; i++){
+	for (let i = 1; i < segs.length; i++) {
 		const currentPoint = segs[i];
-		lengths.push(Math.sqrt((currentPoint[0] - lastPoint[0])**2 + (currentPoint[1] - lastPoint[1])**2));
+		lengths.push(
+			Math.sqrt(
+				(currentPoint[0] - lastPoint[0]) ** 2 +
+					(currentPoint[1] - lastPoint[1]) ** 2,
+			),
+		);
 		lastPoint = currentPoint;
 	}
 	return lengths;
 }
 
-function normalizeCurve(curveFunc, max, delta){
+function normalizeCurve(curveFunc, max, delta) {
 	const segmentLengths = [0]; //first point is always position 0
-	for(let i = 1; i <= max; i++){
+	for (let i = 1; i <= max; i++) {
 		const approximatePoints = approximateCurve(curveFunc, i - 1, i, delta);
 		const approximationSegmentLengths = measureSegments(approximatePoints);
 		const length = approximationSegmentLengths.reduce((sum, l) => sum + l, 0);
@@ -79,17 +84,19 @@ function normalizeCurve(curveFunc, max, delta){
 	}
 	const maxLength = segmentLengths.reduce((sum, l) => sum + l, 0);
 
-	return function(t){
-		if(t < 0){
+	return function (t) {
+		if (t < 0) {
 			return curveFunc(0);
-		} else if (t > 1){
+		} else if (t > 1) {
 			return curveFunc(1);
 		}
 
 		const currentLength = t * maxLength;
 		let totalSegmentLength = 0;
 		let segmentIndex = 0;
-		while(currentLength > totalSegmentLength + segmentLengths[segmentIndex + 1]){
+		while (
+			currentLength > totalSegmentLength + segmentLengths[segmentIndex + 1]
+		) {
 			segmentIndex++;
 			totalSegmentLength += segmentLengths[segmentIndex];
 		}
@@ -98,17 +105,17 @@ function normalizeCurve(curveFunc, max, delta){
 		const remainderLength = currentLength - totalSegmentLength;
 		const fractionalRemainder = remainderLength / segmentLength;
 		return curveFunc(segmentIndex + fractionalRemainder);
-	}
+	};
 }
 
 export class WcCrSpline extends HTMLElement {
 	#height = 480;
 	#width = 640;
 	#editable = false;
-	#color = [1,0,1];
+	#color = [1, 0, 1];
 	#points = [];
 	#approximate = null;
-	#approximateColor = [0,1,0];
+	#approximateColor = [0, 1, 0];
 	#lastPointerX;
 	#lastPointerY;
 	#currentOffsetX;
@@ -116,7 +123,15 @@ export class WcCrSpline extends HTMLElement {
 	#selectedIndex;
 	#selectedPointX;
 	#selectedPointY;
-	static observedAttributes = ["height", "width", "points", "color", "editable", "approximate", "approximate-color"];
+	static observedAttributes = [
+		"height",
+		"width",
+		"points",
+		"color",
+		"editable",
+		"approximate",
+		"approximate-color",
+	];
 	constructor() {
 		super();
 		this.bind(this);
@@ -160,21 +175,36 @@ export class WcCrSpline extends HTMLElement {
 
 		//draw curve
 		context.fillStyle = hexFromFloat(this.#color);
-		const normalCurve = normalizeCurve(catmullRomSpline.bind(null, this.#points), this.#points.length - 3, 0.001);
+		const normalCurve = normalizeCurve(
+			catmullRomSpline.bind(null, this.#points),
+			this.#points.length - 3,
+			0.001,
+		);
 		for (let i = 0; i < 1; i += 0.001) {
 			const [x, y] = normalCurve(i);
 			context.fillRect(x, this.dom.canvas.height - y, 1, 1);
 		}
 
 		//draw approximation
-		if(this.#approximate){
+		if (this.#approximate) {
 			context.strokeStyle = hexFromFloat(this.#approximateColor);
 			context.lineWidth = 1;
 			context.beginPath();
-			const approximatePoints = approximateCurve(catmullRomSpline.bind(null, this.#points), 0, this.#points.length - 2, (this.#points.length - 3) / this.#approximate);
-			context.moveTo(approximatePoints[0][0], this.dom.canvas.height - approximatePoints[0][1]);
-			for(let i = 1; i < approximatePoints.length; i++){
-				context.lineTo(approximatePoints[i][0], this.dom.canvas.height - approximatePoints[i][1]);
+			const approximatePoints = approximateCurve(
+				catmullRomSpline.bind(null, this.#points),
+				0,
+				this.#points.length - 2,
+				(this.#points.length - 3) / this.#approximate,
+			);
+			context.moveTo(
+				approximatePoints[0][0],
+				this.dom.canvas.height - approximatePoints[0][1],
+			);
+			for (let i = 1; i < approximatePoints.length; i++) {
+				context.lineTo(
+					approximatePoints[i][0],
+					this.dom.canvas.height - approximatePoints[i][1],
+				);
 			}
 			context.stroke();
 		}
@@ -187,21 +217,23 @@ export class WcCrSpline extends HTMLElement {
 	}
 	cacheDom() {
 		this.dom = {
-			canvas: this.shadowRoot.querySelector("canvas")
+			canvas: this.shadowRoot.querySelector("canvas"),
 		};
 	}
 	attachEvents() {
-		if(this.#editable){
+		if (this.#editable) {
 			this.dom.canvas.addEventListener("pointerdown", this.onPointerDown);
 		}
 	}
-	onPointerDown(e){
+	onPointerDown(e) {
 		const rect = this.dom.canvas.getBoundingClientRect();
 		this.#lastPointerX = e.offsetX;
 		this.#lastPointerY = rect.height - e.offsetY;
-		this.#selectedIndex = this.#points.findIndex(p => inRadius(this.#lastPointerX, this.#lastPointerY, 4, p[0], p[1]));
+		this.#selectedIndex = this.#points.findIndex((p) =>
+			inRadius(this.#lastPointerX, this.#lastPointerY, 4, p[0], p[1])
+		);
 
-		if(this.#selectedIndex > -1){
+		if (this.#selectedIndex > -1) {
 			console.log("Got Index", this.#selectedIndex);
 			this.#selectedPointX = this.#points[this.#selectedIndex][0];
 			this.#selectedPointY = this.#points[this.#selectedIndex][1];
@@ -210,7 +242,7 @@ export class WcCrSpline extends HTMLElement {
 			this.dom.canvas.removeEventListener("pointerdown", this.onPointerDown);
 		}
 	}
-	onPointerMove(e){
+	onPointerMove(e) {
 		const rect = this.dom.canvas.getBoundingClientRect();
 		const currentPointerX = e.offsetX;
 		const currentPointerY = rect.height - e.offsetY;
@@ -223,7 +255,7 @@ export class WcCrSpline extends HTMLElement {
 		selectedPoint[1] = this.#selectedPointY - this.#currentOffsetY;
 		this.renderSpline();
 	}
-	onPointerUp(e){
+	onPointerUp(e) {
 		const selectedPoint = this.#points[this.#selectedIndex];
 		selectedPoint[0] = this.#selectedPointX + this.#currentOffsetX;
 		selectedPoint[1] = this.#selectedPointY - this.#currentOffsetY;
@@ -241,19 +273,19 @@ export class WcCrSpline extends HTMLElement {
 	set height(val) {
 		this.#height = parseFloat(val);
 	}
-	set editable(val){
-		this.#editable = val !== undefined; 
+	set editable(val) {
+		this.#editable = val !== undefined;
 	}
-	set approximate(val){
+	set approximate(val) {
 		this.#approximate = parseInt(val);
 	}
-	set points(val){
+	set points(val) {
 		this.#points = JSON.parse(val);
 	}
-	set color(val){
+	set color(val) {
 		this.#color = parseColor(val);
 	}
-	set approximateColor(val){
+	set approximateColor(val) {
 		this.#approximateColor = parseColor(val);
 	}
 }

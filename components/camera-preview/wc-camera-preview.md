@@ -3,6 +3,6 @@
 ## Todo
 
 - input switcher:
-    - audio out
-    - audio in
-    - camera
+  - audio out
+  - audio in
+  - camera

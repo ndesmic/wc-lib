@@ -11,7 +11,6 @@ function decrementToMin(count, min, step = 1) {
 	return count;
 }
 
-
 export class WcSlideDeck extends HTMLElement {
 	static observedAttributes = [];
 	#currentIndex = 0;
@@ -63,22 +62,24 @@ export class WcSlideDeck extends HTMLElement {
 		this.#slides[0].style.zIndex = 1;
 		this.dom = {};
 	}
-	attachEvents(){
+	attachEvents() {
 		window.addEventListener("keydown", this.onKeydown);
 	}
 	onKeydown(e) {
-		this.#slides.forEach(element => {
+		this.#slides.forEach((element) => {
 			element.classList.remove("active");
 		});
 		if (e.which === 37) {
 			this.#currentIndex = decrementToMin(this.#currentIndex, 0);
 		} else if (e.which === 39) {
-			this.#currentIndex = incrementToMax(this.#currentIndex, this.#slides.length - 1);
+			this.#currentIndex = incrementToMax(
+				this.#currentIndex,
+				this.#slides.length - 1,
+			);
 		}
 		document.startViewTransition(() => {
 			this.#slides[this.#currentIndex].classList.add("active");
 		});
-		
 	}
 }
 
@@ -122,4 +123,3 @@ export class WcSlide extends HTMLElement {
 }
 
 customElements.define("wc-slide", WcSlide);
-

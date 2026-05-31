@@ -1,38 +1,46 @@
 //Tensors should be (channel, col, row)
 /**
  * @typedef {import("../types/sample.d.ts").OobBehavior} OobBehavior
- * */
+ */
 
 /**
  * Linearly Interpolates between two numbers
- * @param {number} start 
- * @param {number} end 
- * @param {number} value Must be between 0 and 1 
- * @returns 
+ * @param {number} start
+ * @param {number} end
+ * @param {number} value Must be between 0 and 1
+ * @returns
  */
-export function lerp(start, end, value){
-    return start + (end - start) * value;
+export function lerp(start, end, value) {
+	return start + (end - start) * value;
 }
 
 /**
  * Clamps a number between two values
- * @param {number} value 
- * @param {number} min 
- * @param {number} max 
- * @returns 
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @returns
  */
-export function clamp(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) {
+export function clamp(
+	value,
+	min = Number.MIN_SAFE_INTEGER,
+	max = Number.MAX_SAFE_INTEGER,
+) {
 	return Math.max(Math.min(value, max), min);
 }
 
 /**
  * Wraps a number between two values
- * @param {number} value 
- * @param {number} min 
- * @param {number} max 
- * @returns 
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @returns
  */
-export function wrapFloat(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) {
+export function wrapFloat(
+	value,
+	min = Number.MIN_SAFE_INTEGER,
+	max = Number.MAX_SAFE_INTEGER,
+) {
 	const range = max - min;
 	return value < min
 		? max - Math.abs(min - value) % range
@@ -41,37 +49,50 @@ export function wrapFloat(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX
 
 /**
  * Wraps an integer between two values (use for indices)
- * @param {number} value 
- * @param {number} min 
- * @param {number} max 
- * @returns 
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @returns
  */
-export function wrapInteger(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) {
+export function wrapInteger(
+	value,
+	min = Number.MIN_SAFE_INTEGER,
+	max = Number.MAX_SAFE_INTEGER,
+) {
 	const range = max - min + 1;
-    let normalized = (value - min) % range;
-    if (normalized < 0) normalized += range;
-    return min + normalized;
+	let normalized = (value - min) % range;
+	if (normalized < 0) normalized += range;
+	return min + normalized;
 }
 
 /**
  * Mirror wraps a number between two values (use for indices)
- * @param {number} value 
- * @param {number} min 
- * @param {number} max 
- * @returns 
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @returns
  */
-export function mirrorWrap(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) {
-	const range = (max - min);
+export function mirrorWrap(
+	value,
+	min = Number.MIN_SAFE_INTEGER,
+	max = Number.MAX_SAFE_INTEGER,
+) {
+	const range = max - min;
 	const period = range * 2;
 	let normalized = (((value - min) % period) + period) % period;
-	if(normalized >= range){
+	if (normalized >= range) {
 		normalized = period - normalized;
 	}
 	return min + normalized;
 }
 
-export function inRangeOrDefault(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER, defaultValue){
-	if(value < min || value > max){
+export function inRangeOrDefault(
+	value,
+	min = Number.MIN_SAFE_INTEGER,
+	max = Number.MAX_SAFE_INTEGER,
+	defaultValue,
+) {
+	if (value < min || value > max) {
 		return defaultValue;
 	}
 	return value;
@@ -79,8 +100,12 @@ export function inRangeOrDefault(value, min = Number.MIN_SAFE_INTEGER, max = Num
 
 export const UNDERFLOW = Symbol("underflow");
 export const OVERFLOW = Symbol("overflow");
-export function inRangeOrReport(value, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER){
-	if(value < min){
+export function inRangeOrReport(
+	value,
+	min = Number.MIN_SAFE_INTEGER,
+	max = Number.MAX_SAFE_INTEGER,
+) {
+	if (value < min) {
 		return UNDERFLOW;
 	} else if (value > max) {
 		return OVERFLOW;
@@ -90,14 +115,14 @@ export function inRangeOrReport(value, min = Number.MIN_SAFE_INTEGER, max = Numb
 
 /**
  * Bounds a float value between min and max using specified out-of-bounds behavior
- * @param {number} value 
- * @param {number} min 
- * @param {number} max 
- * @param {OobBehavior?} oobBehavior 
- * @returns 
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @param {OobBehavior?} oobBehavior
+ * @returns
  */
-export function boundFloat(value, min, max, oobBehavior = { type: "clamp" }){
-	switch(oobBehavior.type){
+export function boundFloat(value, min, max, oobBehavior = { type: "clamp" }) {
+	switch (oobBehavior.type) {
 		case "wrap": {
 			return wrapFloat(value, min, max);
 		}
@@ -108,7 +133,7 @@ export function boundFloat(value, min, max, oobBehavior = { type: "clamp" }){
 			return inRangeOrDefault(value, min, max, oobBehavior.value);
 		}
 		case "report": {
-			return inRangeOrReport(value, min, max)
+			return inRangeOrReport(value, min, max);
 		}
 		case "clamp":
 		default: {
@@ -120,14 +145,14 @@ export function boundFloat(value, min, max, oobBehavior = { type: "clamp" }){
 /**
  * Bounds an int value between min and max using specified out-of-bounds behavior
  * This is different because space after the last value is included and the max is exclusive
- * @param {number} value 
- * @param {number} min 
- * @param {number} max 
- * @param {OobBehavior?} oobBehavior 
- * @returns 
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @param {OobBehavior?} oobBehavior
+ * @returns
  */
-export function boundInteger(value, min, max, oobBehavior = { type: "clamp" }){
-	switch(oobBehavior.type){
+export function boundInteger(value, min, max, oobBehavior = { type: "clamp" }) {
+	switch (oobBehavior.type) {
 		case "wrap": {
 			return wrapInteger(value, min, max);
 		}
@@ -138,7 +163,7 @@ export function boundInteger(value, min, max, oobBehavior = { type: "clamp" }){
 			return inRangeOrDefault(value, min, max, oobBehavior.value);
 		}
 		case "report": {
-			return inRangeOrReport(value, min, max)
+			return inRangeOrReport(value, min, max);
 		}
 		case "clamp":
 		default: {
@@ -149,8 +174,8 @@ export function boundInteger(value, min, max, oobBehavior = { type: "clamp" }){
 
 /**
  * gets the fractional part of floating point number
- * @param {number} value 
- * @returns 
+ * @param {number} value
+ * @returns
  */
 export function getFractionalPart(value) {
 	return Math.abs(value % 1);

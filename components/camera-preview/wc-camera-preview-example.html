@@ -1,25 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+	<head>
+		<title>Camera Preview</title>
+		<link rel="manifest" href="manifest.json">
+		<link rel="stylesheet" href="../../css/system.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, maximum-scale=1"
+		/>
+	</head>
 
-<head>
-	<title>Camera Preview</title>
-	<link rel="manifest" href="manifest.json">
-	<link rel="stylesheet" href="../../css/system.css">
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-</head>
-
-<body>
-	<h1>Camera Preview</h1>
-	<ma-camera-preview-example>
-		<wc-camera-preview></wc-camera-preview>
-		<label for="flip-x">
-			<span>Flip X</span>
-			<input type="checkbox" id="flip-x">
-		</label>
-	</ma-camera-preview-example>
-	<script src="./wc-camera-preview.js" type="module"></script>
-	<script src="./ma-camera-preview-example.js" type="module"></script>
-</body>
-
+	<body>
+		<h1>Camera Preview</h1>
+		<ma-camera-preview-example>
+			<wc-camera-preview></wc-camera-preview>
+			<label for="flip-x">
+				<span>Flip X</span>
+				<input type="checkbox" id="flip-x">
+			</label>
+		</ma-camera-preview-example>
+		<script src="./wc-camera-preview.js" type="module"></script>
+		<script src="./ma-camera-preview-example.js" type="module"></script>
+	</body>
 </html>

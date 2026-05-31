@@ -1,7 +1,7 @@
-export function jsTokensToDom(tokens){
+export function jsTokensToDom(tokens) {
 	const docFrag = document.createDocumentFragment();
-	for(const token of tokens){
-		switch(token.type){
+	for (const token of tokens) {
+		switch (token.type) {
 			case "generic-whitespace": {
 				const text = document.createTextNode("\u00A0");
 				docFrag.appendChild(text);
@@ -18,7 +18,7 @@ export function jsTokensToDom(tokens){
 				break;
 			}
 			case "string-literal":
-			case "double-quote": 
+			case "double-quote":
 			case "single-quote":
 			case "backtick": {
 				const span = document.createElement("span");
@@ -27,14 +27,14 @@ export function jsTokensToDom(tokens){
 				docFrag.appendChild(span);
 				break;
 			}
-			case "number-literal" : {
+			case "number-literal": {
 				const span = document.createElement("span");
 				span.textContent = token.value;
 				span.classList.add("number-literal");
 				docFrag.appendChild(span);
 				break;
 			}
-			case "identifier" : {
+			case "identifier": {
 				const span = document.createElement("span");
 				span.textContent = token.value;
 				span.classList.add("identifier");
@@ -66,7 +66,7 @@ export function jsTokensToDom(tokens){
 			}
 			case "keyword:const":
 			case "keyword:function":
-			case "keyword:class": 
+			case "keyword:class":
 			case "keyword:delete":
 			case "keyword:debugger":
 			case "keyword:export":

@@ -1,0 +1,30 @@
+#search-tabs {
+	width: 100%;
+	max-width: 1080px;
+	grid-area: article;
+}
+#flights {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: repeat(auto);
+	grid-template-areas: "depart-location arrive-location"
+						 "depart-date arrive-date"
+						 "airline flight-options"
+						 "_ submit";
+	gap: 1rem
+}
+#flight-depart-location {
+	grid-area: depart-location;
+}
+#flight-arrive-location {
+	grid-area: arrive-location;
+}
+#flight-depart-date {
+	grid-area: depart-date;
+}
+#flight-arrive-date {
+	grid-area: arrive-date;
+}
+#flight-submit {
+	grid-area: submit;
+}

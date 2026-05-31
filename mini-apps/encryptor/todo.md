@@ -1,29 +1,29 @@
 - [x] include salt+iv in message
-    - [ ] update to mdenc ordering
+  - [ ] update to mdenc ordering
 - [x] implement hints
 - [x] UI
-    - [x] relative theme colors
-    - [x] why does button not stretch?
+  - [x] relative theme colors
+  - [x] why does button not stretch?
 - [x] File mode
-    - [x] File component
-    - [x] File preview
-    - [ ] mdenc support
+  - [x] File component
+  - [x] File preview
+  - [ ] mdenc support
 - [x] Don't look for ids on ma components
 - [ ] Text mode: download as file
 - [x] File System mode
-    - [x] listing icons for file types
-    - [x] better layout control
-    - [x] passive view crypt file support
-    - [x] decrypt file support
-    - [x] encrypt file support
-    - [x] delete file support
-    - [ ] re-encrypt file support (old -> new passphrase, hint)
-    - [ ] mdenc support
+  - [x] listing icons for file types
+  - [x] better layout control
+  - [x] passive view crypt file support
+  - [x] decrypt file support
+  - [x] encrypt file support
+  - [x] delete file support
+  - [ ] re-encrypt file support (old -> new passphrase, hint)
+  - [ ] mdenc support
 
 - [ ] wc-tab-panel
-    - [ ] prerender mode
+  - [ ] prerender mode
 - [x] copy output decorator
-    - [x] inline variant should not overlap
+  - [x] inline variant should not overlap
 - [x] password show decorator
 - [x] file input with drag-drop
-    - [ ] Show file path + hover styles (decorator)
+  - [ ] Show file path + hover styles (decorator)

@@ -15,7 +15,9 @@ export class WcGlslShaderCanvas extends HTMLElement {
 	#colors;
 	#setReady;
 	#globals;
-	ready = new Promise(res => { this.#setReady = res; });
+	ready = new Promise((res) => {
+		this.#setReady = res;
+	});
 	constructor() {
 		super();
 		this.bind(this);
@@ -57,14 +59,15 @@ export class WcGlslShaderCanvas extends HTMLElement {
 	cacheDom() {
 		this.dom = {
 			canvas: this.shadowRoot.querySelector("canvas"),
-			message: this.shadowRoot.querySelector("#message")
+			message: this.shadowRoot.querySelector("#message"),
 		};
 	}
 	attachEvents() {
-
 	}
 	async bootGpu() {
-		this.context = this.dom.canvas.getContext("webgl2", { preserveDrawingBuffer: true });
+		this.context = this.dom.canvas.getContext("webgl2", {
+			preserveDrawingBuffer: true,
+		});
 		this.program = this.context.createProgram();
 		this.compileShaders();
 		this.attachShaders();
@@ -80,63 +83,144 @@ export class WcGlslShaderCanvas extends HTMLElement {
 	}
 	createPositions() {
 		const positions = new Float32Array([
-			-1.0, -1.0,
-			1.0, -1.0,
-			1.0, 1.0,
-			-1.0, 1.0
+			-1.0,
+			-1.0,
+			1.0,
+			-1.0,
+			1.0,
+			1.0,
+			-1.0,
+			1.0,
 		]);
 		const positionBuffer = this.context.createBuffer();
 		this.context.bindBuffer(this.context.ARRAY_BUFFER, positionBuffer);
-		this.context.bufferData(this.context.ARRAY_BUFFER, positions, this.context.STATIC_DRAW);
+		this.context.bufferData(
+			this.context.ARRAY_BUFFER,
+			positions,
+			this.context.STATIC_DRAW,
+		);
 
-		const positionLocation = this.context.getAttribLocation(this.program, "aVertexPosition");
+		const positionLocation = this.context.getAttribLocation(
+			this.program,
+			"aVertexPosition",
+		);
 		this.context.enableVertexAttribArray(positionLocation);
-		this.context.vertexAttribPointer(positionLocation, 2, this.context.FLOAT, false, 0, 0);
+		this.context.vertexAttribPointer(
+			positionLocation,
+			2,
+			this.context.FLOAT,
+			false,
+			0,
+			0,
+		);
 	}
 	createColors() {
 		const colors = new Float32Array(this.#colors);
 		const colorBuffer = this.context.createBuffer();
 		this.context.bindBuffer(this.context.ARRAY_BUFFER, colorBuffer);
-		this.context.bufferData(this.context.ARRAY_BUFFER, colors, this.context.STATIC_DRAW);
+		this.context.bufferData(
+			this.context.ARRAY_BUFFER,
+			colors,
+			this.context.STATIC_DRAW,
+		);
 
-		const colorLocation = this.context.getAttribLocation(this.program, "aVertexColor");
+		const colorLocation = this.context.getAttribLocation(
+			this.program,
+			"aVertexColor",
+		);
 		this.context.enableVertexAttribArray(colorLocation);
-		this.context.vertexAttribPointer(colorLocation, 4, this.context.FLOAT, false, 0, 0);
+		this.context.vertexAttribPointer(
+			colorLocation,
+			4,
+			this.context.FLOAT,
+			false,
+			0,
+			0,
+		);
 	}
 	createUvs() {
 		const uvs = new Float32Array([
-			0.0, 1.0,
-			1.0, 1.0,
-			1.0, 0.0,
-			0.0, 0.0
+			0.0,
+			1.0,
+			1.0,
+			1.0,
+			1.0,
+			0.0,
+			0.0,
+			0.0,
 		]);
 		const uvBuffer = this.context.createBuffer();
 		this.context.bindBuffer(this.context.ARRAY_BUFFER, uvBuffer);
-		this.context.bufferData(this.context.ARRAY_BUFFER, uvs, this.context.STATIC_DRAW);
+		this.context.bufferData(
+			this.context.ARRAY_BUFFER,
+			uvs,
+			this.context.STATIC_DRAW,
+		);
 
-		const texCoordLocation = this.context.getAttribLocation(this.program, "aTextureCoordinate");
+		const texCoordLocation = this.context.getAttribLocation(
+			this.program,
+			"aTextureCoordinate",
+		);
 		this.context.enableVertexAttribArray(texCoordLocation);
-		this.context.vertexAttribPointer(texCoordLocation, 2, this.context.FLOAT, false, 0, 0);
+		this.context.vertexAttribPointer(
+			texCoordLocation,
+			2,
+			this.context.FLOAT,
+			false,
+			0,
+			0,
+		);
 	}
 	createIndicies() {
 		const indicies = new Uint16Array([
-			0, 1, 2,
-			0, 2, 3
+			0,
+			1,
+			2,
+			0,
+			2,
+			3,
 		]);
 		const indexBuffer = this.context.createBuffer();
 		this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, indexBuffer);
-		this.context.bufferData(this.context.ELEMENT_ARRAY_BUFFER, indicies, this.context.STATIC_DRAW);
+		this.context.bufferData(
+			this.context.ELEMENT_ARRAY_BUFFER,
+			indicies,
+			this.context.STATIC_DRAW,
+		);
 	}
 	createTexture(image) {
 		const texture = this.context.createTexture();
 		this.context.bindTexture(this.context.TEXTURE_2D, texture);
 
-		this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_WRAP_S, this.context.CLAMP_TO_EDGE);
-		this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_WRAP_T, this.context.CLAMP_TO_EDGE);
-		this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_MIN_FILTER, this.context.NEAREST);
-		this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_MAG_FILTER, this.context.NEAREST);
+		this.context.texParameteri(
+			this.context.TEXTURE_2D,
+			this.context.TEXTURE_WRAP_S,
+			this.context.CLAMP_TO_EDGE,
+		);
+		this.context.texParameteri(
+			this.context.TEXTURE_2D,
+			this.context.TEXTURE_WRAP_T,
+			this.context.CLAMP_TO_EDGE,
+		);
+		this.context.texParameteri(
+			this.context.TEXTURE_2D,
+			this.context.TEXTURE_MIN_FILTER,
+			this.context.NEAREST,
+		);
+		this.context.texParameteri(
+			this.context.TEXTURE_2D,
+			this.context.TEXTURE_MAG_FILTER,
+			this.context.NEAREST,
+		);
 
-		this.context.texImage2D(this.context.TEXTURE_2D, 0, this.context.RGBA, this.context.RGBA, this.context.UNSIGNED_BYTE, image);
+		this.context.texImage2D(
+			this.context.TEXTURE_2D,
+			0,
+			this.context.RGBA,
+			this.context.RGBA,
+			this.context.UNSIGNED_BYTE,
+			image,
+		);
 	}
 	createUniforms() {
 		if (!this.#globals) return;
@@ -159,7 +243,9 @@ export class WcGlslShaderCanvas extends HTMLElement {
 						this.context.uniform4fv(location, val);
 					}
 					default: {
-						console.error(`Invalid dimension for binding uniforms. ${key} with value of length ${val.length}`);
+						console.error(
+							`Invalid dimension for binding uniforms. ${key} with value of length ${val.length}`,
+						);
 					}
 				}
 			} else {
@@ -185,8 +271,17 @@ export class WcGlslShaderCanvas extends HTMLElement {
 		this.context.shaderSource(this.vertexShader, vertexShaderText);
 		this.context.compileShader(this.vertexShader);
 
-		if (!this.context.getShaderParameter(this.vertexShader, this.context.COMPILE_STATUS)) {
-			this.setMessage(`⚠ Failed to compile vertex shader: ${this.context.getShaderInfoLog(this.vertexShader)}`);
+		if (
+			!this.context.getShaderParameter(
+				this.vertexShader,
+				this.context.COMPILE_STATUS,
+			)
+		) {
+			this.setMessage(
+				`⚠ Failed to compile vertex shader: ${
+					this.context.getShaderInfoLog(this.vertexShader)
+				}`,
+			);
 		}
 
 		const fragmentShaderText = this.textContent;
@@ -194,8 +289,17 @@ export class WcGlslShaderCanvas extends HTMLElement {
 		this.context.shaderSource(this.fragmentShader, fragmentShaderText);
 		this.context.compileShader(this.fragmentShader);
 
-		if (!this.context.getShaderParameter(this.fragmentShader, this.context.COMPILE_STATUS)) {
-			this.setMessage(`⚠ Failed to compile fragment shader: ${this.context.getShaderInfoLog(this.fragmentShader)}`);
+		if (
+			!this.context.getShaderParameter(
+				this.fragmentShader,
+				this.context.COMPILE_STATUS,
+			)
+		) {
+			this.setMessage(
+				`⚠ Failed to compile fragment shader: ${
+					this.context.getShaderInfoLog(this.fragmentShader)
+				}`,
+			);
 		}
 	}
 	setMessage(message) {
@@ -213,8 +317,15 @@ export class WcGlslShaderCanvas extends HTMLElement {
 		this.context.attachShader(this.program, this.fragmentShader);
 	}
 	render() {
-		this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
-		this.context.drawElements(this.context.TRIANGLES, 6, this.context.UNSIGNED_SHORT, 0);
+		this.context.clear(
+			this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT,
+		);
+		this.context.drawElements(
+			this.context.TRIANGLES,
+			6,
+			this.context.UNSIGNED_SHORT,
+			0,
+		);
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
 		if (newValue !== oldValue) {
@@ -236,20 +347,28 @@ export class WcGlslShaderCanvas extends HTMLElement {
 	set image(value) {
 		this.#image = value;
 		loadImage(value)
-			.then(img => this.createTexture(img));
+			.then((img) => this.createTexture(img));
 	}
 	set colors(value) {
-		this.#colors = value.split(/[,;\s]\s*/g).map(x => parseFloat(x.trim()));
+		this.#colors = value.split(/[,;\s]\s*/g).map((x) => parseFloat(x.trim()));
 	}
 	get pixelData() {
 		return this.ready.then(() => {
 			const array = new Uint8Array(this.#height * this.#width * 4);
-			this.context.readPixels(0, 0, this.#width, this.#height, this.context.RGBA, this.context.UNSIGNED_BYTE, array);
-			return [...array].map(x => x / 255);
+			this.context.readPixels(
+				0,
+				0,
+				this.#width,
+				this.#height,
+				this.context.RGBA,
+				this.context.UNSIGNED_BYTE,
+				array,
+			);
+			return [...array].map((x) => x / 255);
 		});
 	}
 	set globals(val) {
-		val = typeof (val) === "object" ? val : JSON.parse(val);
+		val = typeof val === "object" ? val : JSON.parse(val);
 		this.#globals = val;
 		this.update();
 	}

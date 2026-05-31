@@ -1,7 +1,7 @@
 import { MidiFile } from "./midi.js";
 
 function loadFile(url) {
-	return fetch(url).then(r => r.arrayBuffer());
+	return fetch(url).then((r) => r.arrayBuffer());
 }
 
 export class WcMidiPlayer extends HTMLElement {
@@ -24,7 +24,7 @@ export class WcMidiPlayer extends HTMLElement {
 		this.cacheDom = this.cacheDom.bind(element);
 		this.attachEvents = this.attachEvents.bind(element);
 	}
-	async load(){
+	async load() {
 		const file = await loadFile(this.#src);
 		const midi = new MidiFile(file);
 	}
@@ -34,8 +34,7 @@ export class WcMidiPlayer extends HTMLElement {
 		this.load();
 	}
 	cacheDom() {
-		this.dom = {
-		};
+		this.dom = {};
 	}
 	attachEvents() {
 	}
