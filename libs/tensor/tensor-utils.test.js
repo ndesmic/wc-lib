@@ -1,32 +1,6 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import {
-	addTensor,
-	areShapesEqual,
-	arrayToTensor,
-	constantAddTensor,
-	constantDivideTensor,
-	constantMultiplyTensor,
-	constantSubtractTensor,
-	convoluteTensor,
-	elementWiseDivideTensor,
-	elementWiseMultiplyTensor,
-	getBoundedIndices,
-	getBoundedValue,
-	getDimensionalIndicesleftPacked,
-	getDimensionalMultiRange,
-	getFlatIndexleftPacked,
-	getFlatMultiRange,
-	getValue,
-	isValidDimensionalIndicesForShape,
-	isValidFlatIndexForShape,
-	iterateTensorLeftPacked,
-	negateTensor,
-	sampleTensor,
-	subtractTensor,
-	tensorContains,
-	toLeftPacked,
-} from "./tensor-utils.js";
+import { addTensor, areShapesEqual, arrayToTensor, constantAddTensor, constantDivideTensor, constantMultiplyTensor, constantSubtractTensor, convoluteTensor, elementWiseDivideTensor, elementWiseMultiplyTensor, getBoundedIndices, getBoundedValue, getDimensionalIndicesleftPacked, getDimensionalMultiRange, getFlatIndexleftPacked, getFlatMultiRange, getValue, isValidDimensionalIndicesForShape, isValidFlatIndexForShape, iterateTensorLeftPacked, negateTensor, sampleTensor, subtractTensor, tensorContains, toLeftPacked } from "./tensor-utils.js";
 import { multiTest } from "../test-tools.js";
 import { OVERFLOW, UNDERFLOW } from "../math-utils.js";
 

@@ -158,12 +158,8 @@ export class WcDirectoryListing extends HTMLElement {
 		//const containerRect = this.getBoundingClientRect();
 		this.dom.dragBox.style.left = `${e.pageX}px`;
 		this.dom.dragBox.style.top = `${e.pageY}px`;
-		this.dom.dragBox.style.right = `${
-			document.documentElement.scrollWidth - e.pageX
-		}px`;
-		this.dom.dragBox.style.bottom = `${
-			document.documentElement.scrollHeight - e.pageY
-		}px`;
+		this.dom.dragBox.style.right = `${document.documentElement.scrollWidth - e.pageX}px`;
+		this.dom.dragBox.style.bottom = `${document.documentElement.scrollHeight - e.pageY}px`;
 
 		// Cache all element rects at drag start for drag performance
 		this.#cachedRects.clear();
@@ -187,17 +183,11 @@ export class WcDirectoryListing extends HTMLElement {
 
 		this.dom.dragBox.style.left = `${left}px`;
 		this.dom.dragBox.style.top = `${top}px`;
-		this.dom.dragBox.style.right = `${
-			document.documentElement.scrollWidth - right
-		}px`;
-		this.dom.dragBox.style.bottom = `${
-			document.documentElement.scrollHeight - bottom
-		}px`;
+		this.dom.dragBox.style.right = `${document.documentElement.scrollWidth - right}px`;
+		this.dom.dragBox.style.bottom = `${document.documentElement.scrollHeight - bottom}px`;
 
 		const dragBoxRect = getDocumentRect(this.dom.dragBox);
-		const intersectedElements = this.#domMap.keys().filter((li) =>
-			checkAABB(this.#cachedRects.get(li), dragBoxRect)
-		).toArray();
+		const intersectedElements = this.#domMap.keys().filter((li) => checkAABB(this.#cachedRects.get(li), dragBoxRect)).toArray();
 
 		this.#domMap.keys().forEach((e) => e.classList.remove("selecting"));
 		intersectedElements.forEach((e) => e.classList.add("selecting"));
@@ -214,9 +204,7 @@ export class WcDirectoryListing extends HTMLElement {
 		this.#domMap.keys().forEach((e) => e.classList.remove("selecting"));
 
 		const dragBoxRect = getDocumentRect(this.dom.dragBox);
-		const intersectedElements = this.#domMap.keys().filter((li) =>
-			checkAABB(getDocumentRect(li), dragBoxRect)
-		).toArray();
+		const intersectedElements = this.#domMap.keys().filter((li) => checkAABB(getDocumentRect(li), dragBoxRect)).toArray();
 		const thisEl = this.#domMap.keys().filter((li) =>
 			checkPointInside(
 				{ x: dragBoxRect.right, y: dragBoxRect.bottom },
@@ -309,9 +297,7 @@ export class WcDirectoryListing extends HTMLElement {
 		}
 	}
 	getCustomIconStyles() {
-		const rules = Object.entries(this.#iconMap).map(([key, value]) =>
-			`li.${key} button::before { content: "${value}"; }`
-		);
+		const rules = Object.entries(this.#iconMap).map(([key, value]) => `li.${key} button::before { content: "${value}"; }`);
 		return rules.join("\n");
 	}
 	attributeChangedCallback(name, oldValue, newValue) {

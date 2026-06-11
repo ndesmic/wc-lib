@@ -168,12 +168,9 @@ export class WcRadialGradient extends HTMLElement {
 		const y = imageData.height - this.#cy;
 		imageData.data[(y * imageData.width * 4) + 4 * this.#cx] = this.#stops[0][0] *
 			255;
-		imageData.data[(y * imageData.width * 4) + (4 * this.#cx) + 1] =
-			this.#stops[0][1] * 255;
-		imageData.data[(y * imageData.width * 4) + (4 * this.#cx) + 2] =
-			this.#stops[0][2] * 255;
-		imageData.data[(y * imageData.width * 4) + (4 * this.#cx) + 3] =
-			this.#stops[0][3] * 255;
+		imageData.data[(y * imageData.width * 4) + (4 * this.#cx) + 1] = this.#stops[0][1] * 255;
+		imageData.data[(y * imageData.width * 4) + (4 * this.#cx) + 2] = this.#stops[0][2] * 255;
+		imageData.data[(y * imageData.width * 4) + (4 * this.#cx) + 3] = this.#stops[0][3] * 255;
 		context.putImageData(imageData, 0, 0);
 	}
 	getRValue(r, theta) {

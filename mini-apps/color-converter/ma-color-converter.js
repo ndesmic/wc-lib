@@ -54,13 +54,9 @@ export class MaColorConverter extends HTMLElement {
 		if (color.success) {
 			const rgb = `rgb(${color.value.r}, ${color.value.g}, ${color.value.b})`;
 			this.dom.swatch.setAttribute("value", rgb);
-			this.dom.outputRgbHex.value = `#${color.value.r.toString(16)}${
-				color.value.g.toString(16)
-			}${color.value.b.toString(16)}`;
+			this.dom.outputRgbHex.value = `#${color.value.r.toString(16)}${color.value.g.toString(16)}${color.value.b.toString(16)}`;
 			this.dom.outputRgbInt.value = rgb;
-			this.dom.outputRgbFloat.value = `${(color.value.r / 255).toFixed(2)}, ${
-				(color.value.g / 255).toFixed(2)
-			}, ${(color.value.b / 255).toFixed(2)}`;
+			this.dom.outputRgbFloat.value = `${(color.value.r / 255).toFixed(2)}, ${(color.value.g / 255).toFixed(2)}, ${(color.value.b / 255).toFixed(2)}`;
 		}
 	}
 }

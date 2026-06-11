@@ -54,9 +54,7 @@ export class MaTimer extends HTMLElement {
 		const thisInstant = Temporal.Instant.fromEpochNanoseconds(thisTimeNs);
 		const startInstant = Temporal.Instant.fromEpochNanoseconds(startTimeNs);
 		const duration = startInstant.until(thisInstant);
-		this.dom.display.textContent = `${
-			duration.seconds.toString().padStart(2, 0)
-		}:${duration.milliseconds.toString().padStart(3, 0)}`;
+		this.dom.display.textContent = `${duration.seconds.toString().padStart(2, 0)}:${duration.milliseconds.toString().padStart(3, 0)}`;
 	}
 }
 

@@ -1,30 +1,29 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+	<head>
+		<title>Topology</title>
+		<link rel="stylesheet" href="/css/system.css">
+		<link rel="stylesheet" href="/css/neu.css">
+	</head>
 
-<head>
-	<title>Topology</title>
-	<link rel="stylesheet" href="/css/system.css">
-	<link rel="stylesheet" href="/css/neu.css">
-</head>
-
-<body>
-	<main>
-		<wc-theme-picker></wc-theme-picker>
-		<div class="neu-extrude neu-surface" style="height: 400px; width: 400px;">A</div>
-		<div class="neu-extrude neu-surface" style="height: 400px; width: 400px;">B
-			<div class="neu-depress neu-surface" style="height: 200px; width: 200px;"></div>
-		</div>
-		<div class="neu-depress neu-surface">C
-			<div class="neu-extrude neu-surface" style="height: 200px; width: 300px;">
-				<div class="row" style="gap: 1rem;">
-					<div class="neu-surface neu-extrude neu-convex" style="height: 100px; width: 100px;"></div>
-					<div class="neu-surface neu-extrude neu-concave" style="height: 100px; width: 100px;"></div>
+	<body>
+		<main>
+			<wc-theme-picker></wc-theme-picker>
+			<div class="neu-extrude neu-surface" style="height: 400px; width: 400px">A</div>
+			<div class="neu-extrude neu-surface" style="height: 400px; width: 400px">
+				B
+				<div class="neu-depress neu-surface" style="height: 200px; width: 200px"></div>
+			</div>
+			<div class="neu-depress neu-surface">
+				C
+				<div class="neu-extrude neu-surface" style="height: 200px; width: 300px">
+					<div class="row" style="gap: 1rem">
+						<div class="neu-surface neu-extrude neu-convex" style="height: 100px; width: 100px"></div>
+						<div class="neu-surface neu-extrude neu-concave" style="height: 100px; width: 100px"></div>
+					</div>
 				</div>
 			</div>
-		</div>
-		
-	</main>
-	<script src="/components/theme-picker/wc-theme-picker.js" type="module"></script>
-</body>
-
+		</main>
+		<script src="/components/theme-picker/wc-theme-picker.js" type="module"></script>
+	</body>
 </html>

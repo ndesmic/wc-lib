@@ -1,19 +1,6 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import {
-	boundFloat,
-	boundInteger,
-	clamp,
-	getFractionalPart,
-	inRangeOrDefault,
-	inRangeOrReport,
-	lerp,
-	mirrorWrap,
-	OVERFLOW,
-	UNDERFLOW,
-	wrapFloat,
-	wrapInteger,
-} from "./math-utils.js";
+import { boundFloat, boundInteger, clamp, getFractionalPart, inRangeOrDefault, inRangeOrReport, lerp, mirrorWrap, OVERFLOW, UNDERFLOW, wrapFloat, wrapInteger } from "./math-utils.js";
 import { multiTest } from "./test-tools.js";
 
 describe("math-utils", () => {

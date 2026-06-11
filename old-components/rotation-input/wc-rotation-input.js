@@ -184,9 +184,7 @@ export class WcRotationInput extends HTMLElement {
 			this.#stepAmount = 1;
 		}
 		this.#stepAmount = parseFloat(this.dom.input.getAttribute("step") || 1);
-		const stepsAmountRad = this.#unit === "rad"
-			? this.#stepAmount
-			: degreesToRadians(this.#stepAmount);
+		const stepsAmountRad = this.#unit === "rad" ? this.#stepAmount : degreesToRadians(this.#stepAmount);
 		this.#steps = getSteps(stepsAmountRad, TWO_PI);
 	}
 	onPointerDown(e) {
@@ -225,10 +223,9 @@ export class WcRotationInput extends HTMLElement {
 		}
 	}
 	updateValue(valueRad) {
-		const finalValue =
-			(this.#unit === "rad" ? valueRad : radiansToDegrees(valueRad)).toFixed(
-				this.#precision,
-			);
+		const finalValue = (this.#unit === "rad" ? valueRad : radiansToDegrees(valueRad)).toFixed(
+			this.#precision,
+		);
 		const valueDeg = radiansToDegrees(valueRad);
 		this.dom.input.value = finalValue;
 		this.dom.value.textContent = finalValue;
@@ -247,9 +244,7 @@ export class WcRotationInput extends HTMLElement {
 	}
 	onWheel(e) {
 		const delta = e.deltaY *
-			(this.#unit === "rad"
-				? this.#stepAmount
-				: degreesToRadians(this.#stepAmount)) /
+			(this.#unit === "rad" ? this.#stepAmount : degreesToRadians(this.#stepAmount)) /
 			100;
 		const newValue = normalizeAngle(
 			this.parse(this.dom.input.value || 0) + delta,
@@ -258,10 +253,7 @@ export class WcRotationInput extends HTMLElement {
 	}
 	onKeydown(e) {
 		if (e.which !== 38 && e.which !== 40) return;
-		const delta =
-			(this.#unit === "rad"
-				? this.#stepAmount
-				: degreesToRadians(this.#stepAmount)) * (e.which === 40 ? -1 : 1);
+		const delta = (this.#unit === "rad" ? this.#stepAmount : degreesToRadians(this.#stepAmount)) * (e.which === 40 ? -1 : 1);
 		const newValue = normalizeAngle(
 			this.parse(this.dom.input.value || 0) + delta,
 		);

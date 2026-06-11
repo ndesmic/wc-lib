@@ -12,9 +12,7 @@ export function accessProperty(obj, accessor, defaultValue = null) {
 		return accessor(obj);
 	}
 
-	const accessorParts = typeof accessor === "string"
-		? accessor.split(".")
-		: accessor; //numbers
+	const accessorParts = typeof accessor === "string" ? accessor.split(".") : accessor; //numbers
 
 	if (accessorParts.length === 1) {
 		return obj[accessorParts[0]] ?? defaultValue;

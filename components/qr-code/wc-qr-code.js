@@ -1,10 +1,6 @@
 import { drawQrCanvas } from "./canvas-utils.js";
 import { masks, QrCanvas } from "./qr-canvas.js";
-import {
-	getFormatString,
-	getVersionInfoString,
-	qrEncodeData,
-} from "./qr-utils.js";
+import { getFormatString, getVersionInfoString, qrEncodeData } from "./qr-utils.js";
 import QrCodeCss from "./wc-qr-code.css" with { type: "css" };
 
 export class WcQrCode extends HTMLElement {

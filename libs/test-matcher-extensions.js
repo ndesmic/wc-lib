@@ -23,12 +23,7 @@ expect.extend({
 
 		return {
 			pass,
-			message: () =>
-				`expected ${received.value} ${
-					pass ? "not to be close" : "to be close"
-				} to ${expected} within ${numDigits} decimal places. Arrays differ at index ${lastIndex}, got ${
-					received.value[lastIndex]
-				}, expected ${expected[lastIndex]}`,
+			message: () => `expected ${received.value} ${pass ? "not to be close" : "to be close"} to ${expected} within ${numDigits} decimal places. Arrays differ at index ${lastIndex}, got ${received.value[lastIndex]}, expected ${expected[lastIndex]}`,
 		};
 	},
 });

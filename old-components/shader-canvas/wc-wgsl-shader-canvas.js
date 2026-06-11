@@ -189,13 +189,8 @@ export class WcWgslShaderCanvas extends HTMLElement {
 		if (compilationInfo.messages.length > 0) {
 			let messageString = "";
 			for (const message of compilationInfo.messages) {
-				const type = message.type === "error"
-					? "❌"
-					: msg.type === "warning"
-					? "⚠️"
-					: "ℹ️";
-				messageString +=
-					`${type} ${message.message} (${message.lineNum}:${message.linePos})`;
+				const type = message.type === "error" ? "❌" : msg.type === "warning" ? "⚠️" : "ℹ️";
+				messageString += `${type} ${message.message} (${message.lineNum}:${message.linePos})`;
 			}
 			this.dom.message.textContent = messageString;
 			return;

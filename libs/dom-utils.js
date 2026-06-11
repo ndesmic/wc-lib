@@ -13,9 +13,7 @@ import { getSingleOrArray } from "./array-utils.js";
  * @returns
  */
 export function createElement(tag, options) {
-	const element = options.namespace
-		? document.createElementNS(options.namespace, tag)
-		: document.createElement(tag);
+	const element = options.namespace ? document.createElementNS(options.namespace, tag) : document.createElement(tag);
 	for (const [key, val] of Object.entries(options.props ?? {})) {
 		element[key] = val;
 	}
@@ -37,8 +35,7 @@ export function createElement(tag, options) {
 	return element;
 }
 
-export const createSvg = (tag, options) =>
-	createElement(tag, { ...options, namespace: "http://www.w3.org/2000/svg" });
+export const createSvg = (tag, options) => createElement(tag, { ...options, namespace: "http://www.w3.org/2000/svg" });
 
 /**
  * Creates a list with items

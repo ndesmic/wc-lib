@@ -91,15 +91,11 @@ export class TextCaseFormatter {
 				break;
 			}
 			case "lowerFirst": {
-				segments = segments.map((seg) =>
-					seg.charAt(0).toLowerCase() + seg.slice(1)
-				);
+				segments = segments.map((seg) => seg.charAt(0).toLowerCase() + seg.slice(1));
 				break;
 			}
 			case "upperFirst": {
-				segments = segments.map((seg) =>
-					seg.charAt(0).toUpperCase() + seg.slice(1)
-				);
+				segments = segments.map((seg) => seg.charAt(0).toUpperCase() + seg.slice(1));
 				break;
 			}
 		}

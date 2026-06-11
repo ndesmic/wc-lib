@@ -25,9 +25,9 @@ A tab panel to show different tabbed content
 ### Slots
 
 | name    | type | description |
-|---------|------|-------------|
+| ------- | ---- | ----------- |
 | tab     | any  | the tabs    |
-| content | any  | the content |  
+| content | any  | the content |
 
 ## Outputs
 

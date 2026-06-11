@@ -8,8 +8,7 @@ A grid of inputs
 
 ## Specs
 
-- When `values` is set as a prop, the `Tensor` will not reshape the grid (`rows`
-  and `columns` act like maximums for the grid)
+- When `values` is set as a prop, the `Tensor` will not reshape the grid (`rows` and `columns` act like maximums for the grid)
 
 ## Inputs
 
@@ -25,10 +24,7 @@ A grid of inputs
 
 ### Props
 
-| name | type | description | default | |-|-|-|-|-| | rows | number | the number
-of rows | 3 | | columns | number | the number of columns | 3 | | add-row |
-boolean | allows adding rows | false | | add-column | boolean | allows adding
-columns | false | | values | `Tensor` | the value of the grid | undefined |
+| name | type | description | default | |-|-|-|-|-| | rows | number | the number of rows | 3 | | columns | number | the number of columns | 3 | | add-row | boolean | allows adding rows | false | | add-column | boolean | allows adding columns | false | | values | `Tensor` | the value of the grid | undefined |
 
 ## Outputs
 

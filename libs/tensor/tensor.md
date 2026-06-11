@@ -1,10 +1,8 @@
 # Tensor Notes
 
 - Operations are defined with left-packed (column major) shapes
-  - This means that the value on the left (ie lowest index) has the smallest
-    stride
-  - You can also think of it as the leftmost dimension is packed first and most
-    densely
+  - This means that the value on the left (ie lowest index) has the smallest stride
+  - You can also think of it as the leftmost dimension is packed first and most densely
 
 ```
 [

@@ -229,9 +229,7 @@ export class WcCrSpline extends HTMLElement {
 		const rect = this.dom.canvas.getBoundingClientRect();
 		this.#lastPointerX = e.offsetX;
 		this.#lastPointerY = rect.height - e.offsetY;
-		this.#selectedIndex = this.#points.findIndex((p) =>
-			inRadius(this.#lastPointerX, this.#lastPointerY, 4, p[0], p[1])
-		);
+		this.#selectedIndex = this.#points.findIndex((p) => inRadius(this.#lastPointerX, this.#lastPointerY, 4, p[0], p[1]));
 
 		if (this.#selectedIndex > -1) {
 			console.log("Got Index", this.#selectedIndex);

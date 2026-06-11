@@ -38,7 +38,6 @@ document.documentElement.style.setProperty("--theme", value);
 
 ## Specs
 
-
 ## TODO
 
 - [ ] add todo

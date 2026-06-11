@@ -207,9 +207,7 @@ export class WcGridInput extends HTMLElement {
 			new Array(this.#rows * this.#columns).fill(""),
 		);
 		//if it's just an array we take the values but if it's an object we expect a kernel object
-		this.#values = Array.isArray(parsedValues)
-			? { values: parsedValues, shape: [this.#columns, this.#rows] }
-			: parsedValues;
+		this.#values = Array.isArray(parsedValues) ? { values: parsedValues, shape: [this.#columns, this.#rows] } : parsedValues;
 		this.updateDom();
 	}
 	get values() {

@@ -133,9 +133,7 @@ export class WcSuperellipse extends HTMLElement {
 				const x = i - this.#cx;
 				const y = this.#ry *
 					((1 - Math.abs(x / this.#rx) ** this.#p) ** (1 / this.#p));
-				const [tx, ty] = rotate([x, y], this.#angle, this.#cx, this.#cy).map((x) =>
-					Math.floor(x)
-				);
+				const [tx, ty] = rotate([x, y], this.#angle, this.#cx, this.#cy).map((x) => Math.floor(x));
 				const [tx2, ty2] = rotate([x, -y], this.#angle, this.#cx, this.#cy).map(
 					(x) => Math.floor(x),
 				);
@@ -161,9 +159,7 @@ export class WcSuperellipse extends HTMLElement {
 				const x = Math.floor(
 					this.#rx * ((1 - Math.abs(y / this.#ry) ** this.#p) ** (1 / this.#p)),
 				);
-				const [tx, ty] = rotate([x, y], this.#angle, this.#cx, this.#cy).map((x) =>
-					Math.floor(x)
-				);
+				const [tx, ty] = rotate([x, y], this.#angle, this.#cx, this.#cy).map((x) => Math.floor(x));
 				const [tx2, ty2] = rotate([-x, y], this.#angle, this.#cx, this.#cy).map(
 					(x) => Math.floor(x),
 				);

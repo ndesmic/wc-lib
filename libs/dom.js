@@ -25,9 +25,7 @@ export class DomElement {
 			.toArray().join(" ");
 		const openingPart = `${tagPart}${attrPart ? ` ${attrPart}` : ""}>`;
 		const endPart = `</${this.#tag}>`;
-		return `${openingPart}${
-			this.#children.map((c) => c.toString()).join("\n")
-		}${endPart}`;
+		return `${openingPart}${this.#children.map((c) => c.toString()).join("\n")}${endPart}`;
 	}
 }
 

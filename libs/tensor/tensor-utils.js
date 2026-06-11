@@ -4,13 +4,7 @@
  * @typedef {import("../../types/sample.d.ts").InvalidIndexValueMapping} InvalidIndexValueMapping
  * @typedef {import("../../types/tensor.d.ts").Tensor} Tensor
  */
-import {
-	boundInteger,
-	getFractionalPart,
-	lerp,
-	OVERFLOW,
-	UNDERFLOW,
-} from "../math-utils.js";
+import { boundInteger, getFractionalPart, lerp, OVERFLOW, UNDERFLOW } from "../math-utils.js";
 import { padArrayStart } from "../array-utils.js";
 
 /**
@@ -231,9 +225,7 @@ export function setValue(tensor, leftPackedIndices, value) {
  * @returns
  */
 export function getBoundedIndices(tensor, indices, oobMapping) {
-	return indices.map((i, di) =>
-		boundInteger(Math.floor(i), 0, tensor.shape[di] - 1, oobMapping)
-	);
+	return indices.map((i, di) => boundInteger(Math.floor(i), 0, tensor.shape[di] - 1, oobMapping));
 }
 
 /**
@@ -538,9 +530,7 @@ export function convoluteTensor(
 	if (imageTensor.shape.length < kernelTensor.shape.length) {
 		throw new Error("Kernel must have fewer dimensions than image tensor");
 	}
-	const oob = Array.isArray(oobBehavior)
-		? oobBehavior
-		: new Array(imageTensor.shape.length).fill(oobBehavior);
+	const oob = Array.isArray(oobBehavior) ? oobBehavior : new Array(imageTensor.shape.length).fill(oobBehavior);
 	const normalizedOobBehavior = padArrayStart(
 		oob,
 		imageTensor.shape.length,

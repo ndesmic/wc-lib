@@ -1,9 +1,4 @@
-import {
-	parsePlainDateTimeOrDefault,
-	register,
-	renderInnerHTML,
-	renderOuterHTMLNoPropsShadowWithStyles,
-} from "../../libs/wc-utils.js";
+import { parsePlainDateTimeOrDefault, register, renderInnerHTML, renderOuterHTMLNoPropsShadowWithStyles } from "../../libs/wc-utils.js";
 
 const HTMLElement = globalThis.HTMLElement ?? class {};
 

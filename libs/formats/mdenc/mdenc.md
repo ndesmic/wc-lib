@@ -1,7 +1,6 @@
 # Mdenc
 
-`.mdenc` files. Encrypted `.md` files as used by the Obsidian plugin
-`meld-encrypt`
+`.mdenc` files. Encrypted `.md` files as used by the Obsidian plugin `meld-encrypt`
 
 ## TODO
 

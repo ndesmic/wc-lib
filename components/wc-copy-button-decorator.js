@@ -74,8 +74,7 @@ export class WcCopyButtonDecorator extends HTMLElement {
 				"The decorated input element had no id. Copy button decorator will not work.",
 			);
 		}
-		this.dom.elementToCopy.style.anchorName =
-			`--${this.dom.elementToCopy.id}-anchor`;
+		this.dom.elementToCopy.style.anchorName = `--${this.dom.elementToCopy.id}-anchor`;
 		this.dom.copy.style.positionAnchor = `--${this.dom.elementToCopy.id}-anchor`;
 	}
 	attachEvents() {

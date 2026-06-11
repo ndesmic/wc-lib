@@ -210,9 +210,7 @@ export class WcCanvasLine extends HTMLElement {
 			const cornerDirection = cornerDirections[i / 2];
 
 			let normalMiter = normalizeVector(addVector(nextTangent, previousTangent));
-			normalMiter = (isNaN(normalMiter[0]) || normalMiter[0] == Infinity)
-				? normal
-				: normalMiter;
+			normalMiter = (isNaN(normalMiter[0]) || normalMiter[0] == Infinity) ? normal : normalMiter;
 
 			const isOutsideEdge = dotVector(normal, normalMiter) < 0;
 

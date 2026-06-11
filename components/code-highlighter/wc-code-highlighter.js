@@ -40,9 +40,7 @@ class WcCodeHighlighter extends HTMLElement {
 		this.cacheDom();
 		this.attachEvents();
 		const hasValue = !!this.dom.innerTemplate.innerHTML.trim();
-		this.#value = hasValue
-			? dedent(lineTrim(decodeHtml(this.dom.innerTemplate.innerHTML)))
-			: "";
+		this.#value = hasValue ? dedent(lineTrim(decodeHtml(this.dom.innerTemplate.innerHTML))) : "";
 		this.highlightSyntax();
 	}
 	cacheDom() {

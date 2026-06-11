@@ -1,12 +1,6 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import {
-	applyShader,
-	getIntensityImage,
-	getLumaRec601Image,
-	getLumaRec709Image,
-	tilizeImage,
-} from "./js-shader-utils.js";
+import { applyShader, getIntensityImage, getLumaRec601Image, getLumaRec709Image, tilizeImage } from "./js-shader-utils.js";
 import { getPx, setPx } from "./image-sample-utils.js";
 import "../test-matcher-extensions.js";
 

@@ -233,9 +233,7 @@ export class WcRotationInput2 extends HTMLElement {
 	}
 	set step(val) {
 		this.#stepAmount = parseFloat(val || 1);
-		const stepsAmountRad = this.#unit === "rad"
-			? this.#stepAmount
-			: degreesToRadians(this.#stepAmount);
+		const stepsAmountRad = this.#unit === "rad" ? this.#stepAmount : degreesToRadians(this.#stepAmount);
 		this.#steps = getSteps(stepsAmountRad, TWO_PI);
 	}
 	set value(val) {
@@ -253,9 +251,7 @@ export class WcRotationInput2 extends HTMLElement {
 		this.setAttribute("aria-valuetext", valueDisplay);
 	}
 	get stepAmount() {
-		return this.#unit === "rad"
-			? this.#stepAmount
-			: degreesToRadians(this.#stepAmount);
+		return this.#unit === "rad" ? this.#stepAmount : degreesToRadians(this.#stepAmount);
 	}
 }
 

@@ -1,11 +1,7 @@
 // @ts-check
 /** @typedef {import("../../types/tensor.d.ts").Tensor} Tensor */
 import { createElement, createList } from "../../libs/dom-utils.js";
-import {
-	parseArrayOfArraysOrDefault,
-	parseBoolean,
-	parseIntOrDefault,
-} from "../../libs/wc-utils.js";
+import { parseArrayOfArraysOrDefault, parseBoolean, parseIntOrDefault } from "../../libs/wc-utils.js";
 import systemCss from "../../css/system.css" with { type: "css" };
 import multiGridInputCss from "./wc-multi-grid-input.css" with { type: "css" };
 

@@ -1,4 +1,5 @@
 import { padArrayEnd } from "./array-utils.js";
+import { joinPath } from "./path-utils.js";
 
 //Scalar
 
@@ -38,9 +39,7 @@ export function parseArrayOrDefault(text, defaultValue = null) {
  */
 export function parseFloatArrayOrDefault(text, defaultValue = null) {
 	if (typeof text === "string") {
-		return text?.trim()
-			? text.split(",").map((x) => parseFloat(x.trim()))
-			: defaultValue;
+		return text?.trim() ? text.split(",").map((x) => parseFloat(x.trim())) : defaultValue;
 	}
 	return text ?? defaultValue;
 }
@@ -49,20 +48,14 @@ export function parseFloatArrayOrDefault(text, defaultValue = null) {
 
 export function parseArrayOfArraysOrDefault(text, defaultValue = null) {
 	if (typeof text === "string") {
-		return text?.trim()
-			? text.split(";").map((v) => v.trim().split(",").map((x) => x.trim()))
-			: defaultValue;
+		return text?.trim() ? text.split(";").map((v) => v.trim().split(",").map((x) => x.trim())) : defaultValue;
 	}
 	return text ?? defaultValue;
 }
 
 export function parseFloatArrayOfArraysOrDefault(text, defaultValue = null) {
 	if (typeof text === "string") {
-		return text?.trim()
-			? text.split(";").map((v) =>
-				v.trim().split(",").map((x) => parseFloat(x.trim()))
-			)
-			: defaultValue;
+		return text?.trim() ? text.split(";").map((v) => v.trim().split(",").map((x) => parseFloat(x.trim()))) : defaultValue;
 	}
 	return text ?? defaultValue;
 }
@@ -84,9 +77,7 @@ export function parseFloatArrayWithLengthOrDefault(
 	if (Array.isArray(text)) {
 		array = text;
 	} else {
-		array = text?.trim()
-			? text.split(",").map((x) => parseFloat(x.trim()))
-			: defaultValue;
+		array = text?.trim() ? text.split(",").map((x) => parseFloat(x.trim())) : defaultValue;
 	}
 
 	if (array.length > length) {
@@ -196,16 +187,24 @@ export function register(Component) {
 }
 
 export async function renderOuterHTML(name, componentUrlStem, props = {}) {
-	return `<${name} ${
-		Object.entries(props).map(([k, v]) => `${k}="${v}"`).join(" ")
-	}>
+	return `<${name} ${Object.entries(props).map(([k, v]) => `${k}="${v}"`).join(" ")}>
         ${await renderInnerHTML(componentUrlStem, props)}
     </${name}>`;
 }
 
-export async function renderInnerHTML(componentUrlStem, props) {
-	const renderPath = `${componentUrlStem}.render.js`;
-	return (await import(renderPath)).render(props);
+export async function renderInnerHTML(renderBase, componentName, props) {
+	const renderPath = joinPath(renderBase, `${componentName}.render.js`);
+
+	const module = await import(/* @vite-ignore */ renderPath);
+
+	if (module?.render) {
+		return module.render(props);
+	}
+	console.warn(
+		`Could not find render module for ${componentName}`,
+		Object.entries(renderModules),
+	);
+	return "";
 }
 
 export async function renderOuterHTMLNoProps(
@@ -232,17 +231,16 @@ export async function renderOuterHTMLNoPropsShadow(
 }
 
 export async function renderOuterHTMLNoPropsShadowWithStyles(
-	name,
-	componentUrl,
+	renderBase,
+	componentName,
 	shadowMode = "open",
 	props = {},
 	styles = [],
 ) {
-	const componentUrlStem = componentUrl.split(".").slice(0, -1).join(".");
-	return `<${name}>
+	return `<${componentName}>
 		<template shadowrootmode="${shadowMode}">
-				${styles.map((s) => `<link rel="stylesheet" href="${new URL(s, componentUrlStem)}">`)}
-        ${await renderInnerHTML(componentUrlStem, props)}
+				${styles.map((s) => `<link rel="stylesheet" href="${s}">`).join("\n")}
+        ${await renderInnerHTML(renderBase, componentName, props)}
     </template>
-    </${name}>`;
+    </${componentName}>`;
 }

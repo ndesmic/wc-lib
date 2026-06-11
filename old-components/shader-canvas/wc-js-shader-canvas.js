@@ -55,9 +55,7 @@ export class WcJsShaderCanvas extends HTMLElement {
 		}
 	}
 	update() {
-		const program = this.#mod
-			? this.#mod.default
-			: this.textContent.trim() !== ""
+		const program = this.#mod ? this.#mod.default : this.textContent.trim() !== ""
 			? new Function(
 				["color", "Matrix", "Globals", "attributes"],
 				this.textContent,

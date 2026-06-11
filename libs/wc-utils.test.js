@@ -1,11 +1,6 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import {
-	parseArrayOfArraysOrDefault,
-	parseArrayOrDefault,
-	parseBoolean,
-	parseFloatArrayWithLengthOrDefault,
-} from "./wc-utils.js";
+import { parseArrayOfArraysOrDefault, parseArrayOrDefault, parseBoolean, parseFloatArrayWithLengthOrDefault } from "./wc-utils.js";
 
 describe("wc-utils", () => {
 	describe("parseBoolean", () => {

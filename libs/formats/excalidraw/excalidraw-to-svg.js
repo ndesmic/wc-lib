@@ -1,23 +1,73 @@
+// @ts-check
+/**
+ * @import { DomElement } from "../../dom.js")
+ */
 import { Dom } from "../../dom.js";
 import { dedent, trimLines } from "../../string-utils.js";
 
 const textMaskPadding = 8;
+const textEncoder = new TextEncoder();
+
+async function hashObject(obj, algorithm = "SHA-256") {
+	const str = JSON.stringify(obj);
+	const bytes = textEncoder.encode(str);
+	const hashBuffer = await crypto.subtle.digest(algorithm, bytes);
+	const uint8 = new Uint8Array(hashBuffer);
+	const hex = Array.from(uint8)
+		.map((b) => b.toString(16).padStart(2, "0"))
+		.join("");
+	return hex;
+}
+
+function join(...frags) {
+	return frags.filter((f) => f).join("-");
+}
 
 /**
  * @typedef {{
+ *   min: [number, number],
+ *   max: [number, number]
+ * }} Bounds
+ * @typedef {{
+ * 	id: string,
+ *  type: string,
+ *  isDeleted: boolean,
+ *  height: number,
+ *  width: number,
+ *  strokeStyle: string,
+ *  strokeWidth: number,
+ *  strokeColor: `#${string}`,
+ *  fillStyle: string,
+ *  backgroundColor: `#${string}`,
+ *  points: number[],
+ *  roundness: { type: number },
+ *  x: number,
+ *  y: number,
+ *  fontSize: number,
+ *  verticalAlign: string,
+ *  containerId?: string,
+ *  text: string
+ * }} ExcalidrawElement
+ * @typedef {{
+ * 	elements: ExcalidrawElement[]
+ * }} Excalidraw
+ * @typedef {{
  * 	fontUrl?: string,
  * 	includeFont?: boolean,
- * 	shouldTrim: boolean
- * }} ExalidrawToSvgOptions
- * @param {Object} excalidraw
- * @param {{ }} options
+ *  shouldPrefixIds?: boolean,
+ * 	shouldTrim?: boolean
+ *  padding?: [number,number,number,number]
+ * }} ExcalidrawToSvgOptions
+ * @param {Excalidraw} excalidraw
+ * @param {ExcalidrawToSvgOptions} options
  * @returns
  */
-export function excalidrawToSvg(excalidraw, options = {}) {
+export async function excalidrawToSvg(excalidraw, options = {}) {
+	const hash = options.shouldPrefixIds ? await hashObject(excalidraw) : "";
 	const svg = Dom.createElement("svg");
 	svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
-	if (options.includeFont) {
+	if (options.includeFont && options.fontUrl) {
 		const fontStyle = createFontCss(options.fontUrl);
 		svg.appendChild(fontStyle[0]);
 		svg.appendChild(fontStyle[1]);
@@ -26,10 +76,11 @@ export function excalidrawToSvg(excalidraw, options = {}) {
 	const colorHatches = computeUsedPatterns(excalidraw);
 	const defs = Dom.createElement("defs");
 	for (const colorHatch of colorHatches) {
-		const pattern = createHatchPattern(colorHatch);
+		const pattern = createHatchPattern(colorHatch, hash);
 		defs.appendChild(pattern);
 	}
 
+	/** @type {Bounds}  */
 	let bounds = {
 		min: [0, 0],
 		max: [Infinity, Infinity],
@@ -73,7 +124,7 @@ export function excalidrawToSvg(excalidraw, options = {}) {
 				} else if (element.fillStyle === "hachure") {
 					svgEl.setAttribute(
 						"fill",
-						`url(#crosshatch-${element.backgroundColor.slice(1)})`,
+						`url(#${join(hash, "crosshatch", element.backgroundColor.slice(1))})`,
 					);
 				}
 
@@ -109,10 +160,14 @@ export function excalidrawToSvg(excalidraw, options = {}) {
 			case "text": {
 				svgEl = Dom.createElement("text");
 
-				svgEl.setAttribute("id", element.id);
+				svgEl.setAttribute("id", join(hash, element.id));
 
 				if (element.containerId) {
-					const containerElement = excalidraw.elements.find(e => e.id === element.containerId);
+					const containerElement = excalidraw.elements.find((e) => e.id === element.containerId);
+					if (!containerElement) {
+						console.warn(`container element reference ${element.containerId} was not found, was the excalidraw file modified incorrectly?`);
+						continue;
+					}
 					const box = getBox(containerElement, excalidraw.elements);
 					svgEl.setAttribute("x", box.centerX - bounds.min[0]);
 					svgEl.setAttribute("y", box.centerY - bounds.min[1]);
@@ -153,7 +208,13 @@ export function excalidrawToSvg(excalidraw, options = {}) {
 				break;
 			}
 			case "arrow": {
-				svgEl = renderArrow(element, bounds, state, defs, excalidraw.elements);
+				svgEl = renderArrow(element, {
+					bounds,
+					state,
+					defs,
+					elements: excalidraw.elements,
+					hash,
+				});
 				break;
 			}
 			default: {
@@ -169,21 +230,31 @@ export function excalidrawToSvg(excalidraw, options = {}) {
 	return svg.toString();
 }
 
-function renderArrow(element, bounds, state, defs, elements) {
+/**
+ *  @param {any} element
+ *  @param {{
+ *    bounds: { min: [number, number], max: [number, number] },
+ *    state: { arrowInserted?: boolean },
+ *    defs: DomElement,
+ * 	 elements: ExcalidrawElement[],
+ * 	 hash: string
+ * 	}} options
+ */
+function renderArrow(element, options) {
 	const svgEl = Dom.createElement("path");
 
 	if (element.points.length === 3) {
 		const p1 = [
-			element.x - bounds.min[0] + element.points[0][0],
-			element.y - bounds.min[1] + element.points[0][1],
+			element.x - options.bounds.min[0] + element.points[0][0],
+			element.y - options.bounds.min[1] + element.points[0][1],
 		];
 		const p2 = [
-			element.x - bounds.min[0] + element.points[1][0],
-			element.y - bounds.min[1] + element.points[1][1],
+			element.x - options.bounds.min[0] + element.points[1][0],
+			element.y - options.bounds.min[1] + element.points[1][1],
 		];
 		const p3 = [
-			element.x - bounds.min[0] + element.points[2][0],
-			element.y - bounds.min[1] + element.points[2][1],
+			element.x - options.bounds.min[0] + element.points[2][0],
+			element.y - options.bounds.min[1] + element.points[2][1],
 		];
 
 		const b1 = [
@@ -205,18 +276,16 @@ function renderArrow(element, bounds, state, defs, elements) {
 
 		svgEl.setAttribute(
 			"d",
-			`M ${p1.join(" ")} C ${b1.join(" ")}, ${b2.join(" ")}, ${p2.join(" ")} C ${
-				b3.join(" ")
-			}, ${b4.join(" ")}, ${p3.join(" ")}`,
+			`M ${p1.join(" ")} C ${b1.join(" ")}, ${b2.join(" ")}, ${p2.join(" ")} C ${b3.join(" ")}, ${b4.join(" ")}, ${p3.join(" ")}`,
 		);
 	} else if (element.points.length === 2) {
 		const p1 = [
-			element.x - bounds.min[0] + element.points[0][0],
-			element.y - bounds.min[1] + element.points[0][1],
+			element.x - options.bounds.min[0] + element.points[0][0],
+			element.y - options.bounds.min[1] + element.points[0][1],
 		];
 		const p2 = [
-			element.x - bounds.min[0] + element.points[1][0],
-			element.y - bounds.min[1] + element.points[1][1],
+			element.x - options.bounds.min[0] + element.points[1][0],
+			element.y - options.bounds.min[1] + element.points[1][1],
 		];
 
 		svgEl.setAttribute(
@@ -230,10 +299,10 @@ function renderArrow(element, bounds, state, defs, elements) {
 	if (element.strokeStyle === "dashed") {
 		svgEl.setAttribute("stroke-dasharray", "10 4");
 	}
-	if (element.endArrowhead === "arrow" && !state.arrowInserted) {
+	if (element.endArrowhead === "arrow" && !options.state.arrowInserted) {
 		const markerSize = 10;
 		const marker = Dom.createElement("marker");
-		marker.setAttribute("id", "arrow");
+		marker.setAttribute("id", join(options.hash, "arrow"));
 		marker.setAttribute("viewBox", `0 0 ${markerSize} ${markerSize}`);
 		marker.setAttribute("refX", markerSize);
 		marker.setAttribute("refY", markerSize / 2);
@@ -249,30 +318,39 @@ function renderArrow(element, bounds, state, defs, elements) {
 		path.setAttribute("stroke-width", 1);
 		path.setAttribute("fill", "transparent");
 		marker.appendChild(path);
-		defs.appendChild(marker);
-		state.arrowInserted = true;
+		options.defs.appendChild(marker);
+		options.state.arrowInserted = true;
 	}
-	if (element.boundElements.length > 0) {
+	if (element.boundElements?.length > 0) {
 		for (const boundElementRef of element.boundElements) {
 			if (boundElementRef.type === "text") {
-				const boundElement = elements.find(e => e.id === boundElementRef.id);
-				if(!boundElement) {
+				const boundElement = options.elements.find((e) => e.id === boundElementRef.id);
+				if (!boundElement) {
 					console.warn(`bound element reference ${boundElementRef.id} was not found, was the excalidraw file modified incorrectly?`);
 					continue;
 				}
-				const mask = getTextBackgroundMask(boundElement, elements, bounds);
-				defs.appendChild(mask);
-				svgEl.setAttribute("mask", `url(#mask-${boundElement.id})`);
+				const mask = getTextBackgroundMask(boundElement, { elements: options.elements, bounds: options.bounds, hash: options.hash });
+				options.defs.appendChild(mask);
+				svgEl.setAttribute("mask", `url(#${join(options.hash, "mask", boundElement.id)})`);
 			}
 		}
 	}
-	svgEl.setAttribute("marker-end", `url(#arrow)`);
+	svgEl.setAttribute("marker-end", `url(#${join(options.hash, "arrow")})`);
 	return svgEl;
 }
 
-function getTextBackgroundMask(textElement, elements, bounds) {
+/**
+ * @param {ExcalidrawElement} textElement
+ * @param {{
+ * 	elements: ExcalidrawElement[],
+ * 	bounds: Bounds,
+ *  hash: string
+ * }} options
+ * @returns
+ */
+function getTextBackgroundMask(textElement, options) {
 	const mask = Dom.createElement("mask");
-	mask.setAttribute("id", `mask-${textElement.id}`);
+	mask.setAttribute("id", join(options.hash, "mask", textElement.id));
 	mask.setAttribute("maskUnits", "userSpaceOnUse");
 
 	const rectCanvas = Dom.createElement("rect");
@@ -283,11 +361,11 @@ function getTextBackgroundMask(textElement, elements, bounds) {
 	rectCanvas.setAttribute("fill", "#FFF");
 	mask.appendChild(rectCanvas);
 
-	const box = getBox(textElement, elements);
+	const box = getBox(textElement, options.elements);
 
 	const rect = Dom.createElement("rect");
-	rect.setAttribute("x", box.x - bounds.min[0] - textMaskPadding);
-	rect.setAttribute("y", box.y - bounds.min[1] - textMaskPadding);
+	rect.setAttribute("x", box.x - options.bounds.min[0] - textMaskPadding);
+	rect.setAttribute("y", box.y - options.bounds.min[1] - textMaskPadding);
 	rect.setAttribute("width", box.width + textMaskPadding * 2);
 	rect.setAttribute("height", box.height + textMaskPadding * 2);
 	rect.setAttribute("fill", "#000");
@@ -295,7 +373,15 @@ function getTextBackgroundMask(textElement, elements, bounds) {
 	return mask;
 }
 
+/**
+ * @param {ExcalidrawElement} element
+ * @param {ExcalidrawElement[]} elements
+ * @returns
+ */
 function getBox(element, elements) {
+	if (!element) {
+		console.log(element);
+	}
 	switch (element.type) {
 		case "line": {
 			const x1 = element.x + element.points[0][0];
@@ -304,29 +390,29 @@ function getBox(element, elements) {
 			const y2 = element.y + element.points[1][1];
 
 			return {
-				x: Math.min(x1,x2),
-				y: Math.min(y1,y2),
+				x: Math.min(x1, x2),
+				y: Math.min(y1, y2),
 				width: Math.abs(x2 - x1),
 				height: Math.abs(y2 - y1),
 				centerX: (x2 + x1) / 2,
-				centerY: (y2 + y1) / 2
+				centerY: (y2 + y1) / 2,
 			};
 		}
 		case "arrow": { //might be wrong
-			if(element.points.length === 2){
+			if (element.points.length === 2) {
 				const x1 = element.x + element.points[0][0];
 				const x2 = element.x + element.points[1][0];
 				const y1 = element.y + element.points[0][1];
 				const y2 = element.y + element.points[1][1];
 				return {
-					x: Math.min(x1,x2),
-					y: Math.min(y1,y2),
+					x: Math.min(x1, x2),
+					y: Math.min(y1, y2),
 					width: Math.abs(x2 - x1),
 					height: Math.abs(y2 - y1),
 					centerX: (x2 + x1) / 2,
 					centerY: (y2 + y1) / 2,
 				};
-			} else if(element.points.length === 3) {
+			} else if (element.points.length === 3) {
 				const x1 = element.x + element.points[0][0];
 				const x2 = element.x + element.points[2][0];
 				const y1 = element.y + element.points[0][1];
@@ -335,8 +421,8 @@ function getBox(element, elements) {
 				const cx = element.x + element.points[1][0];
 				const cy = element.y + element.points[1][1];
 				return {
-					x: Math.min(x1,x2),
-					y: Math.min(y1,y2),
+					x: Math.min(x1, x2),
+					y: Math.min(y1, y2),
 					width: Math.abs(x2 - x1),
 					height: Math.abs(y2 - y1),
 					centerX: cx,
@@ -345,7 +431,6 @@ function getBox(element, elements) {
 			} else {
 				throw new Error(`Can't compute >3 point arrow`);
 			}
-
 		}
 		case "rectangle": {
 			return {
@@ -358,20 +443,23 @@ function getBox(element, elements) {
 			};
 		}
 		case "text": {
-			if(element.containerId){
-				const containerElement = elements.find(e => e.id === element.containerId);
+			if (element.containerId) {
+				const containerElement = elements.find((e) => e.id === element.containerId);
+				if (!containerElement) {
+					throw new Error(`container element not found ${element.containerId}.  Was the file modified?`);
+				}
 				const box = getBox(containerElement, elements);
 				const x = box.centerX - (element.width / 2);
 				const y = box.centerY - (element.height / 2);
 
 				return {
 					x,
-					y, 
+					y,
 					width: element.width,
 					height: element.height,
 					centerX: (element.x + element.x + element.width) / 2,
 					centerY: (element.y + element.y + element.height) / 2,
-				}
+				};
 			}
 			return {
 				x: element.x,
@@ -380,7 +468,7 @@ function getBox(element, elements) {
 				height: element.height,
 				centerX: (element.x + element.x + element.width) / 2,
 				centerY: (element.y + element.y + element.height) / 2,
-			}
+			};
 		}
 		default: {
 			throw new Error(`Cannot get midpoint of type: ${element.type}`);
@@ -388,9 +476,13 @@ function getBox(element, elements) {
 	}
 }
 
+/**
+ * @param {Excalidraw} excalidraw
+ * @returns
+ */
 function computeBounds(excalidraw) {
-	const minPoint = [Infinity, Infinity];
-	const maxPoint = [0, 0];
+	const minPoint = /**@type [number, number] */ ([Infinity, Infinity]);
+	const maxPoint = /**@type [number, number] */ ([0, 0]);
 	for (const element of excalidraw.elements) {
 		if (element.isDeleted) continue;
 		switch (element.type) {
@@ -422,6 +514,10 @@ function computeBounds(excalidraw) {
 	};
 }
 
+/**
+ * @param {string} fontUrl
+ * @returns
+ */
 function createFontCss(fontUrl) {
 	const fontFaceStyle = Dom.createElement("style");
 	fontFaceStyle.appendChild(dedent(trimLines(`
@@ -439,6 +535,10 @@ function createFontCss(fontUrl) {
 	return [fontFaceStyle, fontStyle];
 }
 
+/**
+ * @param {Excalidraw} excalidraw
+ * @returns
+ */
 function computeUsedPatterns(excalidraw) {
 	const colorHatchSet = new Set();
 	for (const element of excalidraw.elements) {
@@ -450,13 +550,18 @@ function computeUsedPatterns(excalidraw) {
 	return colorHatchSet.values().toArray();
 }
 
-function createHatchPattern(color) {
+/**
+ * @param {`#${string}`} color
+ * @param {string} hash
+ * @returns
+ */
+function createHatchPattern(color, hash) {
 	const hatchSize = 10;
 	const pattern = Dom.createElement("pattern");
 	pattern.setAttribute("patternUnits", "userSpaceOnUse");
 	pattern.setAttribute("width", hatchSize);
 	pattern.setAttribute("height", hatchSize);
-	pattern.setAttribute("id", `crosshatch-${color.slice(1)}`);
+	pattern.setAttribute("id", join(hash, "crosshatch", color.slice(1)));
 	const hatchLine = Dom.createElement("line");
 	hatchLine.setAttribute("x1", 0);
 	hatchLine.setAttribute("x2", hatchSize);

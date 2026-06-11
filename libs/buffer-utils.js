@@ -83,8 +83,7 @@ function packAttribute(
 ) {
 	if (!vertexLength || !attributes) return;
 	for (let j = 0; j < vertexLength; j++) {
-		buffer[index * elementStride + attributeOffset + j] =
-			attributes[index * vertexLength + j];
+		buffer[index * elementStride + attributeOffset + j] = attributes[index * vertexLength + j];
 	}
 }
 /**

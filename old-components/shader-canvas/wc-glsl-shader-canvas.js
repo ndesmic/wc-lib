@@ -278,9 +278,7 @@ export class WcGlslShaderCanvas extends HTMLElement {
 			)
 		) {
 			this.setMessage(
-				`⚠ Failed to compile vertex shader: ${
-					this.context.getShaderInfoLog(this.vertexShader)
-				}`,
+				`⚠ Failed to compile vertex shader: ${this.context.getShaderInfoLog(this.vertexShader)}`,
 			);
 		}
 
@@ -296,9 +294,7 @@ export class WcGlslShaderCanvas extends HTMLElement {
 			)
 		) {
 			this.setMessage(
-				`⚠ Failed to compile fragment shader: ${
-					this.context.getShaderInfoLog(this.fragmentShader)
-				}`,
+				`⚠ Failed to compile fragment shader: ${this.context.getShaderInfoLog(this.fragmentShader)}`,
 			);
 		}
 	}

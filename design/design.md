@@ -3,26 +3,27 @@
 ## Buttons
 
 ### Level
-- [ ] Primary (normal)
-- [ ] Secondary (alt)
-- [ ] Tertiary (text)
+
+- [x] Primary (normal)
+- [x] Secondary (alt)
+- [x] Tertiary (text)
 
 ### Theme
+
 - [ ] Normal
 - [ ] Destructive
 
 ### States
+
 - [ ] Default
 - [ ] Hover
 - [ ] Active
 - [ ] Focused
-- [ ] Hover + Active (this is more common than Hover + !Active.  The latter is for toggle buttons in pressed state that aren't hovered)
+- [ ] Hover + Active (this is more common than Hover + !Active. The latter is for toggle buttons in pressed state that aren't hovered)
 - [ ] Hover + Focused
 - [ ] Active + Focused
 - [ ] Hover + Active + Focused
 - [ ] Disabled
-
-
 
 - Segmented Button
 

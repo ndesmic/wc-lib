@@ -99,8 +99,7 @@ export function tilizeImage(imageData, tileHeight, tileWidth, tileFunc) {
 
 			for (let pixelY = 0; pixelY < tileHeight; pixelY++) {
 				for (let pixelX = 0; pixelX < tileWidth; pixelX++) {
-					const pixelIndex =
-						((tileStartY + pixelY) * imageData.width + (tileStartX + pixelX)) * 4;
+					const pixelIndex = ((tileStartY + pixelY) * imageData.width + (tileStartX + pixelX)) * 4;
 					const tilePixelIndex = ((pixelY * tileWidth) + pixelX) * 4;
 
 					tile[tilePixelIndex] = imageData.data[pixelIndex];

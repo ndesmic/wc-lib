@@ -70,28 +70,28 @@ export class WcDragPanel extends HTMLElement {
 		}
 	}
 
-	updatePosition(){
+	updatePosition() {
 		this.style.transform = `translate(${this.#position[0]}px, ${this.#position[1]}px)`;
 	}
 
-	set x(value){
+	set x(value) {
 		this.#position[0] = parseFloat(value);
 		this.updatePosition();
 	}
-	get x(){
+	get x() {
 		return this.#position[0];
 	}
 
-	set y(value){
+	set y(value) {
 		this.#position[1] = parseFloat(value);
 		this.updatePosition();
 	}
-	get y(){
+	get y() {
 		return this.#position[1];
 	}
 
-	set position([x,y]){
-		this.#position = [x,y];
+	set position([x, y]) {
+		this.#position = [x, y];
 		this.updatePosition();
 	}
 }

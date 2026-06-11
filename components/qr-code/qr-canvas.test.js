@@ -1,11 +1,6 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import {
-	getAlignmentPositions,
-	getVersionSize,
-	masks,
-	QrCanvas,
-} from "./qr-canvas.js";
+import { getAlignmentPositions, getVersionSize, masks, QrCanvas } from "./qr-canvas.js";
 import { getRange } from "../../libs/array-utils.js";
 
 describe("QrCanvas", () => {

@@ -1,35 +1,8 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import {
-	addTerminalPadding,
-	byteAlignData,
-	byteToDec,
-	createPadBytes,
-	encodeAlphaNumeric,
-	encodeBytes,
-	encodeNumeric,
-	encodePayloadWithModeAndLength,
-	encodePayloadWithPadding,
-	errorEncodeBlocks,
-	errorEncodePaddedPayload,
-	fromBinary,
-	getBitSizeForCode,
-	getCharacterCount,
-	getCharacterCountLength,
-	getErrorCodeWords,
-	getFormatErrorBits,
-	getFormatString,
-	getMessagePolynomial,
-	getMode,
-	getVersionFor,
-	getVersionInfoString,
-	groupBlocks,
-	interleaveBlocks,
-	toBinary,
-} from "./qr-utils.js";
+import { addTerminalPadding, byteAlignData, byteToDec, createPadBytes, encodeAlphaNumeric, encodeBytes, encodeNumeric, encodePayloadWithModeAndLength, encodePayloadWithPadding, errorEncodeBlocks, errorEncodePaddedPayload, fromBinary, getBitSizeForCode, getCharacterCount, getCharacterCountLength, getErrorCodeWords, getFormatErrorBits, getFormatString, getMessagePolynomial, getMode, getVersionFor, getVersionInfoString, groupBlocks, interleaveBlocks, toBinary } from "./qr-utils.js";
 
-const bin = (str) =>
-	str[0].split("").filter((x) => !/\s|\n|_/g.test(x)).map((x) => parseInt(x));
+const bin = (str) => str[0].split("").filter((x) => !/\s|\n|_/g.test(x)).map((x) => parseInt(x));
 
 describe("qr-utils", () => {
 	describe("getMode", () => {
@@ -134,10 +107,7 @@ describe("qr-utils", () => {
 			[255, "binary", "H", 17],
 			[1000, "numeric", "L", 13],
 		]
-			.forEach((test) =>
-				it(`should get version ${test[3]} for ${test[0]},${test[1]},${test[2]}`, () =>
-					expect(getVersionFor(test[0], test[1], test[2])).toBe(test[3]))
-			);
+			.forEach((test) => it(`should get version ${test[3]} for ${test[0]},${test[1]},${test[2]}`, () => expect(getVersionFor(test[0], test[1], test[2])).toBe(test[3])));
 	});
 
 	describe("groupBlocks", () => {
@@ -291,10 +261,7 @@ describe("qr-utils", () => {
 			[33, "alphanumeric", 13],
 			[35, "binary", 16],
 		]
-			.forEach((test) =>
-				it(`should get length ${test[2]} for ${test[0]},${test[1]}`, () =>
-					expect(getCharacterCountLength(test[0], test[1])).toBe(test[2]))
-			);
+			.forEach((test) => it(`should get length ${test[2]} for ${test[0]},${test[1]}`, () => expect(getCharacterCountLength(test[0], test[1])).toBe(test[2])));
 	});
 
 	describe("getCharacterCount", () => {
@@ -322,10 +289,7 @@ describe("qr-utils", () => {
 			[39, "Q", 1582 * 8],
 			[40, "L", 2956 * 8],
 		]
-			.forEach((test) =>
-				it(`should get length ${test[2]} for ${test[0]},${test[1]}}`, () =>
-					expect(getBitSizeForCode(test[0], test[1])).toBe(test[2]))
-			);
+			.forEach((test) => it(`should get length ${test[2]} for ${test[0]},${test[1]}}`, () => expect(getBitSizeForCode(test[0], test[1])).toBe(test[2])));
 	});
 
 	describe("addTerminalPadding", () => {
@@ -335,10 +299,7 @@ describe("qr-utils", () => {
 			[bin`1111111111`, 14, bin`11111111110000`],
 			[bin`1111111111`, 16, bin`11111111110000`],
 		]
-			.forEach((test) =>
-				it(`should get value ${test[2]} for ${test[0]},${test[1]}}`, () =>
-					expect(addTerminalPadding(test[0], test[1])).toEqual(test[2]))
-			);
+			.forEach((test) => it(`should get value ${test[2]} for ${test[0]},${test[1]}}`, () => expect(addTerminalPadding(test[0], test[1])).toEqual(test[2])));
 	});
 
 	describe("byteAlignData", () => {
@@ -367,10 +328,7 @@ describe("qr-utils", () => {
 			[2, bin`1110110000010001`],
 			[3, bin`111011000001000111101100`],
 		]
-			.forEach((test) =>
-				it(`should create pad bytes ${test[0]}`, () =>
-					expect(createPadBytes(test[0])).toEqual(test[1]))
-			);
+			.forEach((test) => it(`should create pad bytes ${test[0]}`, () => expect(createPadBytes(test[0])).toEqual(test[1])));
 	});
 
 	describe("encodePayloadWithModeAndLength", () => {

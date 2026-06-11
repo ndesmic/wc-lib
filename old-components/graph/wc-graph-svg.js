@@ -92,9 +92,7 @@ class WcGraphSvg extends HTMLElement {
 		guides.setAttribute("stroke", "black");
 		guides.setAttribute(
 			"d",
-			`M0,${this.#height / 2} H${this.#width} M${
-				this.#width / 2
-			},0 V${this.#height}`,
+			`M0,${this.#height / 2} H${this.#width} M${this.#width / 2},0 V${this.#height}`,
 		);
 		svg.appendChild(guides);
 

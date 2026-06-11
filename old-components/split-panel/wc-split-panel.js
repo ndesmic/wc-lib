@@ -81,16 +81,12 @@ export class WcSplitPanel extends HTMLElement {
 		if (this.direction === "row") {
 			const newMedianLeft = e.clientX - this.left;
 			const median = this.dom.median.getBoundingClientRect().width;
-			this.style.gridTemplateColumns = `calc(${newMedianLeft}px - ${
-				median / 2
-			}px) ${median}px 1fr`;
+			this.style.gridTemplateColumns = `calc(${newMedianLeft}px - ${median / 2}px) ${median}px 1fr`;
 		}
 		if (this.direction === "column") {
 			const newMedianTop = e.clientY - this.top;
 			const median = this.dom.median.getBoundingClientRect().height;
-			this.style.gridTemplateRows = `calc(${newMedianTop}px - ${
-				median / 2
-			}px) ${median}px 1fr`;
+			this.style.gridTemplateRows = `calc(${newMedianTop}px - ${median / 2}px) ${median}px 1fr`;
 		}
 	}
 	attributeChangedCallback(name, oldValue, newValue) {

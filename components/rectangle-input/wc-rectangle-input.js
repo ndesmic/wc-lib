@@ -107,9 +107,7 @@ export class WcRectangleInput extends HTMLElement {
 		};
 	}
 	attachEvents() {
-		this.dom.handles.forEach((handle) =>
-			handle.addEventListener("pointerdown", this.onHandlePointerDown)
-		);
+		this.dom.handles.forEach((handle) => handle.addEventListener("pointerdown", this.onHandlePointerDown));
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
 		if (oldValue !== newValue) {

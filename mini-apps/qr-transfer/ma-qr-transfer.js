@@ -20,8 +20,7 @@ export class MaQrTransfer extends HTMLElement {
 				formats: ["qr_code"],
 			});
 		} else {
-			this.dom.receiveContent.innerHTML =
-				`<div class="card warn">Barcode Detector not supported on this device</div>`;
+			this.dom.receiveContent.innerHTML = `<div class="card warn">Barcode Detector not supported on this device</div>`;
 		}
 	}
 	registerDom() {

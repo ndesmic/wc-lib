@@ -99,12 +99,9 @@ export class WcUnhidePasswordDecorator extends HTMLElement {
 		this.dom.textInput.classList.add("wc-unhide-password-decorator-text");
 		this.append(this.dom.textInput);
 
-		this.dom.passwordInput.style.anchorName =
-			`--${this.dom.passwordInput.id}-anchor`;
-		this.dom.unhide.style.positionAnchor =
-			`--${this.dom.passwordInput.id}-anchor`;
-		this.dom.textInput.style.positionAnchor =
-			`--${this.dom.passwordInput.id}-anchor`;
+		this.dom.passwordInput.style.anchorName = `--${this.dom.passwordInput.id}-anchor`;
+		this.dom.unhide.style.positionAnchor = `--${this.dom.passwordInput.id}-anchor`;
+		this.dom.textInput.style.positionAnchor = `--${this.dom.passwordInput.id}-anchor`;
 	}
 	attachEvents() {
 		this.dom.unhide.addEventListener("click", this.onUnhideClick);

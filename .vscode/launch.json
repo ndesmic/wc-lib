@@ -8,7 +8,7 @@
 			"request": "launch",
 			"name": "Test",
 			"type": "node",
-			"program": "${workspaceFolder}/libs/formats/excalidraw/excalidraw-to-svg.test.js",
+			"program": "${workspaceFolder}/libs/path-utils.test.js",
 			"cwd": "${workspaceFolder}",
 			"env": {},
 			"runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
@@ -50,6 +50,6 @@
 				"--allow-all"
 			],
 			"attachSimplePort": 9229
-		},
+		}
 	]
 }

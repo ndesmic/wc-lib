@@ -2,34 +2,24 @@
 	navigation: auto;
 }
 
-@media(prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
 	:root {
-		--theme: if(style(--theme: auto): dark;
-				style(--theme: dark): dark;
-				else: light;
-			)
+		--theme: if(style(--theme: auto): dark; style(--theme: dark): dark; else: light;);
 	}
 }
 
-@media(prefers-color-scheme: light) {
+@media (prefers-color-scheme: light) {
 	:root {
-		--theme: if(style(--theme: auto): light;
-				style(--theme: dark): dark;
-				else: light;
-			)
+		--theme: if(style(--theme: auto): light; style(--theme: dark): dark; else: light;);
 	}
 }
 
 @function --contrast(--base-color, --light-color: #fff, --dark-color: #000) {
 	--c: contrast-color(var(--base-color));
-	result: if(style(--c: #fff): var(--light-color);
-			else: var(--dark-color);
-		);
+	result: if(style(--c: #fff): var(--light-color); else: var(--dark-color););
 }
 @function --light-dark(--light-color, --dark-color) {
-	result: if(style(--theme: dark): var(--dark-color);
-		else: var(--light-color)
-	);
+	result: if(style(--theme: dark): var(--dark-color); else: var(--light-color));
 }
 
 :root {
@@ -46,10 +36,7 @@
 	--border-radius: 0.3125rem;
 
 	interpolate-size: allow-keywords;
-	color-scheme: if(style(--theme: dark): dark;
-			style(--theme: auto): light dark;
-			else: light;
-		);
+	color-scheme: if(style(--theme: dark): dark; style(--theme: auto): light dark; else: light;);
 
 	body {
 		/*neutrals*/
@@ -109,21 +96,12 @@
 		--corner-radius: 8px;
 
 		/*Colors*/
-		--background-color: if(style(--theme: dark): var(--neutral-dark-2);
-				style(--theme: auto): light-dark(var(--neutral-lightest),
-					var(--neutral-dark-1));
-				else: var(--neutral-lightest));
-		--border-color: if(style(--theme: dark): var(--neutral-medium);
-				style(--theme: auto): light-dark(var(--neutral-light-1),
-					var(--neutral-medium));
-				else: var(--neutral-light-1));
+		--background-color: if(style(--theme: dark): var(--neutral-dark-2); style(--theme: auto): light-dark(var(--neutral-lightest), var(--neutral-dark-1)); else: var(--neutral-lightest));
+		--border-color: if(style(--theme: dark): var(--neutral-medium); style(--theme: auto): light-dark(var(--neutral-light-1), var(--neutral-medium)); else: var(--neutral-light-1));
 		--border-width: 1px;
 
 		--border: var(--border-width) solid var(--border-color);
-		--text-color: if(style(--theme:dark): var(--neutral-lightest);
-				style(--theme:auto): light-dark(var(--neutral-darkest),
-					var(--neutral-lightest));
-				else: var(--neutral-darkest));
+		--text-color: if(style(--theme:dark): var(--neutral-lightest); style(--theme:auto): light-dark(var(--neutral-darkest), var(--neutral-lightest)); else: var(--neutral-darkest));
 
 		--text-alt-color: var(--neutral-lightest);
 		--link-color: var(--complimentary-medium);
@@ -181,7 +159,6 @@ h6 {
 }
 
 article {
-
 	h1,
 	h2,
 	h3,
@@ -654,8 +631,8 @@ button.secondary {
 button.tertiary {
 	background: transparent;
 	color: var(--primary-medium);
-	border-width: var(--border-width); 
-	border-style: solid; 
+	border-width: var(--border-width);
+	border-style: solid;
 	border-color: var(--primary-medium);
 
 	&:hover:not(:disabled) {
@@ -683,6 +660,12 @@ button.tertiary {
 
 .text-bold {
 	font-weight: bold;
+}
+
+article {
+	.card {
+		margin-bottom: 1rem;
+	}
 }
 
 /*Microcomponents*/

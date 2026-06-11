@@ -297,12 +297,8 @@ export class QrCanvas extends ArrayCanvas {
 		return colScores;
 	}
 	getPenaltyScoreForSpans() {
-		const rowScore = this.getPenaltyScoreForRowSpans().reduce((sum, x) =>
-			sum + x
-		);
-		const colScore = this.getPenaltyScoreForColSpans().reduce((sum, x) =>
-			sum + x
-		);
+		const rowScore = this.getPenaltyScoreForRowSpans().reduce((sum, x) => sum + x);
+		const colScore = this.getPenaltyScoreForColSpans().reduce((sum, x) => sum + x);
 		return rowScore + colScore;
 	}
 	getPenaltyScoreForBlocks() {

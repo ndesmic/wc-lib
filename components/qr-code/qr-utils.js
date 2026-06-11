@@ -1,9 +1,4 @@
-import {
-	chunkArray,
-	padArrayEnd,
-	padArrayStart,
-	trimArrayStart,
-} from "../../libs/array-utils.js";
+import { chunkArray, padArrayEnd, padArrayStart, trimArrayStart } from "../../libs/array-utils.js";
 import { GaloisField } from "./galois-field.js";
 
 /**
@@ -805,9 +800,7 @@ export function errorEncodeBlocks(groupBlocks, version, errorCorrectionLevel) {
 		for (let b = 0; b < groupBlocks[g].length; b++) {
 			const codewords = groupBlocks[g][b].map((x) => fromBinary(x));
 			ecGroup.push(
-				getErrorCodeWords(codewords, version, errorCorrectionLevel).map((x) =>
-					toBinary(x, 8)
-				),
+				getErrorCodeWords(codewords, version, errorCorrectionLevel).map((x) => toBinary(x, 8)),
 			);
 		}
 		ecGroups.push(ecGroup);
@@ -817,8 +810,7 @@ export function errorEncodeBlocks(groupBlocks, version, errorCorrectionLevel) {
 
 //At this point the exact length of data will be correct
 export function groupBlocks(data, version, errorCorrectionLevel) {
-	const errorCorrectionBlocks =
-		errorCorrectionTable[errorCorrectionLevel][version - 1];
+	const errorCorrectionBlocks = errorCorrectionTable[errorCorrectionLevel][version - 1];
 	const totalGroup1Blocks = errorCorrectionBlocks[1] * errorCorrectionBlocks[2];
 	let group1 = chunkArray(data.slice(0, totalGroup1Blocks * 8), 8);
 	let group2 = chunkArray(data.slice(totalGroup1Blocks * 8), 8);
@@ -855,8 +847,7 @@ export function getErrorCodeWords(
 	errorCorrectionLevel,
 ) {
 	const gf = new GaloisField();
-	const group1Blocks =
-		errorCorrectionTable[errorCorrectionLevel][version - 1][0];
+	const group1Blocks = errorCorrectionTable[errorCorrectionLevel][version - 1][0];
 	const paddedMessagePoly = [
 		...messagePolynomial,
 		...new Array(group1Blocks).fill(0),

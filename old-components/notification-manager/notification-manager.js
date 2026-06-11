@@ -37,8 +37,7 @@ customElements.define(
 			this.cacheDom();
 			this.serviceWorker = await navigator.serviceWorker.getRegistration();
 			this.state.hasPermission = Notification.permission === "granted";
-			this.state.hasSubscription =
-				!!(await this.serviceWorker.pushManager.getSubscription());
+			this.state.hasSubscription = !!(await this.serviceWorker.pushManager.getSubscription());
 			this.attachEvents();
 		}
 		createShadowDom() {
@@ -83,9 +82,7 @@ customElements.define(
 			this.serviceWorker.showNotification("hello!");
 		}
 		render() {
-			const notificationStatus = this.state.hasPermission
-				? this.state.hasSubscription ? "enabled" : "not-subscribed"
-				: "disabled";
+			const notificationStatus = this.state.hasPermission ? this.state.hasSubscription ? "enabled" : "not-subscribed" : "disabled";
 			["enabled", "not-subscribed", "disabled"].forEach((c) =>
 				this.dom.testLocalNotifications.classList.toggle(
 					c,
@@ -97,8 +94,7 @@ customElements.define(
 		}
 		async enableNotifications(e) {
 			e.preventDefault();
-			this.state.hasPermission =
-				(await Notification.requestPermission()) === "granted";
+			this.state.hasPermission = (await Notification.requestPermission()) === "granted";
 			if (!hasSubscription) {
 				await this.subscribeForNotifications();
 			} else {

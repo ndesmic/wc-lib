@@ -8,9 +8,7 @@ export function multiTest(cases, testFunc) {
 	cases.forEach((test) => {
 		it(
 			test.name ??
-				`should get ${JSON.stringify(test.expected)} for ${
-					JSON.stringify(test.args)
-				}`,
+				`should get ${JSON.stringify(test.expected)} for ${JSON.stringify(test.args)}`,
 			() => testFunc(test),
 		);
 	});

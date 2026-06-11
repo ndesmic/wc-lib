@@ -1,8 +1,6 @@
 ## Shader Canvas
 
-This component takes an image and shader code and applies the shader to the
-canvas. Child text is assumed to be the source code or the `src` attribute can
-be used for external files.
+This component takes an image and shader code and applies the shader to the canvas. Child text is assumed to be the source code or the `src` attribute can be used for external files.
 
 | prop    | js | glsl | wgsl | type                 | description                                                                                                          |
 | ------- | -- | ---- | ---- | -------------------- | -------------------------------------------------------------------------------------------------------------------- |
@@ -15,9 +13,7 @@ be used for external files.
 
 ## Convolution Canvas
 
-This component take in convolution kernels and applies them to an image. There
-are two variants `wc-js-convolution-canvas` which uses javascript (CPU) and
-`wc-glsl-convolution-canvas` which uses WebGL (GPU).
+This component take in convolution kernels and applies them to an image. There are two variants `wc-js-convolution-canvas` which uses javascript (CPU) and `wc-glsl-convolution-canvas` which uses WebGL (GPU).
 
 | prop   | js | glsl | type                                  | description                                      |
 | ------ | -- | ---- | ------------------------------------- | ------------------------------------------------ |

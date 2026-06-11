@@ -187,9 +187,7 @@ export class WcBezierSpline extends HTMLElement {
 			e.offsetX,
 			rect.height - e.offsetY,
 		];
-		this.#selectedIndex = this.#points.findIndex((p) =>
-			inRadius(this.#lastPointer[0], this.#lastPointer[1], 4, p[0], p[1])
-		);
+		this.#selectedIndex = this.#points.findIndex((p) => inRadius(this.#lastPointer[0], this.#lastPointer[1], 4, p[0], p[1]));
 
 		if (this.#selectedIndex > -1) {
 			this.#selectedPoint = [

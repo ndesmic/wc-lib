@@ -12,9 +12,7 @@ function loadImage(url) {
 
 function bindAttribute(context, attributes, attributeName, size, program) {
 	program = program ?? context.getParameter(context.CURRENT_PROGRAM);
-	attributes = attributes instanceof Float32Array
-		? attributes
-		: new Float32Array(attributes);
+	attributes = attributes instanceof Float32Array ? attributes : new Float32Array(attributes);
 
 	const attributeLocation = context.getAttribLocation(program, attributeName);
 	if (attributeLocation === -1) return; //bail if it doesn't exist in the shader
@@ -41,9 +39,7 @@ function compileShader(context, text, type) {
 
 	if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) {
 		throw new Error(
-			`Failed to compile ${
-				type === context.VERTEX_SHADER ? "vertex" : "fragment"
-			} shader: ${context.getShaderInfoLog(shader)}`,
+			`Failed to compile ${type === context.VERTEX_SHADER ? "vertex" : "fragment"} shader: ${context.getShaderInfoLog(shader)}`,
 		);
 	}
 	return shader;

@@ -42,9 +42,7 @@ export function wrapFloat(
 	max = Number.MAX_SAFE_INTEGER,
 ) {
 	const range = max - min;
-	return value < min
-		? max - Math.abs(min - value) % range
-		: min + (value + min) % range;
+	return value < min ? max - Math.abs(min - value) % range : min + (value + min) % range;
 }
 
 /**
