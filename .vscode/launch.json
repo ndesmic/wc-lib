@@ -8,7 +8,7 @@
 			"request": "launch",
 			"name": "Test",
 			"type": "node",
-			"program": "${workspaceFolder}/libs/path-utils.test.js",
+			"program": "${workspaceFolder}/libs/algorithms/meyers-diff/meyers-diff.test.js",
 			"cwd": "${workspaceFolder}",
 			"env": {},
 			"runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
