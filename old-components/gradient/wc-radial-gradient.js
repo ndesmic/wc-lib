@@ -1,5 +1,8 @@
 export function cartesianToPolar(x, y, cx = 0, cy = 0) {
-	return [Math.sqrt((x - cx) ** 2 + (y - cy) ** 2), Math.atan((y - cy) / (x - cx))];
+	return [
+		Math.sqrt((x - cx) ** 2 + (y - cy) ** 2),
+		Math.atan((y - cy) / (x - cx)),
+	];
 }
 
 export function degreesToRadians(deg) {
@@ -13,7 +16,8 @@ function linearGradient(stops, value) {
 	}
 
 	const remainder = value - stops[stopIndex][4];
-	const stopFraction = remainder / (stops[stopIndex + 1][4] - stops[stopIndex][4]);
+	const stopFraction = remainder /
+		(stops[stopIndex + 1][4] - stops[stopIndex][4]);
 
 	return lerp(stops[stopIndex], stops[stopIndex + 1], stopFraction);
 }
@@ -40,14 +44,16 @@ function validateStops(stops) {
 	for (const color of stops) {
 		if (color.length === 3) color.push(1);
 		for (const component of color) {
-			if (component < 0 || component > 1) throw `Color stop has out of range component: ${component}`;
+			if (component < 0 || component > 1) {
+				throw `Color stop has out of range component: ${component}`;
+			}
 		}
 	}
-	if (stops.every(color => color.length === 4)) {
+	if (stops.every((color) => color.length === 4)) {
 		const stopLength = 1 / (stops.length - 1);
-		stops.forEach((color, i) => color.push(i * stopLength))
+		stops.forEach((color, i) => color.push(i * stopLength));
 	}
-	if (stops.some(color => color.length === 4)) {
+	if (stops.some((color) => color.length === 4)) {
 		throw "Colors must either all have positions, or none have positions";
 	}
 	if (stops[0][4] !== 0) {
@@ -75,7 +81,7 @@ function parseColor(val) {
 			parseInt(hex.substring(0, 2), 16) / 255,
 			parseInt(hex.substring(2, 4), 16) / 255,
 			parseInt(hex.substring(4, 6), 16) / 255,
-			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
+			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255,
 		];
 	} else if (trimmedVal.startsWith("[")) {
 		return JSON.parse(trimmedVal);
@@ -101,7 +107,19 @@ export class WcRadialGradient extends HTMLElement {
 	#angle = 0;
 	#height = 400;
 	#width = 400;
-	static observedAttributes = ["stops", "p", "cx", "cy", "r", "rx", "ry", "clip", "angle", "height", "width"];
+	static observedAttributes = [
+		"stops",
+		"p",
+		"cx",
+		"cy",
+		"r",
+		"rx",
+		"ry",
+		"clip",
+		"angle",
+		"height",
+		"width",
+	];
 	constructor() {
 		super();
 		this.bind(this);
@@ -126,14 +144,19 @@ export class WcRadialGradient extends HTMLElement {
 	}
 	renderGradient() {
 		const context = this.dom.canvas.getContext("2d");
-		const imageData = context.getImageData(0, 0, this.dom.canvas.width, this.dom.canvas.height);
+		const imageData = context.getImageData(
+			0,
+			0,
+			this.dom.canvas.width,
+			this.dom.canvas.height,
+		);
 		for (let i = 0; i < imageData.width; i++) {
 			for (let j = 0; j < imageData.height; j++) {
-				const y = imageData.height - j; 
+				const y = imageData.height - j;
 				const [r, theta] = cartesianToPolar(i, y, this.#cx, this.#cy);
 				let rValue = this.getRValue(r, theta);
-				if(this.#clip !== "clamp" && rValue > 1){
-					writePixel(imageData, i,j,this.#clip);
+				if (this.#clip !== "clamp" && rValue > 1) {
+					writePixel(imageData, i, j, this.#clip);
 				} else {
 					rValue = Math.min(1.0, rValue);
 					const color = linearGradient(this.#stops, rValue);
@@ -143,15 +166,20 @@ export class WcRadialGradient extends HTMLElement {
 		}
 		//hack to fill in center
 		const y = imageData.height - this.#cy;
-		imageData.data[((y * imageData.width * 4) + 4 * this.#cx)] = this.#stops[0][0] * 255;
-		imageData.data[((y * imageData.width * 4) + (4 * this.#cx) + 1)] = this.#stops[0][1] * 255;
-		imageData.data[((y * imageData.width * 4) + (4 * this.#cx) + 2)] = this.#stops[0][2] * 255;
-		imageData.data[((y * imageData.width * 4) + (4 * this.#cx) + 3)] = this.#stops[0][3] * 255;
+		imageData.data[(y * imageData.width * 4) + 4 * this.#cx] = this.#stops[0][0] *
+			255;
+		imageData.data[(y * imageData.width * 4) + (4 * this.#cx) + 1] = this.#stops[0][1] * 255;
+		imageData.data[(y * imageData.width * 4) + (4 * this.#cx) + 2] = this.#stops[0][2] * 255;
+		imageData.data[(y * imageData.width * 4) + (4 * this.#cx) + 3] = this.#stops[0][3] * 255;
 		context.putImageData(imageData, 0, 0);
 	}
 	getRValue(r, theta) {
 		const transformedTheta = normalizeAngle(theta - this.#angle);
-		return r / ((this.#rx * this.#ry) / (Math.abs(this.#ry * Math.cos(transformedTheta)) ** this.#p + Math.abs(this.#rx * Math.sin(transformedTheta)) ** this.#p) ** (1 / this.#p));
+		return r /
+			((this.#rx * this.#ry) /
+				(Math.abs(this.#ry * Math.cos(transformedTheta)) ** this.#p +
+						Math.abs(this.#rx * Math.sin(transformedTheta)) ** this.#p) **
+					(1 / this.#p));
 	}
 	connectedCallback() {
 		this.render();
@@ -162,7 +190,7 @@ export class WcRadialGradient extends HTMLElement {
 	cacheDom() {
 		this.dom = {
 			canvas: this.shadowRoot.querySelector("canvas"),
-			slider: this.shadowRoot.querySelector("input")
+			slider: this.shadowRoot.querySelector("input"),
 		};
 	}
 	attachEvents() {
@@ -172,42 +200,42 @@ export class WcRadialGradient extends HTMLElement {
 	}
 	set stops(val) {
 		if (val.startsWith("#")) {
-			this.#stops = validateStops(val.split(",").map(x => parseColor(x)));
+			this.#stops = validateStops(val.split(",").map((x) => parseColor(x)));
 		} else if (val.startsWith("[")) {
 			this.#stops = validateStops(JSON.parse(val));
 		}
 	}
-	set cx(val){
+	set cx(val) {
 		this.#cx = parseFloat(val);
 	}
-	set cy(val){
+	set cy(val) {
 		this.#cy = parseFloat(val);
 	}
-	set r(val){
+	set r(val) {
 		const r = parseFloat(val);
 		this.#rx = r;
 		this.#ry = r;
 	}
-	set rx(val){
+	set rx(val) {
 		this.#rx = parseFloat(val);
 	}
-	set ry(val){
+	set ry(val) {
 		this.#ry = parseFloat(val);
-	 }
-	set height(val){
+	}
+	set height(val) {
 		this.#height = parseInt(val);
 	}
-	set width(val){
+	set width(val) {
 		this.#width = parseInt(val);
 	}
-	set angle(val){
+	set angle(val) {
 		this.#angle = degreesToRadians(parseFloat(val));
 	}
-	set p(val){
+	set p(val) {
 		this.#p = parseFloat(val);
 	}
-	set clip(val){
-		if(val === "clamp"){
+	set clip(val) {
+		if (val === "clamp") {
 			this.#clip = "clamp";
 		} else {
 			this.#clip = parseColor(val);

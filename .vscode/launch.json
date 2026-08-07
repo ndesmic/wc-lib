@@ -1,41 +1,55 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-
-        {
-            "request": "launch",
-            "name": "Test",
-            "type": "node",
-            "program": "${workspaceFolder}/libs/tensor/tensor-utils.test.js",
-            "cwd": "${workspaceFolder}",
-            "env": {},
-            "runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
-            "runtimeArgs": [
-                "test",
-                "--inspect-wait",
-                "--allow-all"
-            ],
-            "attachSimplePort": 9229
-        },
-        {
-            "request": "launch",
-            "name": "new:app",
-            "type": "node",
-            "program": "${workspaceFolder}/scripts/app/new.js",
-            "cwd": "${workspaceFolder}",
-            "env": {},
-            "runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
-            "runtimeArgs": [
-                "run",
-                "--unstable-raw-imports",
-                "--inspect-wait",
-                "-A"
-            ],
-            "args": ["foo"],
-            "attachSimplePort": 9229
-        }
-    ]
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"request": "launch",
+			"name": "Test",
+			"type": "node",
+			"program": "${workspaceFolder}/libs/algorithms/meyers-diff/meyers-diff.test.js",
+			"cwd": "${workspaceFolder}",
+			"env": {},
+			"runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
+			"runtimeArgs": [
+				"test",
+				"--inspect-wait",
+				"--allow-all"
+			],
+			"attachSimplePort": 9229
+		},
+		{
+			"request": "launch",
+			"name": "new:app",
+			"type": "node",
+			"program": "${workspaceFolder}/scripts/app/new.js",
+			"cwd": "${workspaceFolder}",
+			"env": {},
+			"runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
+			"runtimeArgs": [
+				"run",
+				"--unstable-raw-imports",
+				"--inspect-wait",
+				"-A"
+			],
+			"args": ["foo"],
+			"attachSimplePort": 9229
+		},
+		{
+			"request": "launch",
+			"name": "Excalidraw manual test",
+			"type": "node",
+			"program": "${workspaceFolder}/manual-tests/libs/formats/excalidraw/excalidraw.manual-test.js",
+			"cwd": "${workspaceFolder}",
+			"env": {},
+			"runtimeExecutable": "C:\\Users\\omnid\\.deno\\bin\\deno.EXE",
+			"runtimeArgs": [
+				"run",
+				"--inspect-wait",
+				"--allow-all"
+			],
+			"attachSimplePort": 9229
+		}
+	]
 }

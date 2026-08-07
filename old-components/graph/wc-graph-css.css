@@ -1,6 +1,24 @@
 table {
 	display: inline-block;
-	background: linear-gradient(90deg, transparent, transparent calc(50% - 1px), black 50%, black 50%, transparent calc(50% + 1px), transparent), linear-gradient(0deg, transparent, transparent calc(50% - 1px), black 50%, black 50%, transparent calc(50% + 1px), transparent);
+	background:
+		linear-gradient(
+			90deg,
+			transparent,
+			transparent calc(50% - 1px),
+			black 50%,
+			black 50%,
+			transparent calc(50% + 1px),
+			transparent
+		),
+		linear-gradient(
+		0deg,
+		transparent,
+		transparent calc(50% - 1px),
+		black 50%,
+		black 50%,
+		transparent calc(50% + 1px),
+		transparent
+	);
 	font-size: 0;
 }
 tbody {
@@ -26,9 +44,9 @@ table.continuous td::before {
 	width: 100%;
 	background-color: var(--default-color);
 	clip-path: polygon(
-		0 calc(var(--prev-y) - var(--size) - var(--thickness) / 2), 
-		100% calc(var(--y) - var(--size) - var(--thickness) / 2), 
-		100% calc(var(--y) - var(--size) + var(--thickness) / 2), 
+		0 calc(var(--prev-y) - var(--size) - var(--thickness) / 2),
+		100% calc(var(--y) - var(--size) - var(--thickness) / 2),
+		100% calc(var(--y) - var(--size) + var(--thickness) / 2),
 		0 calc(var(--prev-y) - var(--size) + var(--thickness) / 2)
 	);
 }

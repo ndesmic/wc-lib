@@ -1,31 +1,31 @@
 import { getEventRelativeTo } from "../../libs/dom-utils.js";
 
 export class WcRectangleInput extends HTMLElement {
-    #top = 0;
-    #left = 0;
-    #right = 0;
-    #bottom = 0;
+	#top = 0;
+	#left = 0;
+	#right = 0;
+	#bottom = 0;
 
-    #handleIsDragging = new Set();
-    #pointerToHandle = new Map();
+	#handleIsDragging = new Set();
+	#pointerToHandle = new Map();
 
-    static observedAttributes = ["top", "left", "right", "bottom"];
+	static observedAttributes = ["top", "left", "right", "bottom"];
 
-    connectedCallback(){
-        this.bind();
-        this.renderDom();
-        this.registerDom();
-        this.attachEvents();
-    }
-    bind(){
-        this.onHandlePointerDown = this.onHandlePointerDown.bind(this);
-        this.onHandlePointerMove = this.onHandlePointerMove.bind(this);
-        this.onHandlePointerUp = this.onHandlePointerUp.bind(this);
-        this.onHandlePointerCancel = this.onHandlePointerCancel.bind(this);
-    }
-    renderDom(){
-        this.shadow = this.attachShadow({ mode: "open" });
-        this.shadow.innerHTML = `
+	connectedCallback() {
+		this.bind();
+		this.renderDom();
+		this.registerDom();
+		this.attachEvents();
+	}
+	bind() {
+		this.onHandlePointerDown = this.onHandlePointerDown.bind(this);
+		this.onHandlePointerMove = this.onHandlePointerMove.bind(this);
+		this.onHandlePointerUp = this.onHandlePointerUp.bind(this);
+		this.onHandlePointerCancel = this.onHandlePointerCancel.bind(this);
+	}
+	renderDom() {
+		this.shadow = this.attachShadow({ mode: "open" });
+		this.shadow.innerHTML = `
                 <style>
                     :host {
                         display: block;
@@ -100,141 +100,141 @@ export class WcRectangleInput extends HTMLElement {
                     <button class="v-mid h-mid handle" data-position="center"></button>
                 </div>
         `;
-    }
-    registerDom(){
-        this.dom = {
-            handles: Array.from(this.shadowRoot.querySelectorAll(".handle"))
-        };
-    }
-    attachEvents(){
-        this.dom.handles.forEach(handle => handle.addEventListener("pointerdown", this.onHandlePointerDown));
-    }
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (oldValue !== newValue) {
-            this[name] = newValue;
-        }
-    }
+	}
+	registerDom() {
+		this.dom = {
+			handles: Array.from(this.shadowRoot.querySelectorAll(".handle")),
+		};
+	}
+	attachEvents() {
+		this.dom.handles.forEach((handle) => handle.addEventListener("pointerdown", this.onHandlePointerDown));
+	}
+	attributeChangedCallback(name, oldValue, newValue) {
+		if (oldValue !== newValue) {
+			this[name] = newValue;
+		}
+	}
 
-    onHandlePointerDown(e){
-        this.#handleIsDragging.add(e.target);
-        this.#pointerToHandle.set(e.pointerId, e.target);
-        this.setPointerCapture(e.pointerId);
-        this.addEventListener("pointermove", this.onHandlePointerMove);
-        this.addEventListener("pointerup", this.onHandlePointerUp);
-    }
+	onHandlePointerDown(e) {
+		this.#handleIsDragging.add(e.target);
+		this.#pointerToHandle.set(e.pointerId, e.target);
+		this.setPointerCapture(e.pointerId);
+		this.addEventListener("pointermove", this.onHandlePointerMove);
+		this.addEventListener("pointerup", this.onHandlePointerUp);
+	}
 
-    onHandlePointerMove(e){
-        const { x, y } = getEventRelativeTo(this, e);
-        const element = this.#pointerToHandle.get(e.pointerId);
+	onHandlePointerMove(e) {
+		const { x, y } = getEventRelativeTo(this, e);
+		const element = this.#pointerToHandle.get(e.pointerId);
 
-        switch(element.dataset["position"]){
-            case "top": {
-                this.top = y;
-                break;
-            }
-            case "bottom": {
-                this.bottom = y;
-                break;
-            }
-            case "left": {
-                this.left = x;
-                break;
-            }
-            case "right": {
-                this.right = x;
-                break;
-            }
-            case "top-left": {
-                this.left = x;
-                this.top = y;
-                break;
-            }
-            case "top-right": {
-                this.right = x;
-                this.top = y;
-                break;
-            }
-            case "bottom-left": {
-                this.left = x;
-                this.bottom = y;
-                break;
-            }
-            case "bottom-right": {
-                this.right = x;
-                this.bottom = y;
-                break;
-            }
-            case "center": {
-                const halfWidth = (this.right - this.left) / 2;
-                const halfHeight = (this.bottom - this.top) / 2;
-                this.top = y - halfHeight;
-                this.left = x - halfWidth;
-                this.right =  x + halfWidth;
-                this.bottom = y + halfHeight;
-                break;
-            }
-        }
-    }
+		switch (element.dataset["position"]) {
+			case "top": {
+				this.top = y;
+				break;
+			}
+			case "bottom": {
+				this.bottom = y;
+				break;
+			}
+			case "left": {
+				this.left = x;
+				break;
+			}
+			case "right": {
+				this.right = x;
+				break;
+			}
+			case "top-left": {
+				this.left = x;
+				this.top = y;
+				break;
+			}
+			case "top-right": {
+				this.right = x;
+				this.top = y;
+				break;
+			}
+			case "bottom-left": {
+				this.left = x;
+				this.bottom = y;
+				break;
+			}
+			case "bottom-right": {
+				this.right = x;
+				this.bottom = y;
+				break;
+			}
+			case "center": {
+				const halfWidth = (this.right - this.left) / 2;
+				const halfHeight = (this.bottom - this.top) / 2;
+				this.top = y - halfHeight;
+				this.left = x - halfWidth;
+				this.right = x + halfWidth;
+				this.bottom = y + halfHeight;
+				break;
+			}
+		}
+	}
 
-    onHandlePointerUp(e){
-        this.#handleIsDragging.delete(e.target);
-        this.#pointerToHandle.delete(e.pointerId);
-        this.releasePointerCapture(e.pointerId);
-        this.removeEventListener("pointermove", this.onHandlePointerMove);
-        this.removeEventListener("pointerup", this.onHandlePointerUp);
-        const event = new CustomEvent("rectangle-input", {
-            bubbles: true,
-            composed: true,
-            detail: { 
-                value: this.value
-            }
-        });
-        this.dispatchEvent(event);
-    }
+	onHandlePointerUp(e) {
+		this.#handleIsDragging.delete(e.target);
+		this.#pointerToHandle.delete(e.pointerId);
+		this.releasePointerCapture(e.pointerId);
+		this.removeEventListener("pointermove", this.onHandlePointerMove);
+		this.removeEventListener("pointerup", this.onHandlePointerUp);
+		const event = new CustomEvent("rectangle-input", {
+			bubbles: true,
+			composed: true,
+			detail: {
+				value: this.value,
+			},
+		});
+		this.dispatchEvent(event);
+	}
 
-    onHandlePointerCancel(e){
-        e.releasePointerCapture(e.pointerId);
-        this.#handleIsDragging.delete(e.target);
-        this.#pointerToHandle.delete(e.pointerId);
-    }
+	onHandlePointerCancel(e) {
+		e.releasePointerCapture(e.pointerId);
+		this.#handleIsDragging.delete(e.target);
+		this.#pointerToHandle.delete(e.pointerId);
+	}
 
-    get left(){
-        return this.#left;
-    }
-    set left(value){
-        this.style.setProperty("--left", value);
-        this.#left = value;
-    }
-    get top(){
-        return this.#top;
-    }
-    set top(value){
-        this.style.setProperty("--top", value);
-        this.#top = value;
-    }
-    get right(){
-        return this.#right;
-    }
-    set right(value){
-        this.style.setProperty("--right", value);
-        this.#right = value; 
-    }
-    get bottom(){
-        return this.#bottom;
-    }
-    set bottom(value){
-        this.style.setProperty("--bottom", value);
-        this.#bottom = value; 
-    }
+	get left() {
+		return this.#left;
+	}
+	set left(value) {
+		this.style.setProperty("--left", value);
+		this.#left = value;
+	}
+	get top() {
+		return this.#top;
+	}
+	set top(value) {
+		this.style.setProperty("--top", value);
+		this.#top = value;
+	}
+	get right() {
+		return this.#right;
+	}
+	set right(value) {
+		this.style.setProperty("--right", value);
+		this.#right = value;
+	}
+	get bottom() {
+		return this.#bottom;
+	}
+	set bottom(value) {
+		this.style.setProperty("--bottom", value);
+		this.#bottom = value;
+	}
 
-    get value(){
-        return {
-            top: this.#top,
-            bottom: this.#bottom,
-            left: this.#left,
-            right: this.#right,
-        };
-    }
+	get value() {
+		return {
+			top: this.#top,
+			bottom: this.#bottom,
+			left: this.#left,
+			right: this.#right,
+		};
+	}
 }
 
 customElements.define("wc-rectangle-input", WcRectangleInput);

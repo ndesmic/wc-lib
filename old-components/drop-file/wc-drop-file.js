@@ -33,7 +33,7 @@ export class WcDropFile extends HTMLElement {
 		return new Promise((resolve, reject) => {
 			const reader = new FileReader();
 			reader.onerror = reject;
-			reader.onload = e => resolve(e.target.result);
+			reader.onload = (e) => resolve(e.target.result);
 			switch (this.type) {
 				case "binary":
 					reader.readAsBinaryString(file);

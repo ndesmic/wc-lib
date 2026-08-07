@@ -1,2 +1,8 @@
-slot { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto }
-input { width: 60px; }
+slot {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: auto;
+}
+input {
+	width: 60px;
+}

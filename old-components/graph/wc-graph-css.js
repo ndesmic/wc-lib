@@ -3,10 +3,10 @@ function windowValue(v, vmin, vmax, flipped = false) {
 	return (v - vmin) / (vmax - vmin);
 }
 function hyphenCaseToCamelCase(text) {
-	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
+	return text.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
-function createShape(shape, [x, y], size, color, value, previousY){
+function createShape(shape, [x, y], size, color, value, previousY) {
 	const td = document.createElement("td");
 	td.style.setProperty("--y", y + "px");
 	td.style.setProperty("--prev-y", previousY + "px");
@@ -14,7 +14,7 @@ function createShape(shape, [x, y], size, color, value, previousY){
 	td.style.setProperty("--color", color);
 	td.textContent = value;
 
-	switch(shape){
+	switch (shape) {
 		case "circle": {
 			td.classList.add("circle");
 		}
@@ -38,9 +38,24 @@ class WcGraphCss extends HTMLElement {
 
 	#defaultShape = "circle";
 	#defaultSize = 2;
-	#defaultColor = "#F00"
+	#defaultColor = "#F00";
 
-	static observedAttributes = ["points", "func", "step", "width", "height", "xmin", "xmax", "ymin", "ymax", "default-shape", "default-size", "default-color", "continuous", "thickness"];
+	static observedAttributes = [
+		"points",
+		"func",
+		"step",
+		"width",
+		"height",
+		"xmin",
+		"xmax",
+		"ymin",
+		"ymax",
+		"default-shape",
+		"default-size",
+		"default-color",
+		"continuous",
+		"thickness",
+	];
 	constructor() {
 		super();
 		this.bind(this);
@@ -53,13 +68,19 @@ class WcGraphCss extends HTMLElement {
 			this.attachShadow({ mode: "open" });
 		}
 		this.shadowRoot.innerHTML = "";
-		
+
 		let points;
 		if (this.#func) {
 			points = [];
 			for (let x = this.#xmin; x < this.#xmax; x += this.#step) {
 				const y = this.#func(x);
-				points.push({ x, y, color: this.#defaultColor, size: this.#defaultSize, shape: this.#defaultShape });
+				points.push({
+					x,
+					y,
+					color: this.#defaultColor,
+					size: this.#defaultSize,
+					shape: this.#defaultShape,
+				});
 			}
 		} else {
 			points = this.#points;
@@ -71,17 +92,17 @@ class WcGraphCss extends HTMLElement {
 			value: p.y,
 			color: p.color,
 			size: p.size,
-			shape: p.shape
+			shape: p.shape,
 		}));
 
-		points.sort((a,b) => b.x - a.x).reverse();
+		points.sort((a, b) => b.x - a.x).reverse();
 
 		points = points.map((p, i, arr) => ({
 			...p,
 			...{
 				width: p.x - (arr[i - 1]?.x ?? 0),
-				previousY: (arr[i - 1]?.y ?? 0)
-			}
+				previousY: arr[i - 1]?.y ?? 0,
+			},
 		}));
 
 		const style = document.createElement("link");
@@ -92,17 +113,24 @@ class WcGraphCss extends HTMLElement {
 		const table = document.createElement("table");
 		table.style.setProperty("--default-color", this.#defaultColor);
 		table.style.setProperty("--thickness", this.#thickness + "px");
-		if(this.#continuous){
+		if (this.#continuous) {
 			table.classList.add("continuous");
 		}
 		table.style.width = this.#width + "px";
 		table.style.height = this.#height + "px";
 		const tbody = document.createElement("tbody");
-		tbody.style.gridTemplateColumns = points.map(p => p.width + "px").join(" ");
+		tbody.style.gridTemplateColumns = points.map((p) => p.width + "px").join(" ");
 		table.append(tbody);
 		for (const point of points) {
 			const tr = document.createElement("tr");
-			const td = createShape(point.shape, [point.x, point.y], point.size, point.color, point.value, point.previousY);
+			const td = createShape(
+				point.shape,
+				[point.x, point.y],
+				point.size,
+				point.color,
+				point.value,
+				point.previousY,
+			);
 			tr.append(td);
 			tbody.append(tr);
 		}
@@ -110,7 +138,6 @@ class WcGraphCss extends HTMLElement {
 		this.shadowRoot.append(table);
 	}
 	attachEvents() {
-
 	}
 	connectedCallback() {
 		this.render();
@@ -120,16 +147,16 @@ class WcGraphCss extends HTMLElement {
 		this[hyphenCaseToCamelCase(name)] = newValue;
 	}
 	set points(value) {
-		if (typeof (value) === "string") {
+		if (typeof value === "string") {
 			value = JSON.parse(value);
 		}
 
-		value = value.map(p => ({
+		value = value.map((p) => ({
 			x: p[0],
 			y: p[1],
 			color: p[2] ?? this.#defaultColor,
 			size: p[3] ?? this.#defaultSize,
-			shape: p[4] ?? this.#defaultShape
+			shape: p[4] ?? this.#defaultShape,
 		}));
 
 		this.#points = value;

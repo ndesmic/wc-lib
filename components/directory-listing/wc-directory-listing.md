@@ -24,5 +24,5 @@ Previews a list of files
 - [ ] directory navigation
 - [x] file icons
 - [ ] selection while scrolling
-    - This will likely need to remove the bounding box caching because the elements can move during drag
+  - This will likely need to remove the bounding box caching because the elements can move during drag
 - [ ] Grid

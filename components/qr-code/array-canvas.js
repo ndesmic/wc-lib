@@ -10,27 +10,27 @@ export class ArrayCanvas {
 		this.#outOfBoundsBehavior = options.outOfBoundsBehavior ?? "throw";
 		this.#alloc();
 	}
-	set height(value){
+	set height(value) {
 		this.#height = value;
 		this.#alloc();
 	}
-	get height(){
+	get height() {
 		return this.#height;
 	}
-	set width(value){
+	set width(value) {
 		this.#width = value;
 		this.#alloc();
 	}
-	get width(){
+	get width() {
 		return this.#width;
 	}
-	get data(){
+	get data() {
 		return this.#canvas;
 	}
-	#alloc(){
+	#alloc() {
 		this.#canvas = new Array(this.#height * this.#width).fill(0);
 	}
-	reset(){
+	reset() {
 		this.#alloc();
 	}
 	drawVerticalLine(startX, startY, length, value) {
@@ -47,7 +47,7 @@ export class ArrayCanvas {
 		this.drawHorizontalLine(startX, startY, width, value);
 		this.drawVerticalLine(startX + (width - 1), startY, height, value);
 		this.drawVerticalLine(startX, startY, height, value);
-		this.drawHorizontalLine(startX, (startY + height - 1), width, value);
+		this.drawHorizontalLine(startX, startY + height - 1, width, value);
 	}
 	drawFilledRect(startX, startY, width, height, value) {
 		for (let row = startY; row < startY + height; row++) {
@@ -57,33 +57,37 @@ export class ArrayCanvas {
 		}
 	}
 	drawPixel(x, y, value) {
-		if(value === undefined) {
+		if (value === undefined) {
 			throw new Error("No value");
 		}
-		if(x >= this.#width || x < -this.#width){
-			switch(this.#outOfBoundsBehavior){
+		if (x >= this.#width || x < -this.#width) {
+			switch (this.#outOfBoundsBehavior) {
 				case "throw": {
-					throw new Error(`Out of bounds: x:${x}, y:${y}, width: ${this.#width}, height: ${this.#height}`);
+					throw new Error(
+						`Out of bounds: x:${x}, y:${y}, width: ${this.#width}, height: ${this.#height}`,
+					);
 				}
 				case "ignore": {
 					return;
 				}
 			}
 		}
-		if (y >= this.height || y < -this.height){
-			switch(this.#outOfBoundsBehavior){
+		if (y >= this.height || y < -this.height) {
+			switch (this.#outOfBoundsBehavior) {
 				case "throw": {
-					throw new Error(`Out of bounds: x:${x}, y:${y}, width: ${this.#width}, height: ${this.#height}`);
+					throw new Error(
+						`Out of bounds: x:${x}, y:${y}, width: ${this.#width}, height: ${this.#height}`,
+					);
 				}
 				case "ignore": {
 					return;
 				}
 			}
 		}
-		if(x < 0){
+		if (x < 0) {
 			x = this.#width + x;
 		}
-		if(y < 0){
+		if (y < 0) {
 			y = this.#height + y;
 		}
 		this.#canvas[(y * this.#width) + x] = value;
@@ -93,10 +97,13 @@ export class ArrayCanvas {
 		return this.#canvas[(y * this.#width) + x];
 	}
 	//super unoptimized :(
-	print(){
+	print() {
 		const result = [];
-		for(let i = 0; i < this.#canvas.length; i++){
-			result.push(this.#canvas[i].toString() + (i % this.#width === this.#width - 1 ? "\n" : ","));
+		for (let i = 0; i < this.#canvas.length; i++) {
+			result.push(
+				this.#canvas[i].toString() +
+					(i % this.#width === this.#width - 1 ? "\n" : ","),
+			);
 		}
 		return result.join("").trim();
 	}

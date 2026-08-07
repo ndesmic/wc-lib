@@ -1,5 +1,5 @@
 function hyphenCaseToCamelCase(text) {
-	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
+	return text.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
 function imageToCanvas(image) {
@@ -32,9 +32,24 @@ class WcGraphCanvas extends HTMLElement {
 
 	#defaultShape = "circle";
 	#defaultSize = 2;
-	#defaultColor = "#F00"
+	#defaultColor = "#F00";
 
-	static observedAttributes = ["points", "func", "step", "width", "height", "xmin", "xmax", "ymin", "ymax", "default-shape", "default-size", "default-color", "continuous", "thickness"];
+	static observedAttributes = [
+		"points",
+		"func",
+		"step",
+		"width",
+		"height",
+		"xmin",
+		"xmax",
+		"ymin",
+		"ymax",
+		"default-shape",
+		"default-size",
+		"default-color",
+		"continuous",
+		"thickness",
+	];
 	constructor() {
 		super();
 		this.bind(this);
@@ -47,7 +62,7 @@ class WcGraphCanvas extends HTMLElement {
 		this.attachShadow({ mode: "open" });
 		this.canvas = document.createElement("canvas");
 		this.shadowRoot.appendChild(this.canvas);
-		const dpr  = window.devicePixelRatio;
+		const dpr = window.devicePixelRatio;
 		this.canvas.height = this.#height * dpr;
 		this.canvas.width = this.#width * dpr;
 		this.canvas.style.height = this.#height + "px";
@@ -59,8 +74,8 @@ class WcGraphCanvas extends HTMLElement {
 		this.willRender();
 		this.attachEvents();
 	}
-	willRender(){
-		if(!this.context) return;
+	willRender() {
+		if (!this.context) return;
 		worker.postMessage({
 			points: this.#points,
 			xmax: this.#xmax,
@@ -77,24 +92,29 @@ class WcGraphCanvas extends HTMLElement {
 			continuous: this.#continuous,
 			thickness: this.#thickness,
 			devicePixelRatio: window.devicePixelRatio,
-			recipientId: this.#id
+			recipientId: this.#id,
 		});
 	}
-	render(image){
+	render(image) {
 		this.canvas.height = this.#height * window.devicePixelRatio;
 		this.canvas.width = this.#width * window.devicePixelRatio;
-		this.context.clearRect(0,0,this.#width * window.devicePixelRatio, this.#height * window.devicePixelRatio);
+		this.context.clearRect(
+			0,
+			0,
+			this.#width * window.devicePixelRatio,
+			this.#height * window.devicePixelRatio,
+		);
 		this.context.drawImage(image, 0, 0);
 	}
 	attachEvents() {
-		worker.addEventListener("message", e => {
-			if(e.data.recipientId === this.#id){
-				this.render(e.data.image)
+		worker.addEventListener("message", (e) => {
+			if (e.data.recipientId === this.#id) {
+				this.render(e.data.image);
 			}
 		});
 		window.addEventListener("resize", () => {
 			const dpr = window.devicePixelRatio;
-			if(lastDpr !== dpr){
+			if (lastDpr !== dpr) {
 				lastDpr = dpr;
 				this.willRender();
 			}
@@ -104,16 +124,16 @@ class WcGraphCanvas extends HTMLElement {
 		this[hyphenCaseToCamelCase(name)] = newValue;
 	}
 	set points(value) {
-		if (typeof (value) === "string") {
+		if (typeof value === "string") {
 			value = JSON.parse(value);
 		}
 
-		value = value.map(p => ({
+		value = value.map((p) => ({
 			x: p[0],
 			y: p[1],
 			color: p[2] ?? this.#defaultColor,
 			size: p[3] ?? this.#defaultSize,
-			shape: p[4] ?? this.#defaultShape
+			shape: p[4] ?? this.#defaultShape,
 		}));
 
 		this.#points = value;

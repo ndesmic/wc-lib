@@ -1,13 +1,12 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import { getMode, encodeNumeric, encodeAlphaNumeric, toBinary, fromBinary, encodeBytes, encodePayloadWithModeAndLength, getVersionFor, getCharacterCountLength, getCharacterCount, getBitSizeForCode, addTerminalPadding, byteAlignData, createPadBytes, groupBlocks, encodePayloadWithPadding, byteToDec, getMessagePolynomial, getErrorCodeWords, interleaveBlocks, errorEncodeBlocks, errorEncodePaddedPayload, getFormatErrorBits, getFormatString, getVersionInfoString } from "./qr-utils.js";
+import { addTerminalPadding, byteAlignData, byteToDec, createPadBytes, encodeAlphaNumeric, encodeBytes, encodeNumeric, encodePayloadWithModeAndLength, encodePayloadWithPadding, errorEncodeBlocks, errorEncodePaddedPayload, fromBinary, getBitSizeForCode, getCharacterCount, getCharacterCountLength, getErrorCodeWords, getFormatErrorBits, getFormatString, getMessagePolynomial, getMode, getVersionFor, getVersionInfoString, groupBlocks, interleaveBlocks, toBinary } from "./qr-utils.js";
 
-const bin = str => 
-	str[0].split("").filter(x => !/\s|\n|_/g.test(x)).map(x => parseInt(x));
+const bin = (str) => str[0].split("").filter((x) => !/\s|\n|_/g.test(x)).map((x) => parseInt(x));
 
 describe("qr-utils", () => {
 	describe("getMode", () => {
-		it("gets numeric mode", () =>{
+		it("gets numeric mode", () => {
 			expect(getMode("123")).toBe("numeric");
 		});
 		it("gets alphanumeric", () => {
@@ -30,11 +29,13 @@ describe("qr-utils", () => {
 			[8, bin`1000`],
 			[9, bin`1001`],
 			[10, bin`1010`],
-			[530, bin`1000010010`]
+			[530, bin`1000010010`],
 		]
-		.forEach(test => it(`should convert ${test[0]} to binary`, () => {
-			expect(toBinary(test[0])).toEqual(test[1]);
-		}));
+			.forEach((test) =>
+				it(`should convert ${test[0]} to binary`, () => {
+					expect(toBinary(test[0])).toEqual(test[1]);
+				})
+			);
 	});
 
 	describe("fromBinary", () => {
@@ -49,11 +50,13 @@ describe("qr-utils", () => {
 			[bin`1000`, 8],
 			[bin`1001`, 9],
 			[bin`1010`, 10],
-			[bin`1000010010`, 530]
+			[bin`1000010010`, 530],
 		]
-			.forEach(test => it(`should convert ${test[0]} to binary`, () => {
-				expect(fromBinary(test[0])).toEqual(test[1]);
-			}));
+			.forEach((test) =>
+				it(`should convert ${test[0]} to binary`, () => {
+					expect(fromBinary(test[0])).toEqual(test[1]);
+				})
+			);
 	});
 
 	describe("byteToDec", () => {
@@ -65,11 +68,12 @@ describe("qr-utils", () => {
 			[[0, 0, 0, 0, 1, 0, 0, 0], 8],
 			[[0, 0, 0, 1, 0, 0, 0, 0], 16],
 			[[0, 0, 1, 0, 0, 0, 0, 0], 32],
-			[[0, 1, 0, 1, 1, 0, 1, 1], 91]
-		].forEach(test =>
+			[[0, 1, 0, 1, 1, 0, 1, 1], 91],
+		].forEach((test) =>
 			it(`Converts ${test[0]} array to ${test[1]}`, () => {
 				expect(byteToDec(test[0])).toBe(test[1]);
-			}));
+			})
+		);
 	});
 
 	describe("encodeNumeric", () => {
@@ -82,14 +86,18 @@ describe("qr-utils", () => {
 	describe("encodeAlphaNumeric", () => {
 		it("encodes alphanumeric", () => {
 			expect(encodeAlphaNumeric("HELLO WORLD"))
-				.toEqual(bin`0110000101101111000110100010111001011011100010011010100001101`);
+				.toEqual(
+					bin`0110000101101111000110100010111001011011100010011010100001101`,
+				);
 		});
 	});
 
 	describe("encodeBytes", () => {
 		it("encodes bytes", () => {
 			expect(encodeBytes("Hello, world!"))
-				.toEqual(bin`01001000011001010110110001101100011011110010110000100000011101110110111101110010011011000110010000100001`);
+				.toEqual(
+					bin`01001000011001010110110001101100011011110010110000100000011101110110111101110010011011000110010000100001`,
+				);
 		});
 	});
 
@@ -97,11 +105,9 @@ describe("qr-utils", () => {
 		[
 			[11, "alphanumeric", "Q", 1],
 			[255, "binary", "H", 17],
-			[1000, "numeric", "L", 13]
+			[1000, "numeric", "L", 13],
 		]
-			.forEach(test => it(`should get version ${test[3]} for ${test[0]},${test[1]},${test[2]}`, () =>
-				expect(getVersionFor(test[0], test[1], test[2])).toBe(test[3]))
-			);
+			.forEach((test) => it(`should get version ${test[3]} for ${test[0]},${test[1]},${test[2]}`, () => expect(getVersionFor(test[0], test[1], test[2])).toBe(test[3])));
 	});
 
 	describe("groupBlocks", () => {
@@ -185,7 +191,7 @@ describe("qr-utils", () => {
 				bin`00010010`,
 				bin`00000110`,
 				bin`01100111`,
-				bin`00100110`
+				bin`00100110`,
 			]);
 			expect(groups[0][1]).toEqual([
 				bin`11110110`,
@@ -202,7 +208,7 @@ describe("qr-utils", () => {
 				bin`11000110`,
 				bin`11000111`,
 				bin`10010010`,
-				bin`00000110`
+				bin`00000110`,
 			]);
 			expect(groups[1][0]).toEqual([
 				bin`10110110`,
@@ -220,7 +226,7 @@ describe("qr-utils", () => {
 				bin`10000110`,
 				bin`10010111`,
 				bin`00110010`,
-				bin`00000111`
+				bin`00000111`,
 			]);
 			expect(groups[1][1]).toEqual([
 				bin`01000110`,
@@ -238,7 +244,7 @@ describe("qr-utils", () => {
 				bin`00010001`,
 				bin`11101100`,
 				bin`00010001`,
-				bin`11101100`
+				bin`11101100`,
 			]);
 		});
 	});
@@ -253,38 +259,37 @@ describe("qr-utils", () => {
 			[15, "binary", 16],
 			[40, "numeric", 14],
 			[33, "alphanumeric", 13],
-			[35, "binary", 16]
+			[35, "binary", 16],
 		]
-			.forEach(test => it(`should get length ${test[2]} for ${test[0]},${test[1]}`, () =>
-				expect(getCharacterCountLength(test[0], test[1])).toBe(test[2]))
-			);
+			.forEach((test) => it(`should get length ${test[2]} for ${test[0]},${test[1]}`, () => expect(getCharacterCountLength(test[0], test[1])).toBe(test[2])));
 	});
 
 	describe("getCharacterCount", () => {
 		[
-			[1, "alphanumeric", 11, "000001011"]
+			[1, "alphanumeric", 11, "000001011"],
 		]
-			.forEach(test => it(`should get length ${test[3]} for ${test[0]},${test[1]},${test[2]}`, () =>
-				expect(getCharacterCount(test[0], test[1], test[2]).join("")).toBe(test[3]))
+			.forEach((test) =>
+				it(`should get length ${test[3]} for ${test[0]},${test[1]},${test[2]}`, () =>
+					expect(getCharacterCount(test[0], test[1], test[2]).join("")).toBe(
+						test[3],
+					))
 			);
 	});
 
 	describe("getBitSizeForCode", () => {
 		[
-			[1, "Q", 13*8],
-			[5, "L", 108*8],
-			[8, "H", 86*8],
-			[13, "M", 334*8],
-			[24, "Q", 664*8],
-			[27, "L", 1468*8],
-			[32, "H", 845*8],
-			[36, "M", 1914*8],
-			[39, "Q", 1582*8],
-			[40, "L", 2956*8]
+			[1, "Q", 13 * 8],
+			[5, "L", 108 * 8],
+			[8, "H", 86 * 8],
+			[13, "M", 334 * 8],
+			[24, "Q", 664 * 8],
+			[27, "L", 1468 * 8],
+			[32, "H", 845 * 8],
+			[36, "M", 1914 * 8],
+			[39, "Q", 1582 * 8],
+			[40, "L", 2956 * 8],
 		]
-			.forEach(test => it(`should get length ${test[2]} for ${test[0]},${test[1]}}`, () =>
-				expect(getBitSizeForCode(test[0], test[1])).toBe(test[2]))
-			);
+			.forEach((test) => it(`should get length ${test[2]} for ${test[0]},${test[1]}}`, () => expect(getBitSizeForCode(test[0], test[1])).toBe(test[2])));
 	});
 
 	describe("addTerminalPadding", () => {
@@ -292,28 +297,28 @@ describe("qr-utils", () => {
 			[bin`1111111111`, 10, bin`1111111111`],
 			[bin`1111111111`, 12, bin`111111111100`],
 			[bin`1111111111`, 14, bin`11111111110000`],
-			[bin`1111111111`, 16, bin`11111111110000`]
+			[bin`1111111111`, 16, bin`11111111110000`],
 		]
-			.forEach(test => it(`should get value ${test[2]} for ${test[0]},${test[1]}}`, () =>
-				expect(addTerminalPadding(test[0], test[1])).toEqual(test[2]))
-			);
+			.forEach((test) => it(`should get value ${test[2]} for ${test[0]},${test[1]}}`, () => expect(addTerminalPadding(test[0], test[1])).toEqual(test[2])));
 	});
 
 	describe("byteAlignData", () => {
 		[
-			[[1], [1,0,0,0,0,0,0,0]],
+			[[1], [1, 0, 0, 0, 0, 0, 0, 0]],
 			[[1, 1], [1, 1, 0, 0, 0, 0, 0, 0]],
-			[[1,1,1], [1, 1, 1, 0, 0, 0, 0, 0]],
-			[[1,1,1,1], [1, 1, 1, 1, 0, 0, 0, 0]],
-			[[1,1,1,1,1], [1, 1, 1, 1, 1, 0, 0, 0]],
-			[[1,1,1,1,1,1], [1, 1, 1, 1, 1, 1, 0, 0]],
-			[[1,1,1,1,1,1,1], [1, 1, 1, 1, 1, 1, 1, 0]],
-			[[1,1,1,1,1,1,1,1], [1, 1, 1, 1, 1, 1, 1, 1]]
+			[[1, 1, 1], [1, 1, 1, 0, 0, 0, 0, 0]],
+			[[1, 1, 1, 1], [1, 1, 1, 1, 0, 0, 0, 0]],
+			[[1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 0, 0, 0]],
+			[[1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 0, 0]],
+			[[1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 0]],
+			[[1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]],
 		]
-			.forEach(test => it(`should byte align ${test[0]}`, () => {
-				byteAlignData(test[0]);
-				expect(test[1]).toEqual(test[1]);
-			}));
+			.forEach((test) =>
+				it(`should byte align ${test[0]}`, () => {
+					byteAlignData(test[0]);
+					expect(test[1]).toEqual(test[1]);
+				})
+			);
 	});
 
 	describe("createPadBytes", () => {
@@ -321,29 +326,49 @@ describe("qr-utils", () => {
 			[0, []],
 			[1, bin`11101100`],
 			[2, bin`1110110000010001`],
-			[3, bin`111011000001000111101100`]
+			[3, bin`111011000001000111101100`],
 		]
-			.forEach(test => it(`should create pad bytes ${test[0]}`, () =>
-				expect(createPadBytes(test[0])).toEqual(test[1])
-			));
+			.forEach((test) => it(`should create pad bytes ${test[0]}`, () => expect(createPadBytes(test[0])).toEqual(test[1])));
 	});
 
 	describe("encodePayloadWithModeAndLength", () => {
 		[
-			["HELLO WORLD", "alphanumeric", 1, bin`00100000010110110000101101111000110100010111001011011100010011010100001101`]
+			[
+				"HELLO WORLD",
+				"alphanumeric",
+				1,
+				bin`00100000010110110000101101111000110100010111001011011100010011010100001101`,
+			],
 		]
-			.forEach(test => it(`should get value ${test[3]} for ${test[0]},${test[1]},${test[2]}`, () =>
-				expect(encodePayloadWithModeAndLength(test[0], test[1], test[2])).toEqual(test[3]))
+			.forEach((test) =>
+				it(`should get value ${test[3]} for ${test[0]},${test[1]},${test[2]}`, () =>
+					expect(encodePayloadWithModeAndLength(test[0], test[1], test[2])).toEqual(
+						test[3],
+					))
 			);
 	});
 
 	describe("encodePayloadWithPadding", () => {
 		[
-			["HELLO WORLD", "alphanumeric", 1, "M", bin`00100000_01011011_00001011_01111000_11010001_01110010_11011100_01001101_01000011_01000000_11101100_00010001_11101100_00010001_11101100_00010001`],
-			["QR CODES", "alphanumeric", 1, "M", bin`00100000_01000100_10101101_11001100_00010001_00010101_01001001_00000000_11101100_00010001_11101100_00010001_11101100_00010001_11101100_00010001`]
+			[
+				"HELLO WORLD",
+				"alphanumeric",
+				1,
+				"M",
+				bin`00100000_01011011_00001011_01111000_11010001_01110010_11011100_01001101_01000011_01000000_11101100_00010001_11101100_00010001_11101100_00010001`,
+			],
+			[
+				"QR CODES",
+				"alphanumeric",
+				1,
+				"M",
+				bin`00100000_01000100_10101101_11001100_00010001_00010101_01001001_00000000_11101100_00010001_11101100_00010001_11101100_00010001_11101100_00010001`,
+			],
 		]
-			.forEach(test => it(`should get value ${test[4]} for ${test[0]},${test[1]},${test[2]},${test[3]}`, () =>
-				expect(encodePayloadWithPadding(test[0], test[1], test[2], test[3])).toEqual(test[4]))
+			.forEach((test) =>
+				it(`should get value ${test[4]} for ${test[0]},${test[1]},${test[2]},${test[3]}`, () =>
+					expect(encodePayloadWithPadding(test[0], test[1], test[2], test[3]))
+						.toEqual(test[4]))
 			);
 	});
 
@@ -382,7 +407,7 @@ describe("qr-utils", () => {
 				236,
 				17,
 				236,
-				17
+				17,
 			]);
 		});
 	});
@@ -394,29 +419,68 @@ describe("qr-utils", () => {
 				[32, 91, 11, 120, 209, 114, 220, 77, 67, 64, 236, 17, 236, 17, 236, 17],
 				1,
 				"M",
-				[196, 35, 39, 119, 235, 215, 231, 226, 93, 23]
+				[196, 35, 39, 119, 235, 215, 231, 226, 93, 23],
 			],
 			[
 				[67, 85, 70, 134, 87, 38, 85, 194, 119, 50, 6, 18, 6, 103, 38],
 				5,
 				"Q",
-				[213, 199, 11, 45, 115, 247, 241, 223, 229, 248, 154, 117, 154, 111, 86, 161, 111, 39]
+				[
+					213,
+					199,
+					11,
+					45,
+					115,
+					247,
+					241,
+					223,
+					229,
+					248,
+					154,
+					117,
+					154,
+					111,
+					86,
+					161,
+					111,
+					39,
+				],
 			],
 			[
 				[246, 246, 66, 7, 118, 134, 242, 7, 38, 86, 22, 198, 199, 146, 6],
 				5,
 				"Q",
-				[87, 204, 96, 60, 202, 182, 124, 157, 200, 134, 27, 129, 209, 17, 163, 163, 120, 133]
-			]
-		].forEach(([codewords, version, ec, result]) => 
+				[
+					87,
+					204,
+					96,
+					60,
+					202,
+					182,
+					124,
+					157,
+					200,
+					134,
+					27,
+					129,
+					209,
+					17,
+					163,
+					163,
+					120,
+					133,
+				],
+			],
+		].forEach(([codewords, version, ec, result]) =>
 			it("should get error codewords", () => {
 				const ecCodewords = getErrorCodeWords(
 					codewords,
 					version,
-					ec
+					ec,
 				);
 				expect(ecCodewords).toEqual(result);
-			}));
+			})
+		);
 	});
 
 	describe("interleaveBlocks", () => {
@@ -438,7 +502,7 @@ describe("qr-utils", () => {
 						bin`00010010`,
 						bin`00000110`,
 						bin`01100111`,
-						bin`00100110`
+						bin`00100110`,
 					],
 					[
 						bin`11110110`,
@@ -455,8 +519,8 @@ describe("qr-utils", () => {
 						bin`11000110`,
 						bin`11000111`,
 						bin`10010010`,
-						bin`00000110`
-					]
+						bin`00000110`,
+					],
 				],
 				[
 					[
@@ -475,7 +539,7 @@ describe("qr-utils", () => {
 						bin`10000110`,
 						bin`10010111`,
 						bin`00110010`,
-						bin`00000111`
+						bin`00000111`,
 					],
 					[
 						bin`01000110`,
@@ -493,75 +557,75 @@ describe("qr-utils", () => {
 						bin`00010001`,
 						bin`11101100`,
 						bin`00010001`,
-						bin`11101100`
-					]
-				]
+						bin`11101100`,
+					],
+				],
 			];
 
 			const result = interleaveBlocks(groups);
 			const expected = [
-					bin`01000011`,
-					bin`11110110`,
-					bin`10110110`,
-					bin`01000110`,
-					bin`01010101`,
-					bin`11110110`,
-					bin`11100110`,
-					bin`11110111`,
-					bin`01000110`,
-					bin`01000010`,
-					bin`11110111`,
-					bin`01110110`,
-					bin`10000110`,
-					bin`00000111`,
-					bin`01110111`,
-					bin`01010110`,
-					bin`01010111`,
-					bin`01110110`,
-					bin`00110010`,
-					bin`11000010`,
-					bin`00100110`,
-					bin`10000110`,
-					bin`00000111`,
-					bin`00000110`,
-					bin`01010101`,
-					bin`11110010`,
-					bin`01110110`,
-					bin`10010111`,
-					bin`11000010`,
-					bin`00000111`,
-					bin`10000110`,
-					bin`00110010`,
-					bin`01110111`,
-					bin`00100110`,
-					bin`01010111`,
-					bin`00010000`,
-					bin`00110010`,
-					bin`01010110`,
-					bin`00100110`,
-					bin`11101100`,
-					bin`00000110`,
-					bin`00010110`,
-					bin`01010010`,
-					bin`00010001`,
-					bin`00010010`,
-					bin`11000110`,
-					bin`00000110`,
-					bin`11101100`,
-					bin`00000110`,
-					bin`11000111`,
-					bin`10000110`,
-					bin`00010001`,
-					bin`01100111`,
-					bin`10010010`,
-					bin`10010111`,
-					bin`11101100`,
-					bin`00100110`,
-					bin`00000110`,
-					bin`00110010`,
-					bin`00010001`,
-					bin`00000111`,
-					bin`11101100`
+				bin`01000011`,
+				bin`11110110`,
+				bin`10110110`,
+				bin`01000110`,
+				bin`01010101`,
+				bin`11110110`,
+				bin`11100110`,
+				bin`11110111`,
+				bin`01000110`,
+				bin`01000010`,
+				bin`11110111`,
+				bin`01110110`,
+				bin`10000110`,
+				bin`00000111`,
+				bin`01110111`,
+				bin`01010110`,
+				bin`01010111`,
+				bin`01110110`,
+				bin`00110010`,
+				bin`11000010`,
+				bin`00100110`,
+				bin`10000110`,
+				bin`00000111`,
+				bin`00000110`,
+				bin`01010101`,
+				bin`11110010`,
+				bin`01110110`,
+				bin`10010111`,
+				bin`11000010`,
+				bin`00000111`,
+				bin`10000110`,
+				bin`00110010`,
+				bin`01110111`,
+				bin`00100110`,
+				bin`01010111`,
+				bin`00010000`,
+				bin`00110010`,
+				bin`01010110`,
+				bin`00100110`,
+				bin`11101100`,
+				bin`00000110`,
+				bin`00010110`,
+				bin`01010010`,
+				bin`00010001`,
+				bin`00010010`,
+				bin`11000110`,
+				bin`00000110`,
+				bin`11101100`,
+				bin`00000110`,
+				bin`11000111`,
+				bin`10000110`,
+				bin`00010001`,
+				bin`01100111`,
+				bin`10010010`,
+				bin`10010111`,
+				bin`11101100`,
+				bin`00100110`,
+				bin`00000110`,
+				bin`00110010`,
+				bin`00010001`,
+				bin`00000111`,
+				bin`11101100`,
 			];
 
 			expect(result).toEqual(expected);
@@ -587,7 +651,7 @@ describe("qr-utils", () => {
 						bin`00010010`,
 						bin`00000110`,
 						bin`01100111`,
-						bin`00100110`
+						bin`00100110`,
 					],
 					[
 						bin`11110110`,
@@ -604,8 +668,8 @@ describe("qr-utils", () => {
 						bin`11000110`,
 						bin`11000111`,
 						bin`10010010`,
-						bin`00000110`
-					]
+						bin`00000110`,
+					],
 				],
 				[
 					[
@@ -624,7 +688,7 @@ describe("qr-utils", () => {
 						bin`10000110`,
 						bin`10010111`,
 						bin`00110010`,
-						bin`00000111`
+						bin`00000111`,
 					],
 					[
 						bin`01000110`,
@@ -642,9 +706,9 @@ describe("qr-utils", () => {
 						bin`00010001`,
 						bin`11101100`,
 						bin`00010001`,
-						bin`11101100`
-					]
-				]
+						bin`11101100`,
+					],
+				],
 			];
 
 			const ecBlocks = errorEncodeBlocks(groups, 5, "Q");
@@ -667,7 +731,7 @@ describe("qr-utils", () => {
 				bin`01010110`,
 				bin`10100001`,
 				bin`01101111`,
-				bin`00100111`
+				bin`00100111`,
 			]);
 
 			expect(ecBlocks[0][1]).toEqual([
@@ -688,7 +752,7 @@ describe("qr-utils", () => {
 				bin`10100011`,
 				bin`10100011`,
 				bin`01111000`,
-				bin`10000101`
+				bin`10000101`,
 			]);
 
 			expect(ecBlocks[1][0]).toEqual([
@@ -709,9 +773,8 @@ describe("qr-utils", () => {
 				bin`01101100`,
 				bin`11110000`,
 				bin`11000000`,
-				bin`10001101`
+				bin`10001101`,
 			]);
-
 
 			expect(ecBlocks[1][1]).toEqual([
 				bin`11101011`,
@@ -731,7 +794,7 @@ describe("qr-utils", () => {
 				bin`10000011`,
 				bin`00100000`,
 				bin`10110010`,
-				bin`11101100`
+				bin`11101100`,
 			]);
 		});
 	});
@@ -940,14 +1003,15 @@ describe("qr-utils", () => {
 				10001101
 				11101100
 				0000000
-				`);
+				`,
+			);
 		});
 	});
 
 	describe("getFormatErrorBits", () => {
 		it("should get the error bits for format bit string", () => {
-			const result = getFormatErrorBits([0,1,1,0,0]);
-			expect(result).toEqual([1,0,0,0,1,1,1,1,0,1]);
+			const result = getFormatErrorBits([0, 1, 1, 0, 0]);
+			expect(result).toEqual([1, 0, 0, 0, 1, 1, 1, 1, 0, 1]);
 		});
 	});
 
@@ -963,17 +1027,17 @@ describe("qr-utils", () => {
 			[["Q", 6], bin`010111011011010`],
 			[["Q", 7], bin`010101111101101`],
 		]
-		.forEach(([args, expected]) =>
-			it(`should get the format string for error: ${args[0]}, mask: ${args[1]}`, () => {
-				const result = getFormatString(args[0], args[1])
-				expect(result).toEqual(expected);
-			})
-		)
+			.forEach(([args, expected]) =>
+				it(`should get the format string for error: ${args[0]}, mask: ${args[1]}`, () => {
+					const result = getFormatString(args[0], args[1]);
+					expect(result).toEqual(expected);
+				})
+			);
 	});
 
 	describe("getVersionInfoString", () => {
 		it("should get the version info string", () => {
-			const result = getVersionInfoString(7)
+			const result = getVersionInfoString(7);
 			expect(result).toEqual(bin`000111110010010100`);
 		});
 	});

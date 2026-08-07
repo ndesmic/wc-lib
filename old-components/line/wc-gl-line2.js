@@ -4,7 +4,9 @@ function compileShader(context, text, type) {
 	context.compileShader(shader);
 
 	if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) {
-		throw new Error(`Failed to compile shader: ${context.getShaderInfoLog(shader)}`);
+		throw new Error(
+			`Failed to compile shader: ${context.getShaderInfoLog(shader)}`,
+		);
 	}
 	return shader;
 }
@@ -16,14 +18,19 @@ function compileProgram(context, vertexShader, fragmentShader) {
 	context.linkProgram(program);
 
 	if (!context.getProgramParameter(program, context.LINK_STATUS)) {
-		throw new Error(`Failed to compile WebGL program: ${context.getProgramInfoLog(program)}`);
+		throw new Error(
+			`Failed to compile WebGL program: ${context.getProgramInfoLog(program)}`,
+		);
 	}
 
 	return program;
 }
 
 function autoBindUniform(context, uniformName, value) {
-	const location = context.getUniformLocation(context.getParameter(context.CURRENT_PROGRAM), uniformName);
+	const location = context.getUniformLocation(
+		context.getParameter(context.CURRENT_PROGRAM),
+		uniformName,
+	);
 	if (!location) return;
 	if (Array.isArray(value)) {
 		switch (value.length) {
@@ -44,7 +51,9 @@ function autoBindUniform(context, uniformName, value) {
 				break;
 			}
 			default: {
-				console.error(`Invalid dimension for binding uniforms. ${uniformName} with value of length ${value.length}`);
+				console.error(
+					`Invalid dimension for binding uniforms. ${uniformName} with value of length ${value.length}`,
+				);
 			}
 		}
 	} else {
@@ -54,9 +63,12 @@ function autoBindUniform(context, uniformName, value) {
 }
 
 function bindAttribute(context, attributes, attributeName, size) {
-	const attributeLocation = context.getAttribLocation(context.getParameter(context.CURRENT_PROGRAM), attributeName);
+	const attributeLocation = context.getAttribLocation(
+		context.getParameter(context.CURRENT_PROGRAM),
+		attributeName,
+	);
 	if (attributeLocation === -1) {
-		console.error(attributeName, "Failed to bind")
+		console.error(attributeName, "Failed to bind");
 		return; //bail if it doesn't exist in the shader
 	}
 	const attributeBuffer = context.createBuffer();
@@ -65,7 +77,14 @@ function bindAttribute(context, attributes, attributeName, size) {
 	context.bufferData(context.ARRAY_BUFFER, attributes, context.STATIC_DRAW);
 
 	context.enableVertexAttribArray(attributeLocation);
-	context.vertexAttribPointer(attributeLocation, size, context.FLOAT, false, 0, 0);
+	context.vertexAttribPointer(
+		attributeLocation,
+		size,
+		context.FLOAT,
+		false,
+		0,
+		0,
+	);
 	return attributeLocation;
 }
 
@@ -76,7 +95,7 @@ function getVectorMagnitude(vec) {
 }
 
 function divideVector(vec, s) {
-	return vec.map(x => x / s);
+	return vec.map((x) => x / s);
 }
 
 function subtractVector(a, b) {
@@ -124,7 +143,7 @@ export class WcGlLine extends HTMLElement {
 	renderLine() {
 		if (!this.context) return;
 
-		const points = this.#points.flatMap(p => [p[0], p[1], p[0], p[1]]);
+		const points = this.#points.flatMap((p) => [p[0], p[1], p[0], p[1]]);
 
 		//Get the normal for each point as well as a tangent vector to the previous point
 		const normals = [];
@@ -147,14 +166,19 @@ export class WcGlLine extends HTMLElement {
 				const previousVector = normalizeVector(subtractVector(prev, current));
 				const bisection = normalizeVector(addVector(nextVector, previousVector));
 				normals.push(
-					-previousVector[1], previousVector[0],
-					previousVector[1], -previousVector[0]);
+					-previousVector[1],
+					previousVector[0],
+					previousVector[1],
+					-previousVector[0],
+				);
 				miters.push(bisection[0], bisection[1], -bisection[0], -bisection[1]);
 			}
 		}
 
 		//Setup WebGL shaders
-		const vertexShader = compileShader(this.context, `
+		const vertexShader = compileShader(
+			this.context,
+			`
 			attribute vec2 aVertexPosition;
 			attribute vec2 aVertexNormal;
 			attribute vec2 aVertexMiter;
@@ -170,17 +194,23 @@ export class WcGlLine extends HTMLElement {
 				gl_Position = vec4(aVertexPosition + (aVertexMiter * length * uScale), 0.0, 1.0);
 				vColor = aVertexColor;
 			}
-		`, this.context.VERTEX_SHADER);
+		`,
+			this.context.VERTEX_SHADER,
+		);
 
-		const fragmentShader = compileShader(this.context, `
+		const fragmentShader = compileShader(
+			this.context,
+			`
 			varying lowp vec4 vColor;
 			void main() {
 
 				gl_FragColor = vColor;
 			}
-		`, this.context.FRAGMENT_SHADER);
+		`,
+			this.context.FRAGMENT_SHADER,
+		);
 
-		const program = compileProgram(this.context, vertexShader, fragmentShader)
+		const program = compileProgram(this.context, vertexShader, fragmentShader);
 
 		this.context.useProgram(program);
 
@@ -191,7 +221,7 @@ export class WcGlLine extends HTMLElement {
 			[1.0, 0.0, 0.0, 1.0],
 			[0.0, 1.0, 0.0, 1.0],
 			[0.0, 0.0, 1.0, 1.0],
-			[1.0, 0.0, 1.0, 1.0]
+			[1.0, 0.0, 1.0, 1.0],
 		];
 		let colors = [];
 		for (let i = 0; i < points.length; i++) {
@@ -199,18 +229,24 @@ export class WcGlLine extends HTMLElement {
 		}
 
 		//attributes
-		const pointsLocation = bindAttribute(this.context, new Float32Array(points), "aVertexPosition", 2);
+		const pointsLocation = bindAttribute(
+			this.context,
+			new Float32Array(points),
+			"aVertexPosition",
+			2,
+		);
 		bindAttribute(this.context, new Float32Array(normals), "aVertexNormal", 2);
 		bindAttribute(this.context, new Float32Array(miters), "aVertexMiter", 2);
 		bindAttribute(this.context, new Float32Array(colors), "aVertexColor", 4);
-
 
 		autoBindUniform(this.context, "uThickness", this.#thickness);
 		autoBindUniform(this.context, "uScale", [2 / this.#height, 2 / this.#width]);
 
 		this.context.disable(this.context.CULL_FACE);
 
-		this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
+		this.context.clear(
+			this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT,
+		);
 		this.context.drawArrays(this.context.TRIANGLE_STRIP, 0, points.length);
 
 		//
@@ -245,7 +281,7 @@ export class WcGlLine extends HTMLElement {
 		const quadArray = new Float32Array([1, -1, 1, 1, -1, -1, -1, 1]);
 		this.context.useProgram(gridProgram);
 		bindAttribute(this.context, quadArray, "aPoints", 2)
-		
+
 		this.context.drawArrays(this.context.TRIANGLE_STRIP, 0, 4);
 		*/
 	}
@@ -258,7 +294,7 @@ export class WcGlLine extends HTMLElement {
 	}
 	cacheDom() {
 		this.dom = {
-			canvas: this.shadowRoot.querySelector("canvas")
+			canvas: this.shadowRoot.querySelector("canvas"),
 		};
 	}
 	attachEvents() {

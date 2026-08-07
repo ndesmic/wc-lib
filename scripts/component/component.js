@@ -1,3 +1,5 @@
+import {{componentCamelCase}}Css from "./wc-{{componentKebabCase}}.css" with { type: "css" };
+
 export class {{componentTitleCase}} extends HTMLElement {
     static observedAttributes = [];
 
@@ -11,8 +13,9 @@ export class {{componentTitleCase}} extends HTMLElement {
 
     }
     renderDom(){
-        this.shadow = this.attachShadow({ mode: "open" });
-        this.shadow.innerHTML = `
+        this.attachShadow({ mode: "open" });
+        this.shadowRoot.adoptedStyleSheets.push({{componentCamelCase}}Css);
+        this.shadowRoot.innerHTML = `
                 <style>
                     :host {  }
                 </style>
@@ -31,4 +34,4 @@ export class {{componentTitleCase}} extends HTMLElement {
     }
 }
 
-customElements.define("{{componentKebabCase}}", {{componentTitleCase}});
+customElements.define("{{prefixedComponentKebabCase}}", {{componentTitleCase}});

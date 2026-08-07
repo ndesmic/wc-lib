@@ -70,15 +70,15 @@ export class WcWgslShaderCanvas extends HTMLElement {
 		this.dom = {
 			canvas: this.shadowRoot.querySelector("canvas"),
 			message: this.shadowRoot.querySelector("#message"),
-			script: this.querySelector("script")
+			script: this.querySelector("script"),
 		};
 	}
-	attachEvents(){
+	attachEvents() {
 		this.#device.addEventListener("uncapturederror", this.onError);
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
 		if (oldValue !== newValue) {
-			this[name] = newValue
+			this[name] = newValue;
 		}
 	}
 	async bootGpu() {
@@ -88,24 +88,42 @@ export class WcWgslShaderCanvas extends HTMLElement {
 
 		this.#context.configure({
 			device: this.#device,
-			format: "bgra8unorm"
+			format: "bgra8unorm",
 		});
 
 		//2d position + uv
 		const vertices = new Float32Array([
-			-1.0, -1.0, 0.0, 1.0,
-			1.0, -1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0, 0.0,
+			-1.0,
+			-1.0,
+			0.0,
+			1.0,
+			1.0,
+			-1.0,
+			1.0,
+			1.0,
+			1.0,
+			1.0,
+			1.0,
+			0.0,
 
-			-1.0, -1.0, 0.0, 1.0,
-			1.0, 1.0, 1.0, 0.0,
-			-1.0, 1.0, 0.0, 0.0
+			-1.0,
+			-1.0,
+			0.0,
+			1.0,
+			1.0,
+			1.0,
+			1.0,
+			0.0,
+			-1.0,
+			1.0,
+			0.0,
+			0.0,
 		]);
 
 		this.#vertexBuffer = this.#device.createBuffer({
 			size: vertices.byteLength,
 			usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-			mappedAtCreation: true
+			mappedAtCreation: true,
 		});
 
 		new Float32Array(this.#vertexBuffer.getMappedRange()).set(vertices);
@@ -116,16 +134,16 @@ export class WcWgslShaderCanvas extends HTMLElement {
 				{
 					shaderLocation: 0,
 					offset: 0,
-					format: "float32x2"
+					format: "float32x2",
 				},
 				{
 					shaderLocation: 1,
 					offset: 8,
-					format: "float32x2"
-				}
+					format: "float32x2",
+				},
 			],
 			arrayStride: 16,
-			stepMode: "vertex"
+			stepMode: "vertex",
 		}];
 	}
 	async updateTexture() {
@@ -134,28 +152,28 @@ export class WcWgslShaderCanvas extends HTMLElement {
 		const textureSize = {
 			width: this.#image.width,
 			height: this.#image.height,
-			depthOrArrayLayers: 1
+			depthOrArrayLayers: 1,
 		};
 		this.#texture = this.#device.createTexture({
 			size: textureSize,
-			dimension: '2d',
+			dimension: "2d",
 			format: `rgba8unorm`,
-			usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+			usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT |
+				GPUTextureUsage.TEXTURE_BINDING,
 		});
 
 		this.#device.queue.copyExternalImageToTexture({
-			source: this.#image
+			source: this.#image,
 		}, {
 			texture: this.#texture,
-			mipLevel: 0
-		},
-			textureSize);
+			mipLevel: 0,
+		}, textureSize);
 
 		this.#sampler = this.#device.createSampler({
 			addressModeU: "repeat",
 			addressModeV: "repeat",
 			magFilter: "linear",
-			minFilter: "nearest"
+			minFilter: "nearest",
 		});
 	}
 	async updateShader() {
@@ -164,72 +182,66 @@ export class WcWgslShaderCanvas extends HTMLElement {
 		this.dom.message.textContent = "";
 
 		this.#shaderModule = this.#device.createShaderModule({
-			code: this.code
+			code: this.code,
 		});
 
 		const compilationInfo = await this.#shaderModule.getCompilationInfo();
-		if(compilationInfo.messages.length > 0){
+		if (compilationInfo.messages.length > 0) {
 			let messageString = "";
-			for(const message of compilationInfo.messages){
-				const type = message.type === "error" 
-					? "❌" 
-					: msg.type === "warning" 
-						? "⚠️" 
-						: "ℹ️";
+			for (const message of compilationInfo.messages) {
+				const type = message.type === "error" ? "❌" : msg.type === "warning" ? "⚠️" : "ℹ️";
 				messageString += `${type} ${message.message} (${message.lineNum}:${message.linePos})`;
-
 			}
 			this.dom.message.textContent = messageString;
 			return;
 		}
 
-
 		const bindGroupLayout = this.#device.createBindGroupLayout({
 			label: "canvas-texture-bindgroup-layout",
-            entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    sampler: {
-                        type: "filtering"
-                    }
-                },
-                {
-                    binding: 1,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    texture: {
-                        sampleType: "float",
-                        viewDimension: "2d"
-                    }
-                },
-            ]
+			entries: [
+				{
+					binding: 0,
+					visibility: GPUShaderStage.FRAGMENT,
+					sampler: {
+						type: "filtering",
+					},
+				},
+				{
+					binding: 1,
+					visibility: GPUShaderStage.FRAGMENT,
+					texture: {
+						sampleType: "float",
+						viewDimension: "2d",
+					},
+				},
+			],
 		});
 
 		const pipelineLayout = this.#device.createPipelineLayout({
-            label: "canvas-pipeline-layout",
-            bindGroupLayouts: [bindGroupLayout]
-        });
+			label: "canvas-pipeline-layout",
+			bindGroupLayouts: [bindGroupLayout],
+		});
 
 		const pipelineDescriptor = {
 			label: "canvas-pipeline",
 			vertex: {
 				module: this.#shaderModule,
 				entryPoint: "vertex_main",
-				buffers: this.#vertexBufferDescriptor
+				buffers: this.#vertexBufferDescriptor,
 			},
 			fragment: {
 				module: this.#shaderModule,
 				entryPoint: "fragment_main",
 				targets: [
 					{
-						format: "bgra8unorm"
-					}
-				]
+						format: "bgra8unorm",
+					},
+				],
 			},
 			primitive: {
-				topology: "triangle-list"
+				topology: "triangle-list",
 			},
-			layout: pipelineLayout
+			layout: pipelineLayout,
 		};
 
 		this.#renderPipeline = this.#device.createRenderPipeline(pipelineDescriptor);
@@ -238,7 +250,9 @@ export class WcWgslShaderCanvas extends HTMLElement {
 		if (!this.#texture || !this.#renderPipeline) return;
 		await this.#ready;
 
-		const commandEncoder = this.#device.createCommandEncoder({ label: "canvas-command-encoder"});
+		const commandEncoder = this.#device.createCommandEncoder({
+			label: "canvas-command-encoder",
+		});
 
 		const clearColor = { r: 0, g: 0, b: 0, a: 1 };
 		const renderPassDescriptor = {
@@ -248,9 +262,9 @@ export class WcWgslShaderCanvas extends HTMLElement {
 					loadValue: clearColor,
 					storeOp: "store",
 					loadOp: "load",
-					view: this.#context.getCurrentTexture().createView()
-				}
-			]
+					view: this.#context.getCurrentTexture().createView(),
+				},
+			],
 		};
 		const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
 		passEncoder.setPipeline(this.#renderPipeline);
@@ -261,8 +275,8 @@ export class WcWgslShaderCanvas extends HTMLElement {
 			layout: this.#renderPipeline.getBindGroupLayout(0),
 			entries: [
 				{ binding: 0, resource: this.#sampler },
-				{ binding: 1, resource: this.#texture.createView() }
-			]
+				{ binding: 1, resource: this.#texture.createView() },
+			],
 		});
 		passEncoder.setBindGroup(0, textureBindGroup);
 
@@ -270,7 +284,7 @@ export class WcWgslShaderCanvas extends HTMLElement {
 			const data = new Float32Array(this.#globals.flat());
 			const uniformBuffer = this.#device.createBuffer({
 				size: data.byteLength,
-				usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+				usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
 			});
 			this.#device.queue.writeBuffer(uniformBuffer, 0, data);
 			const uniformGroup = this.#device.createBindGroup({
@@ -281,10 +295,10 @@ export class WcWgslShaderCanvas extends HTMLElement {
 						resource: {
 							buffer: uniformBuffer,
 							offset: 0,
-							size: data.byteLength
-						}
-					}
-				]
+							size: data.byteLength,
+						},
+					},
+				],
 			});
 			passEncoder.setBindGroup(1, uniformGroup);
 		}
@@ -293,13 +307,13 @@ export class WcWgslShaderCanvas extends HTMLElement {
 		passEncoder.end();
 		this.#device.queue.submit([commandEncoder.finish()]);
 	}
-	onError(e){
+	onError(e) {
 		this.dom.message.textContent = e.error.message;
 	}
 	set image(val) {
 		loadImage(val)
-			.then(img => createImageBitmap(img))
-			.then(bitmap => {
+			.then((img) => createImageBitmap(img))
+			.then((bitmap) => {
 				this.#image = bitmap;
 				this.updateTexture()
 					.then(() => this.draw());
@@ -307,18 +321,18 @@ export class WcWgslShaderCanvas extends HTMLElement {
 	}
 	set src(val) {
 		fetch(val)
-			.then(r => r.text())
-			.then(txt => {
+			.then((r) => r.text())
+			.then((txt) => {
 				this.code = txt;
 			});
 	}
-	get code(){
+	get code() {
 		return this.#code ?? this.dom?.script?.textContent;
 	}
-	set code(val){
+	set code(val) {
 		this.#code = val;
 		this.updateShader()
-					.then(() => this.draw());
+			.then(() => this.draw());
 	}
 	set height(val) {
 		val = parseInt(val);
@@ -335,7 +349,7 @@ export class WcWgslShaderCanvas extends HTMLElement {
 		}
 	}
 	set globals(val) {
-		val = typeof (val) === "object" ? val : JSON.parse(val);
+		val = typeof val === "object" ? val : JSON.parse(val);
 		this.#globals = val;
 		this.draw();
 	}

@@ -1,14 +1,14 @@
-function factorial(n){
-	if(n < 0) throw new Error(`Cannot get factorial of negative number: ${n}`);
-	if(n === 0) return 1;
+function factorial(n) {
+	if (n < 0) throw new Error(`Cannot get factorial of negative number: ${n}`);
+	if (n === 0) return 1;
 	let result = n;
-	for(let i = 1; i < n; i++){
+	for (let i = 1; i < n; i++) {
 		result *= n - i;
 	}
 	return result;
 }
 
-function combinations(n, k){
+function combinations(n, k) {
 	return factorial(n) / (factorial(k) * factorial(n - k));
 }
 
@@ -20,7 +20,7 @@ function parseColor(val) {
 			parseInt(hex.substring(0, 2), 16) / 255,
 			parseInt(hex.substring(2, 4), 16) / 255,
 			parseInt(hex.substring(4, 6), 16) / 255,
-			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
+			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255,
 		];
 	} else if (trimmedVal.startsWith("[")) {
 		return JSON.parse(trimmedVal);
@@ -31,26 +31,27 @@ function inRadius(x, y, r, tx, ty) {
 	return Math.sqrt((x - tx) ** 2 + (y - ty) ** 2) <= r;
 }
 
-function pointsToSegments(points){
-	if(points.length < 2) throw new Error(`need at least 3 points`);
+function pointsToSegments(points) {
+	if (points.length < 2) throw new Error(`need at least 3 points`);
 
 	const segs = [];
 
-	for(let i = 1; i < points.length; i++){
-		segs.push([points[i - 1], points[i]]); 
+	for (let i = 1; i < points.length; i++) {
+		segs.push([points[i - 1], points[i]]);
 	}
 
 	return segs;
 }
 
-function bezierSpline(points, t){
+function bezierSpline(points, t) {
 	const dimensions = points[0].length;
 	const n = points.length - 1;
 	const result = new Array(dimensions);
-	for(let d = 0; d < dimensions; d++){
+	for (let d = 0; d < dimensions; d++) {
 		let dimensionResult = 0;
-		for(let i = 0; i < points.length; i++){
-			dimensionResult += combinations(n,i) * ((1 - t) ** (n - i)) * (t ** i) * points[i][d];
+		for (let i = 0; i < points.length; i++) {
+			dimensionResult += combinations(n, i) * ((1 - t) ** (n - i)) * (t ** i) *
+				points[i][d];
 		}
 		result[d] = dimensionResult;
 	}
@@ -65,7 +66,8 @@ function rationalBezierSpline(points, t) {
 		let dimensionResult = 0;
 		let dimensionWeight = 0;
 		for (let i = 0; i < points.length; i++) {
-			const weight = combinations(n, i) * ((1 - t) ** (n - i)) * (t ** i) * points[i][dimensions];
+			const weight = combinations(n, i) * ((1 - t) ** (n - i)) * (t ** i) *
+				points[i][dimensions];
 			dimensionResult += weight * points[i][d];
 			dimensionWeight += weight;
 		}
@@ -76,22 +78,22 @@ function rationalBezierSpline(points, t) {
 
 function lerp(pointA, pointB, normalValue) {
 	const result = [];
-	for(let d = 0; d < pointA.length; d++){
-		result.push(pointA[d] + (pointB[d] - pointA[d]) * normalValue)
+	for (let d = 0; d < pointA.length; d++) {
+		result.push(pointA[d] + (pointB[d] - pointA[d]) * normalValue);
 	}
 	return result;
 }
 
-
-function bezierSplineCasteljau(points, t){
+function bezierSplineCasteljau(points, t) {
 	const segs = pointsToSegments(points);
-	const values = segs.map(seg => lerp(seg[0], seg[1], t));
-	if(values.length === 1) return values[0];
+	const values = segs.map((seg) => lerp(seg[0], seg[1], t));
+	if (values.length === 1) return values[0];
 	return bezierSplineCasteljau(values, t);
 }
 
 function hexFromFloat(color) {
-	return "#" + color.map(c => (c * 255).toString(16).padStart(2, "0")).join("");
+	return "#" +
+		color.map((c) => (c * 255).toString(16).padStart(2, "0")).join("");
 }
 
 export class WcBezierSpline extends HTMLElement {
@@ -100,7 +102,7 @@ export class WcBezierSpline extends HTMLElement {
 	#color = [1, 0, 1];
 	#points = [];
 	#editable = false;
-	
+
 	#selectedIndex;
 	#lastPointer;
 	#currentOffset;
@@ -151,7 +153,7 @@ export class WcBezierSpline extends HTMLElement {
 		//draw curve
 		context.fillStyle = hexFromFloat(this.#color);
 
-		if(this.#points[0].length === 2){
+		if (this.#points[0].length === 2) {
 			for (let t = 0; t <= 1; t += 0.001) {
 				const [x, y] = bezierSplineCasteljau(this.#points, t);
 				context.fillRect(x, this.dom.canvas.height - y, 1, 1);
@@ -171,26 +173,26 @@ export class WcBezierSpline extends HTMLElement {
 	}
 	cacheDom() {
 		this.dom = {
-			canvas: this.shadowRoot.querySelector("canvas")
+			canvas: this.shadowRoot.querySelector("canvas"),
 		};
 	}
 	attachEvents() {
 		if (this.#editable) {
-			this.dom.canvas.addEventListener("pointerdown", this.onPointerDown)
+			this.dom.canvas.addEventListener("pointerdown", this.onPointerDown);
 		}
 	}
 	onPointerDown(e) {
 		const rect = this.dom.canvas.getBoundingClientRect();
 		this.#lastPointer = [
 			e.offsetX,
-			rect.height - e.offsetY
+			rect.height - e.offsetY,
 		];
-		this.#selectedIndex = this.#points.findIndex(p => inRadius(this.#lastPointer[0], this.#lastPointer[1], 4, p[0], p[1]));
+		this.#selectedIndex = this.#points.findIndex((p) => inRadius(this.#lastPointer[0], this.#lastPointer[1], 4, p[0], p[1]));
 
 		if (this.#selectedIndex > -1) {
 			this.#selectedPoint = [
 				this.#points[this.#selectedIndex][0],
-				this.#points[this.#selectedIndex][1]
+				this.#points[this.#selectedIndex][1],
 			];
 			this.dom.canvas.setPointerCapture(e.pointerId);
 			this.dom.canvas.addEventListener("pointermove", this.onPointerMove);
@@ -201,16 +203,16 @@ export class WcBezierSpline extends HTMLElement {
 		const rect = this.dom.canvas.getBoundingClientRect();
 		const currentPointer = [
 			e.offsetX,
-			rect.height - e.offsetY
+			rect.height - e.offsetY,
 		];
 		this.#currentOffset = [
 			currentPointer[0] - this.#lastPointer[0],
-			this.#lastPointer[1] - currentPointer[1]
+			this.#lastPointer[1] - currentPointer[1],
 		];
 
 		this.#points[this.#selectedIndex] = [
 			this.#selectedPoint[0] + this.#currentOffset[0],
-			this.#selectedPoint[1] - this.#currentOffset[1]
+			this.#selectedPoint[1] - this.#currentOffset[1],
 		];
 
 		this.renderSpline();
@@ -218,7 +220,7 @@ export class WcBezierSpline extends HTMLElement {
 	onPointerUp(e) {
 		this.#points[this.#selectedIndex] = [
 			this.#selectedPoint[0] + this.#currentOffset[0],
-			this.#selectedPoint[1] - this.#currentOffset[1]
+			this.#selectedPoint[1] - this.#currentOffset[1],
 		];
 		this.renderSpline();
 		this.dom.canvas.removeEventListener("pointermove", this.onPointerMove);

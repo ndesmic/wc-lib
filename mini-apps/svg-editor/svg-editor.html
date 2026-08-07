@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Svg Editor</title>
+		<link rel="stylesheet" href="../../css/system.css">
+	</head>
+	<body class="center">
+		<a href="../../index.html">Back</a>
+		<main class="constrained-width constrained-height">
+			<div class="stack gap2 card full-width">
+				<h1>Svg Editor</h1>
+				<ma-svg-editor>
+					<wc-editor preview-attribute="setHTML" editor-initial-prop="value">
+						<textarea slot="editor"><circle r="50" cx="50" cy="50" fill="red"></circle></textarea>
+						<svg slot="preview"></svg>
+					</wc-editor>
+				</ma-svg-editor>
+			</div>
+		</main>
+		<script src="../../components/editor/wc-editor.js" type="module"></script>
+		<script src="./ma-svg-editor.js" type="module"></script>
+	</body>
+</html>

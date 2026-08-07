@@ -1,6 +1,6 @@
 import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
-import { QrCanvas, getAlignmentPositions, getVersionSize, masks } from "./qr-canvas.js";
+import { getAlignmentPositions, getVersionSize, masks, QrCanvas } from "./qr-canvas.js";
 import { getRange } from "../../libs/array-utils.js";
 
 describe("QrCanvas", () => {
@@ -8,8 +8,8 @@ describe("QrCanvas", () => {
 		[
 			[1, 21],
 			[2, 25],
-			[40, 177]
-		].forEach(test =>
+			[40, 177],
+		].forEach((test) =>
 			it(`gets version size for version ${test[0]}`, () => {
 				expect(getVersionSize(test[0])).toBe(test[1]);
 			})
@@ -18,30 +18,30 @@ describe("QrCanvas", () => {
 	describe("getAlignmentPositions", () => {
 		[
 			[1, []],
-			[2, [6,18]],
-			[3, [6,22]],
-			[4, [6,26]],
-			[5, [6,30]],
-			[6, [6,34]],
-			[7, [6,22,38]],
-			[8, [6,24,42]],
-			[9, [6,26,46]],
-			[10, [6,28,50]],
-			[11, [6,30,54]],
+			[2, [6, 18]],
+			[3, [6, 22]],
+			[4, [6, 26]],
+			[5, [6, 30]],
+			[6, [6, 34]],
+			[7, [6, 22, 38]],
+			[8, [6, 24, 42]],
+			[9, [6, 26, 46]],
+			[10, [6, 28, 50]],
+			[11, [6, 30, 54]],
 			//..
-			[14, [6,26,46,66]],
+			[14, [6, 26, 46, 66]],
 			//..
-			[21, [6,28,50,72,94]],
+			[21, [6, 28, 50, 72, 94]],
 			//..
-			[28, [6,26,50,74,98,122]],
+			[28, [6, 26, 50, 74, 98, 122]],
 			//..
-			[32, [6,34,60,86,112,138]], //problem case
+			[32, [6, 34, 60, 86, 112, 138]], //problem case
 			//..
-			[35, [6,30,54,78,102,126,150]],
-			[36, [6,24,50,76,102,128,154]], //problem case
+			[35, [6, 30, 54, 78, 102, 126, 150]],
+			[36, [6, 24, 50, 76, 102, 128, 154]], //problem case
 			//.
-			[39, [6,26,54,82,110,138,166]]
-		].forEach(([version, expected]) => 
+			[39, [6, 26, 54, 82, 110, 138, 166]],
+		].forEach(([version, expected]) =>
 			it(`should get positions for ${version}`, () => {
 				expect(getAlignmentPositions(version)).toEqual(expected);
 			})
@@ -84,7 +84,11 @@ describe("QrCanvas", () => {
 	describe("drawPayloadData", () => {
 		it("should follow iteration pattern", () => {
 			//This test is too small for a real QR code, and therefore doesn't run into the timing column, oob ignore prevents layout from erroring
-			const canvas = new QrCanvas({ height: 6, width: 6, outOfBoundsBehavior: "ignore" });
+			const canvas = new QrCanvas({
+				height: 6,
+				width: 6,
+				outOfBoundsBehavior: "ignore",
+			});
 			canvas.reset(); //clear layout
 			const data = getRange({ end: 6 * 6 - 1 });
 
@@ -93,19 +97,53 @@ describe("QrCanvas", () => {
 
 			canvas.drawPayloadData(data);
 			expect(canvas.data).toEqual([
-				35, 34, 13, 12, 11, 10,
-				33, 32, 15, 14, 9, 8,
-				31, 30, 17, 16, 7, 6,
-				29, 28, 19, 18, 5, 4,
-				27, 26, 21, 20, 3, 2,
-				25, 24, 23, 22, 1, 0
+				35,
+				34,
+				13,
+				12,
+				11,
+				10,
+				33,
+				32,
+				15,
+				14,
+				9,
+				8,
+				31,
+				30,
+				17,
+				16,
+				7,
+				6,
+				29,
+				28,
+				19,
+				18,
+				5,
+				4,
+				27,
+				26,
+				21,
+				20,
+				3,
+				2,
+				25,
+				24,
+				23,
+				22,
+				1,
+				0,
 			]);
 		});
 		it("should skip reserved space", () => {
 			//This test is too small for a real QR code, and therefore doesn't run into the timing column, oob ignore prevents layout from erroring
-			const canvas = new QrCanvas({ height: 6, width: 6, outOfBoundsBehavior: "ignore" });
+			const canvas = new QrCanvas({
+				height: 6,
+				width: 6,
+				outOfBoundsBehavior: "ignore",
+			});
 			canvas.reset(); //clear layout
-			const data = getRange({ end: (6 * 6) - 1 - 6 })
+			const data = getRange({ end: (6 * 6) - 1 - 6 });
 
 			canvas.height = 6;
 			canvas.width = 6;
@@ -113,51 +151,197 @@ describe("QrCanvas", () => {
 			canvas.reserveHorizontalLine(0, 3, 6);
 			canvas.drawPayloadData(data);
 			expect(canvas.data).toEqual([
-				29, 28, 11, 10, 9, 8,
-				27, 26, 13, 12, 7, 6,
-				25, 24, 15, 14, 5, 4,
-				2, 2, 2, 2, 2, 2,
-				23, 22, 17, 16, 3, 2,
-				21, 20, 19, 18, 1, 0
+				29,
+				28,
+				11,
+				10,
+				9,
+				8,
+				27,
+				26,
+				13,
+				12,
+				7,
+				6,
+				25,
+				24,
+				15,
+				14,
+				5,
+				4,
+				2,
+				2,
+				2,
+				2,
+				2,
+				2,
+				23,
+				22,
+				17,
+				16,
+				3,
+				2,
+				21,
+				20,
+				19,
+				18,
+				1,
+				0,
 			]);
 		});
 		it("should skip timing column", () => {
 			//This test is too small for a real QR code, and therefore doesn't run into the timing column, oob ignore prevents layout from erroring
-			const canvas = new QrCanvas({ height: 10, width: 10, outOfBoundsBehavior: "ignore" });
+			const canvas = new QrCanvas({
+				height: 10,
+				width: 10,
+				outOfBoundsBehavior: "ignore",
+			});
 			canvas.reset(); //clear layout
-			const data = getRange({ end: 10 * 10 - 1 })
+			const data = getRange({ end: 10 * 10 - 1 });
 
 			canvas.height = 10;
 			canvas.width = 11;
 
 			canvas.drawPayloadData(data);
 			expect(canvas.data).toEqual([
-				99, 98, 61, 60, 59, 58, 0, 21, 20, 19, 18,
-				97, 96, 63, 62, 57, 56, 0, 23, 22, 17, 16,
-				95, 94, 65, 64, 55, 54, 0, 25, 24, 15, 14,
-				93, 92, 67, 66, 53, 52, 0, 27, 26, 13, 12,
-				91, 90, 69, 68, 51, 50, 0, 29, 28, 11, 10,
-				89, 88, 71, 70, 49, 48, 0, 31, 30, 9, 8,
-				87, 86, 73, 72, 47, 46, 0, 33, 32, 7, 6,
-				85, 84, 75, 74, 45, 44, 0, 35, 34, 5, 4,
-				83, 82, 77, 76, 43, 42, 0, 37, 36, 3, 2,
-				81, 80, 79, 78, 41, 40, 0, 39, 38, 1, 0
+				99,
+				98,
+				61,
+				60,
+				59,
+				58,
+				0,
+				21,
+				20,
+				19,
+				18,
+				97,
+				96,
+				63,
+				62,
+				57,
+				56,
+				0,
+				23,
+				22,
+				17,
+				16,
+				95,
+				94,
+				65,
+				64,
+				55,
+				54,
+				0,
+				25,
+				24,
+				15,
+				14,
+				93,
+				92,
+				67,
+				66,
+				53,
+				52,
+				0,
+				27,
+				26,
+				13,
+				12,
+				91,
+				90,
+				69,
+				68,
+				51,
+				50,
+				0,
+				29,
+				28,
+				11,
+				10,
+				89,
+				88,
+				71,
+				70,
+				49,
+				48,
+				0,
+				31,
+				30,
+				9,
+				8,
+				87,
+				86,
+				73,
+				72,
+				47,
+				46,
+				0,
+				33,
+				32,
+				7,
+				6,
+				85,
+				84,
+				75,
+				74,
+				45,
+				44,
+				0,
+				35,
+				34,
+				5,
+				4,
+				83,
+				82,
+				77,
+				76,
+				43,
+				42,
+				0,
+				37,
+				36,
+				3,
+				2,
+				81,
+				80,
+				79,
+				78,
+				41,
+				40,
+				0,
+				39,
+				38,
+				1,
+				0,
 			]);
 		});
 	});
 	describe("getPenaltyScoreForRowSpans", () => {
 		it("should get row penalty scores for long runs", () => {
-			const canvas = new QrCanvas({ height: 10, width: 10, outOfBoundsBehavior: "ignore" });
+			const canvas = new QrCanvas({
+				height: 10,
+				width: 10,
+				outOfBoundsBehavior: "ignore",
+			});
 			canvas.reset();
 
 			canvas.drawHorizontalLine(0, 0, 7, 1); //5
 			canvas.drawHorizontalLine(3, 1, 5, 1); //3
-			canvas.drawPixel(1, 2, 1); canvas.drawPixel(3, 2, 1); canvas.drawPixel(5, 2, 1); //0
-			canvas.drawPixel(4, 3, 1); canvas.drawPixel(6, 3, 1); //0
+			canvas.drawPixel(1, 2, 1);
+			canvas.drawPixel(3, 2, 1);
+			canvas.drawPixel(5, 2, 1); //0
+			canvas.drawPixel(4, 3, 1);
+			canvas.drawPixel(6, 3, 1); //0
 			canvas.drawHorizontalLine(7, 4, 3, 1); //5
-			canvas.drawHorizontalLine(0, 5, 3, 1); canvas.drawHorizontalLine(8, 5, 2, 1); //3
-			canvas.drawHorizontalLine(0, 6, 2, 1); canvas.drawPixel(3, 6, 1, 1); canvas.drawPixel(5, 6, 1, 1); canvas.drawHorizontalLine(7, 6, 3, 1); //0
-			canvas.drawHorizontalLine(0, 7, 4, 1); canvas.drawHorizontalLine(7, 7, 3, 1); //0
+			canvas.drawHorizontalLine(0, 5, 3, 1);
+			canvas.drawHorizontalLine(8, 5, 2, 1); //3
+			canvas.drawHorizontalLine(0, 6, 2, 1);
+			canvas.drawPixel(3, 6, 1, 1);
+			canvas.drawPixel(5, 6, 1, 1);
+			canvas.drawHorizontalLine(7, 6, 3, 1); //0
+			canvas.drawHorizontalLine(0, 7, 4, 1);
+			canvas.drawHorizontalLine(7, 7, 3, 1); //0
 			canvas.drawHorizontalLine(0, 8, 10, 1); //8
 			//8
 
@@ -172,23 +356,35 @@ describe("QrCanvas", () => {
 				0,
 				0,
 				8,
-				8
+				8,
 			]);
 		});
 	});
 	describe("getPenaltyScoreForColSpans", () => {
 		it("should get column penalty scores for long runs", () => {
-			const canvas = new QrCanvas({ height: 10, width: 10, outOfBoundsBehavior: "ignore" });
+			const canvas = new QrCanvas({
+				height: 10,
+				width: 10,
+				outOfBoundsBehavior: "ignore",
+			});
 			canvas.reset();
 
 			canvas.drawVerticalLine(0, 0, 7, 1); //5
 			canvas.drawVerticalLine(1, 3, 5, 1); //3
-			canvas.drawPixel(2, 1, 1); canvas.drawPixel(2, 3, 1); canvas.drawPixel(2, 5, 1); //0
-			canvas.drawPixel(3, 4, 1); canvas.drawPixel(3, 6, 1); //0
+			canvas.drawPixel(2, 1, 1);
+			canvas.drawPixel(2, 3, 1);
+			canvas.drawPixel(2, 5, 1); //0
+			canvas.drawPixel(3, 4, 1);
+			canvas.drawPixel(3, 6, 1); //0
 			canvas.drawVerticalLine(4, 7, 3, 1); //5
-			canvas.drawVerticalLine(5, 0, 3, 1); canvas.drawVerticalLine(5, 8, 2, 1); //3
-			canvas.drawVerticalLine(6, 0, 2, 1); canvas.drawPixel(6, 3, 1, 1); canvas.drawPixel(6, 5, 1, 1); canvas.drawVerticalLine(6, 7, 3, 1); //0
-			canvas.drawVerticalLine(7, 0, 4, 1); canvas.drawVerticalLine(7, 7, 3, 1); //0
+			canvas.drawVerticalLine(5, 0, 3, 1);
+			canvas.drawVerticalLine(5, 8, 2, 1); //3
+			canvas.drawVerticalLine(6, 0, 2, 1);
+			canvas.drawPixel(6, 3, 1, 1);
+			canvas.drawPixel(6, 5, 1, 1);
+			canvas.drawVerticalLine(6, 7, 3, 1); //0
+			canvas.drawVerticalLine(7, 0, 4, 1);
+			canvas.drawVerticalLine(7, 7, 3, 1); //0
 			canvas.drawVerticalLine(8, 0, 10, 1); //8
 			//8
 
@@ -203,13 +399,17 @@ describe("QrCanvas", () => {
 				0,
 				0,
 				8,
-				8
+				8,
 			]);
 		});
 	});
 	describe("getPenaltyScoreForBlocks", () => {
 		it("should get row penalty scores blocks of pixels", () => {
-			const canvas = new QrCanvas({ height: 5, width: 5, outOfBoundsBehavior: "ignore" });
+			const canvas = new QrCanvas({
+				height: 5,
+				width: 5,
+				outOfBoundsBehavior: "ignore",
+			});
 			canvas.reset();
 
 			canvas.drawFilledRect(1, 0, 2, 2, 1);
@@ -221,11 +421,39 @@ describe("QrCanvas", () => {
 	});
 	describe("getPenaltyScoreForMarkers", () => {
 		it("should penalty scores for special markers", () => {
-			const canvas = new QrCanvas({ height: 20, width: 20, outOfBoundsBehavior: "ignore" });
+			const canvas = new QrCanvas({
+				height: 20,
+				width: 20,
+				outOfBoundsBehavior: "ignore",
+			});
 			canvas.reset();
 
-			const pattern1 = [true, false, true, true, true, false, true, false, false, false, false];
-			const pattern2 = [false, false, false, false, true, false, true, true, true, false, true];
+			const pattern1 = [
+				true,
+				false,
+				true,
+				true,
+				true,
+				false,
+				true,
+				false,
+				false,
+				false,
+				false,
+			];
+			const pattern2 = [
+				false,
+				false,
+				false,
+				false,
+				true,
+				false,
+				true,
+				true,
+				true,
+				false,
+				true,
+			];
 
 			//markers should be aligned to edge because they will be counted multiple times due to the pattern symmetry
 			for (let i = 0; i < pattern1.length; i++) {
@@ -247,7 +475,11 @@ describe("QrCanvas", () => {
 	});
 	describe("getPenaltyScoreForRatio", () => {
 		it("should get row penalty scores uneven ratios of pixels", () => {
-			const canvas = new QrCanvas({ height: 10, width: 10, outOfBoundsBehavior: "ignore" });
+			const canvas = new QrCanvas({
+				height: 10,
+				width: 10,
+				outOfBoundsBehavior: "ignore",
+			});
 			canvas.reset();
 
 			for (let i = 0; i < 43; i++) {
@@ -327,8 +559,27 @@ describe("QrCanvas", () => {
 			const canvas = QrCanvas.fromVersion(version);
 			canvas.reset();
 
-			canvas.drawVersionString([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]);
-			
+			canvas.drawVersionString([
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+			]);
+
 			expect(canvas.getPixel(5, 36)).toEqual(2);
 			expect(canvas.getPixel(5, 35)).toEqual(3);
 			expect(canvas.getPixel(5, 34)).toEqual(4);
@@ -353,7 +604,26 @@ describe("QrCanvas", () => {
 			const canvas = QrCanvas.fromVersion(version);
 			canvas.reset();
 
-			canvas.drawVersionString([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
+			canvas.drawVersionString([
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+			]);
 
 			expect(canvas.getPixel(36, 5)).toEqual(2);
 			expect(canvas.getPixel(35, 5)).toEqual(3);
@@ -377,7 +647,11 @@ describe("QrCanvas", () => {
 	});
 	describe("printMasked", () => {
 		it("should print masked", () => {
-			const canvas = new QrCanvas({ height: 3, width: 3, outOfBoundsBehavior: "ignore" });
+			const canvas = new QrCanvas({
+				height: 3,
+				width: 3,
+				outOfBoundsBehavior: "ignore",
+			});
 			canvas.reset();
 			canvas.applyMask(masks[0]);
 

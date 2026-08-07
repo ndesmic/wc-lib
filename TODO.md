@@ -1,5 +1,46 @@
 - [ ] VDOM
 - [ ] Robust Prop validator
-- [ ] Generator scripts
 - [ ] Migrate old components
-    
+
+## Jslib migration
+
+- [ ] array-tools
+- [ ] binary-tools
+- [ ] bool-tools
+- [ ] color-tools
+- [ ] combinatorics-tools
+- [ ] convolution-tools
+- [ ] data-view-tools
+- [ ] dom-tools
+- [ ] encoding-tools
+- [ ] exception-tools
+- [ ] file-tools
+- [ ] form-tools
+- [ ] function-tools
+- [ ] geometry-tools
+- [ ] image-tools
+- [ ] iterator-tools
+- [ ] linear-algebra-tools
+- [ ] mailto-tools
+- [ ] map-tools
+- [ ] matrix-tools
+- [ ] nn-tools
+- [ ] node-tools
+- [ ] number-tools
+- [ ] oauth-tools
+- [ ] object-tools
+- [ ] path-tools
+- [ ] promise-tools
+- [ ] random-tools
+- [ ] regex-tools
+- [ ] sampler
+- [ ] sorting
+- [ ] stat-tools
+- [ ] stream-tools
+- [ ] string-tools
+- [ ] task-tools
+- [ ] tensor-tools
+- [ ] time-tools
+- [ ] tree-tools
+- [ ] value-tools
+- [ ] vector-tools

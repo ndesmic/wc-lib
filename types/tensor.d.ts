@@ -1,4 +1,4 @@
 export type Tensor = {
-    shape: number[],
-    values: number[]
-}
+	shape: number[];
+	values: number[];
+};

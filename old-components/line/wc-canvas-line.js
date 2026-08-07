@@ -1,5 +1,5 @@
 function hyphenCaseToCamelCase(text) {
-	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
+	return text.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
 function getVectorMagnitude(vec) {
@@ -7,7 +7,7 @@ function getVectorMagnitude(vec) {
 }
 
 function divideVector(vec, s) {
-	return vec.map(x => x / s);
+	return vec.map((x) => x / s);
 }
 
 function subtractVector(a, b) {
@@ -57,9 +57,9 @@ class WcCanvasLine extends HTMLElement {
         `;
 	}
 	renderLine() {
-		if(!this.context) return;
+		if (!this.context) return;
 
-		//Get the normal for each point as well as a tangent vector to the previous 
+		//Get the normal for each point as well as a tangent vector to the previous
 		const positions = [];
 		const normals = [];
 		const miters = [];
@@ -69,44 +69,58 @@ class WcCanvasLine extends HTMLElement {
 			const next = this.#points[i + 1];
 
 			positions.push(
-				current[0], current[1],
-				current[0], current[1]
+				current[0],
+				current[1],
+				current[0],
+				current[1],
 			);
 
 			if (next && !prev) { //start of line
 				const delta = normalizeVector(subtractVector(next, current));
 
 				normals.push(
-					delta[1], -delta[0], 
-					-delta[1], delta[0]
+					delta[1],
+					-delta[0],
+					-delta[1],
+					delta[0],
 				);
 				miters.push(
-					delta[1], -delta[0], 
-					-delta[1], delta[0]
+					delta[1],
+					-delta[0],
+					-delta[1],
+					delta[0],
 				);
 			} else if (prev && !next) { //end of line
 				const delta = normalizeVector(subtractVector(current, prev));
 
 				normals.push(
-					delta[1], -delta[0], 
-					-delta[1], delta[0]
+					delta[1],
+					-delta[0],
+					-delta[1],
+					delta[0],
 				);
 				miters.push(
-					delta[1], -delta[0], 
-					-delta[1], delta[0]
+					delta[1],
+					-delta[0],
+					-delta[1],
+					delta[0],
 				);
 			} else { //between lines
 				const nextNormal = normalizeVector(subtractVector(next, current));
-				const previousNormal = normalizeVector(subtractVector(prev, current)); 
+				const previousNormal = normalizeVector(subtractVector(prev, current));
 				const bisection = normalizeVector(addVector(nextNormal, previousNormal));
 
 				normals.push(
-					-previousNormal[1], previousNormal[0], 
-					previousNormal[1], -previousNormal[0], 
+					-previousNormal[1],
+					previousNormal[0],
+					previousNormal[1],
+					-previousNormal[0],
 				);
 				miters.push(
-					bisection[0], bisection[1], 
-					-bisection[0], -bisection[1]
+					bisection[0],
+					bisection[1],
+					-bisection[0],
+					-bisection[1],
 				);
 			}
 		}
@@ -125,13 +139,15 @@ class WcCanvasLine extends HTMLElement {
 			const sx = ((position[0] + 1) / 2) * this.#width; //screen scaled X
 			const sy = this.#height - (((position[1] + 1) / 2) * this.#height); //screen scaled Y
 
-			const x = sx + (normalMiter[0] * (1 / dotVector(normal, normalMiter)) * this.#thickness);
-			const y = sy - (normalMiter[1] * (1 / dotVector(normal, normalMiter)) * this.#thickness);
+			const x = sx +
+				(normalMiter[0] * (1 / dotVector(normal, normalMiter)) * this.#thickness);
+			const y = sy -
+				(normalMiter[1] * (1 / dotVector(normal, normalMiter)) * this.#thickness);
 
-			if(i === 0){
+			if (i === 0) {
 				this.context.beginPath();
 				this.context.moveTo(x, y);
-			} else if(i < 4){
+			} else if (i < 4) {
 				this.context.lineTo(x, y);
 			} else {
 				this.context.lineTo(x, y);
@@ -146,9 +162,9 @@ class WcCanvasLine extends HTMLElement {
 		}
 
 		this.context.strokeStyle = "#F00000";
-		for(let i = 0; i < this.#points.length; i++){
+		for (let i = 0; i < this.#points.length; i++) {
 			const rawX = this.#points[i][0];
-			const rawY = this.#points[i][1]; 
+			const rawY = this.#points[i][1];
 			const sx = ((rawX + 1) / 2) * this.#width;
 			const sy = this.#height - (((rawY + 1) / 2) * this.#height);
 
@@ -171,7 +187,7 @@ class WcCanvasLine extends HTMLElement {
 	}
 	cacheDom() {
 		this.dom = {
-			canvas: this.shadowRoot.querySelector("canvas")
+			canvas: this.shadowRoot.querySelector("canvas"),
 		};
 	}
 	attachEvents() {
@@ -185,11 +201,11 @@ class WcCanvasLine extends HTMLElement {
 	set height(val) {
 		this.#height = parseFloat(val);
 	}
-	set points(val){
+	set points(val) {
 		this.#points = JSON.parse(val);
 		this.renderLine();
 	}
-	set thickness(val){
+	set thickness(val) {
 		this.#thickness = parseFloat(val);
 	}
 }

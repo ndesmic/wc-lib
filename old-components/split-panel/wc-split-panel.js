@@ -1,4 +1,9 @@
-export function fireEvent(element, eventName, bubbles = true, cancelable = true) {
+export function fireEvent(
+	element,
+	eventName,
+	bubbles = true,
+	cancelable = true,
+) {
 	const event = new Event(eventName, { bubbles, cancelable });
 	return element.dispatchEvent(event);
 }
@@ -52,7 +57,7 @@ export class WcSplitPanel extends HTMLElement {
 	}
 	cacheDom() {
 		this.dom = {
-			median: this.shadowRoot.querySelector("#median")
+			median: this.shadowRoot.querySelector("#median"),
 		};
 	}
 	attachEvents() {

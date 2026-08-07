@@ -1,4 +1,10 @@
-function fireEvent(element, eventName, data, bubbles = true, cancelable = true) {
+function fireEvent(
+	element,
+	eventName,
+	data,
+	bubbles = true,
+	cancelable = true,
+) {
 	const event = document.createEvent("HTMLEvents");
 	event.initEvent(eventName, bubbles, cancelable);
 	if (data) {
@@ -51,22 +57,23 @@ export function getClosest(value, possibleValues) {
 		if (value === possibleValues[midIndex]) return possibleValues[midIndex];
 		if (value < possibleValues[midIndex]) {
 			if (midIndex > 0 && value > possibleValues[midIndex - 1]) {
-				return value - possibleValues[midIndex + 1] >= possibleValues[midIndex] - value
+				return value - possibleValues[midIndex + 1] >=
+						possibleValues[midIndex] - value
 					? possibleValues[midIndex]
-					: possibleValues[midIndex - 1]
+					: possibleValues[midIndex - 1];
 			}
 			highIndex = midIndex;
-		}
-		else {
+		} else {
 			if (midIndex < highIndex - 1 && value < possibleValues[midIndex + 1]) {
-				return value - possibleValues[midIndex] >= possibleValues[midIndex + 1] - value
+				return value - possibleValues[midIndex] >=
+						possibleValues[midIndex + 1] - value
 					? possibleValues[midIndex + 1]
-					: possibleValues[midIndex]
+					: possibleValues[midIndex];
 			}
 			lowIndex = midIndex + 1;
 		}
 	}
-	return possibleValues[midIndex]
+	return possibleValues[midIndex];
 }
 
 export class WcRotationInput2 extends HTMLElement {
@@ -149,7 +156,7 @@ export class WcRotationInput2 extends HTMLElement {
 		this.dom = {
 			pointer: this.shadowRoot.querySelector("#pointer"),
 			value: this.shadow.querySelector("#value"),
-			svg: this.shadow.querySelector("svg")
+			svg: this.shadow.querySelector("svg"),
 		};
 	}
 	attachEvents() {
@@ -159,23 +166,30 @@ export class WcRotationInput2 extends HTMLElement {
 	}
 	onPointerDown(e) {
 		const rect = this.dom.svg.getBoundingClientRect();
-		this.#center = { x: rect.x + (rect.width / 2), y: rect.y + (rect.height / 2) };
+		this.#center = {
+			x: rect.x + (rect.width / 2),
+			y: rect.y + (rect.height / 2),
+		};
 		document.addEventListener("pointermove", this.onPointerMove);
 		document.addEventListener("pointerup", this.onPointerUp);
 	}
 	onPointerMove(e) {
 		const offsetX = e.clientX - this.#center.x;
-		const offsetY = this.#center.y - e.clientY;  //y-coords flipped
+		const offsetY = this.#center.y - e.clientY; //y-coords flipped
 		let rad;
-		if (offsetX >= 0 && offsetY >= 0) { rad = Math.atan(offsetY / offsetX); }
-		else if (offsetX < 0 && offsetY >= 0) { rad = (Math.PI / 2) + Math.atan(-offsetX / offsetY); }
-		else if (offsetX < 0 && offsetY < 0) { rad = Math.PI + Math.atan(offsetY / offsetX); }
-		else { rad = (3 * Math.PI / 2) + Math.atan(offsetX / -offsetY); }
+		if (offsetX >= 0 && offsetY >= 0) rad = Math.atan(offsetY / offsetX);
+		else if (offsetX < 0 && offsetY >= 0) {
+			rad = (Math.PI / 2) + Math.atan(-offsetX / offsetY);
+		} else if (offsetX < 0 && offsetY < 0) {
+			rad = Math.PI + Math.atan(offsetY / offsetX);
+		} else rad = (3 * Math.PI / 2) + Math.atan(offsetX / -offsetY);
 
 		rad = this.#steps === null ? rad : getClosest(rad, this.#steps);
 
 		const deg = radiansToDegrees(rad);
-		const finalValue = (this.#unit === "rad" ? rad : deg).toFixed(this.#precision);
+		const finalValue = (this.#unit === "rad" ? rad : deg).toFixed(
+			this.#precision,
+		);
 		this.dom.pointer.style = `transform: rotateZ(-${deg}deg)`;
 		this.dom.value.textContent = finalValue;
 
@@ -217,15 +231,17 @@ export class WcRotationInput2 extends HTMLElement {
 	set trigger(val) {
 		this.#trigger = validateEnum(val, WcRotationInput.#triggerType);
 	}
-	set step(val){
+	set step(val) {
 		this.#stepAmount = parseFloat(val || 1);
 		const stepsAmountRad = this.#unit === "rad" ? this.#stepAmount : degreesToRadians(this.#stepAmount);
 		this.#steps = getSteps(stepsAmountRad, TWO_PI);
 	}
-	set value(val){
+	set value(val) {
 		const valueRad = this.#unit === "rad" ? val : degreesToRadians(val);
 		const valueDeg = this.#unit === "rad" ? radiansToDegrees(val) : val;
-		const valueDisplay = (this.#unit === "rad" ? valueRad : valueDeg).toFixed(this.#precision);
+		const valueDisplay = (this.#unit === "rad" ? valueRad : valueDeg).toFixed(
+			this.#precision,
+		);
 		this.#value = normalizeAngle(valueRad);
 
 		this.dom.value.textContent = valueDisplay;
@@ -234,7 +250,7 @@ export class WcRotationInput2 extends HTMLElement {
 		this.setAttribute("aria-valuenow", valueDisplay);
 		this.setAttribute("aria-valuetext", valueDisplay);
 	}
-	get stepAmount(){
+	get stepAmount() {
 		return this.#unit === "rad" ? this.#stepAmount : degreesToRadians(this.#stepAmount);
 	}
 }

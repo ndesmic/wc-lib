@@ -1,20 +1,28 @@
 {
-    "tasks": {
-        "start": "deno -A jsr:@std/http/file-server .",
-        "new:app": "deno run -A --unstable-raw-imports ./scripts/app/new-app.js",
-        "new:component": "deno run -A --unstable-raw-imports ./scripts/component/new-component.js",
-        "test:current": "deno test -A ./libs/tensor/tensor-utils.test.js"
-    },
-    "fmt": {
-        "indentWidth": 1,
-        "useTabs": true
-    },
-    "compilerOptions": {
-        "noImplicitAny": false
-    },
-    "imports": {
-        "@std/cli": "jsr:@std/cli@^1.0.27",
-        "@std/expect": "jsr:@std/expect@^1.0.17",
-        "@std/testing": "jsr:@std/testing@^1.0.16"
-    }
+	"tasks": {
+		"start": "deno -A jsr:@std/http/file-server .",
+		"new:app": "deno run -A --unstable-raw-imports ./scripts/app/new-app.js",
+		"new:component": "deno run -A --unstable-raw-imports ./scripts/component/new-component.js",
+		"test:current": "deno test -A ./libs/algorithms/meyers-diff/meyers-diff.test.js",
+		"testm:excalidraw": "deno run -A ./manual-tests/libs/formats/excalidraw/excalidraw.manual-test.js"
+	},
+	"fmt": {
+		"indentWidth": 1,
+		"useTabs": true,
+		"lineWidth": 1200
+	},
+	"compilerOptions": {
+		"noImplicitAny": false
+	},
+	"imports": {
+		"@std/cli": "jsr:@std/cli@^1.0.27",
+		"@std/encoding": "jsr:@std/encoding@^1.0.10",
+		"@std/expect": "jsr:@std/expect@^1.0.17",
+		"@std/testing": "jsr:@std/testing@^1.0.16"
+	},
+	"test": {
+		"exclude": [
+			"manual-tests/"
+		]
+	}
 }

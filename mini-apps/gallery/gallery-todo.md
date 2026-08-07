@@ -1,4 +1,4 @@
 - [x] Get it working
-    - [x] Show image grid
-        - [ ] use grid/masonry
-    - [ ] Lightbox on click
+  - [x] Show image grid
+    - [ ] use grid/masonry
+  - [ ] Lightbox on click

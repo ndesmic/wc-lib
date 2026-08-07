@@ -1,0 +1,60 @@
+#theme-popover {
+	--r: var(--border-radius);
+	--ah: 1rem;
+	--aw: 1rem;
+	--ap: 50%;
+
+	border: none;
+	position: absolute;
+	margin: 0;
+	inset: auto;
+	overflow: hidden;
+	padding: 0;
+	background: transparent;
+
+	top: anchor(bottom);
+	justify-self: anchor-center;
+	position-anchor: auto;
+	position-try-fallbacks: flip-block;
+	container-type: anchored;
+
+	fieldset {
+		height: 100%;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		background: var(--background-color);
+		border: var(--border);
+		padding: var(--ah) 0 0 0;
+
+		border-shape: shape(from var(--r) var(--ah), hline to calc(var(--ap) - var(--aw)), line by var(--aw) calc(var(--ah) * -1), line by var(--aw) var(--ah), hline to calc(100% - var(--r)), curve to right calc(var(--ah) + var(--r)) with right calc(var(--ah)), vline to calc(100% - var(--r)), curve to calc(100% - var(--r)) bottom with right bottom, hline to var(--r), curve to left calc(100% - var(--r)) with left bottom, vline to calc(var(--ah) + var(--r)), curve to var(--r) var(--ah) with left var(--ah));
+	}
+
+	button {
+		display: flex;
+		gap: 0.5rem;
+		cursor: pointer;
+		padding: 0.5rem;
+		border-radius: 0;
+		background: none;
+		color: var(--text-color);
+
+		&:hover, &:hover[aria-checked="true"] {
+			background-color: var(--primary-color);
+			color: var(--text-alt-color);
+			fill: var(--text-alt-color);
+		}
+
+		&[aria-checked="true"] {
+			color: var(--primary-color);
+			fill: var(--primary-color);
+		}
+	}
+}
+@container anchored (fallback: flip-block) {
+	#theme-popover fieldset {
+		padding: 0 0 var(--ah) 0;
+		border-shape: shape(from var(--r) 0, hline to calc(100% - var(--r)), curve to right var(--r) with right top, vline to calc(100% - (var(--r) + var(--ah))), curve to calc(100% - var(--r)) calc(100% - var(--ah)) with right calc(100% - var(--ah)), hline to calc(var(--ap) + var(--aw)), line by calc(var(--aw) * -1) var(--ah), line by calc(var(--aw) * -1) calc(var(--ah) * -1), hline to var(--r), curve to left calc(100% - (var(--r) + var(--ah))) with left calc(100% - var(--ah)), vline to var(--r), curve to var(--r) top with left top);
+	}
+}

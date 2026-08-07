@@ -23,7 +23,7 @@ function createShape(context, shape, [x, y], size, color) {
 	}
 }
 
-globalThis.onmessage = e => {
+globalThis.onmessage = (e) => {
 	let {
 		points,
 		xmax,
@@ -40,10 +40,13 @@ globalThis.onmessage = e => {
 		continuous,
 		thickness,
 		devicePixelRatio,
-		recipientId
+		recipientId,
 	} = e.data;
 
-	const canvas = new OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
+	const canvas = new OffscreenCanvas(
+		width * devicePixelRatio,
+		height * devicePixelRatio,
+	);
 	const context = canvas.getContext("2d");
 	context.scale(devicePixelRatio, devicePixelRatio);
 
@@ -52,16 +55,22 @@ globalThis.onmessage = e => {
 		points = [];
 		for (let x = xmin; x < xmax; x += step) {
 			const y = func(x);
-			points.push({ x, y, color: defaultColor, size: defaultSize, shape: defaultShape });
+			points.push({
+				x,
+				y,
+				color: defaultColor,
+				size: defaultSize,
+				shape: defaultShape,
+			});
 		}
 	}
 
-	points = points.map(p => ({
+	points = points.map((p) => ({
 		x: windowValue(p.x, xmin, xmax) * width,
 		y: windowValue(p.y, ymin, ymax, true) * height,
 		color: p.color,
 		size: p.size,
-		shape: p.shape
+		shape: p.shape,
 	}));
 
 	context.strokeStyle = "#000";
@@ -83,7 +92,13 @@ globalThis.onmessage = e => {
 	}
 
 	for (const point of points) {
-		createShape(context, point.shape, [point.x, point.y], point.size, point.color);
+		createShape(
+			context,
+			point.shape,
+			[point.x, point.y],
+			point.size,
+			point.color,
+		);
 	}
 
 	const image = canvas.transferToImageBitmap();

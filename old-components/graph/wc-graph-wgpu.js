@@ -1,5 +1,5 @@
 function hyphenCaseToCamelCase(text) {
-	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
+	return text.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
 export class WcGraphWgpu extends HTMLElement {
@@ -28,7 +28,21 @@ export class WcGraphWgpu extends HTMLElement {
 	#guidePipeline;
 	#guideVertexBuffer;
 
-	static observedAttributes = ["points", "func", "step", "width", "height", "xmin", "xmax", "ymin", "ymax", "default-size", "default-color", "continuous", "thickness"];
+	static observedAttributes = [
+		"points",
+		"func",
+		"step",
+		"width",
+		"height",
+		"xmin",
+		"xmax",
+		"ymin",
+		"ymax",
+		"default-size",
+		"default-color",
+		"continuous",
+		"thickness",
+	];
 	constructor() {
 		super();
 		this.bind(this);
@@ -37,8 +51,8 @@ export class WcGraphWgpu extends HTMLElement {
 		element.attachEvents.bind(element);
 	}
 	async connectedCallback() {
-		this.cacheDom()
-		if(navigator.gpu){
+		this.cacheDom();
+		if (navigator.gpu) {
 			await this.setupGpu();
 			await this.loadShaderPipeline();
 			await this.setupGuidePipeline();
@@ -48,7 +62,7 @@ export class WcGraphWgpu extends HTMLElement {
 			this.innerText = "Browser does not support WebGPU";
 		}
 	}
-	cacheDom(){
+	cacheDom() {
 		this.attachShadow({ mode: "open" });
 		this.#dom = {};
 		this.#dom.canvas = document.createElement("canvas");
@@ -64,7 +78,7 @@ export class WcGraphWgpu extends HTMLElement {
 
 		this.#context.configure({
 			device: this.#device,
-			format: "bgra8unorm"
+			format: "bgra8unorm",
 		});
 
 		this.#vertexBufferDescriptor = [{
@@ -72,16 +86,16 @@ export class WcGraphWgpu extends HTMLElement {
 				{
 					shaderLocation: 0,
 					offset: 0,
-					format: "float32x2"
+					format: "float32x2",
 				},
 				{
 					shaderLocation: 1,
 					offset: 8,
-					format: "float32x4"
-				}
+					format: "float32x4",
+				},
 			],
 			arrayStride: 24,
-			stepMode: "vertex"
+			stepMode: "vertex",
 		}];
 	}
 	async loadShaderPipeline() {
@@ -126,39 +140,39 @@ export class WcGraphWgpu extends HTMLElement {
 				{
 					return fragData.color;
 				}
-			`
+			`,
 		});
 		const pipelineDescriptor = {
 			vertex: {
 				module: this.#shaderModule,
 				entryPoint: "vertex_main",
-				buffers: this.#vertexBufferDescriptor
+				buffers: this.#vertexBufferDescriptor,
 			},
 			fragment: {
 				module: this.#shaderModule,
 				entryPoint: "fragment_main",
 				targets: [
 					{
-						format: "bgra8unorm"
-					}
-				]
-			}
+						format: "bgra8unorm",
+					},
+				],
+			},
 		};
 
-		if(this.#continuous){
+		if (this.#continuous) {
 			pipelineDescriptor.primitive = {
 				topology: "line-strip",
-				stripIndexFormat: "uint16"
-			}
+				stripIndexFormat: "uint16",
+			};
 		} else {
 			pipelineDescriptor.primitive = {
-				topology: "point-list"
-			}
+				topology: "point-list",
+			};
 		}
 
 		this.#renderPipeline = this.#device.createRenderPipeline(pipelineDescriptor);
 	}
-	setupGuidePipeline(){
+	setupGuidePipeline() {
 		const shaderModule = this.#device.createShaderModule({
 			code: `
 				struct VertexOut {
@@ -182,7 +196,7 @@ export class WcGraphWgpu extends HTMLElement {
 				{
 					return vec4<f32>(0.0, 0.0, 0.0, 1.0);
 				}
-			`
+			`,
 		});
 
 		const vertexBufferDescriptor = [{
@@ -190,49 +204,58 @@ export class WcGraphWgpu extends HTMLElement {
 				{
 					shaderLocation: 0,
 					offset: 0,
-					format: "float32x2"
-				}
+					format: "float32x2",
+				},
 			],
 			arrayStride: 8,
-			stepMode: "vertex"
+			stepMode: "vertex",
 		}];
 
 		const pipelineDescriptor = {
 			vertex: {
 				module: shaderModule,
 				entryPoint: "vertex_main",
-				buffers: vertexBufferDescriptor
+				buffers: vertexBufferDescriptor,
 			},
 			fragment: {
 				module: shaderModule,
 				entryPoint: "fragment_main",
 				targets: [
 					{
-						format: "bgra8unorm"
-					}
-				]
+						format: "bgra8unorm",
+					},
+				],
 			},
 			primitive: {
-				topology: "line-list"
-			}
+				topology: "line-list",
+			},
 		};
 		this.#guidePipeline = this.#device.createRenderPipeline(pipelineDescriptor);
 
 		this.#guideVertexBuffer = this.#device.createBuffer({
 			size: 32,
 			usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-			mappedAtCreation: true
+			mappedAtCreation: true,
 		});
-		new Float32Array(this.#guideVertexBuffer.getMappedRange()).set([0.0, -1, 0.0, 1, -1, 0.0, 1, 0.0]);
+		new Float32Array(this.#guideVertexBuffer.getMappedRange()).set([
+			0.0,
+			-1,
+			0.0,
+			1,
+			-1,
+			0.0,
+			1,
+			0.0,
+		]);
 		this.#guideVertexBuffer.unmap();
 	}
 	render() {
-		if(!this.#device) return;
+		if (!this.#device) return;
 
 		let points;
 		if (this.#func) {
 			points = [];
-			for (let x = this.#xmin; x < this.#xmax; x += this.#step){
+			for (let x = this.#xmin; x < this.#xmax; x += this.#step) {
 				const y = this.#func(x);
 				points.push(x, y, ...this.#defaultColor);
 			}
@@ -244,7 +267,7 @@ export class WcGraphWgpu extends HTMLElement {
 		const vertexBuffer = this.#device.createBuffer({
 			size: points.length * 4,
 			usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-			mappedAtCreation: true
+			mappedAtCreation: true,
 		});
 
 		new Float32Array(vertexBuffer.getMappedRange()).set(points);
@@ -254,12 +277,16 @@ export class WcGraphWgpu extends HTMLElement {
 		const boundsBuffer = this.#device.createBuffer({
 			size: 16,
 			usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-			mappedAtCreation: true
+			mappedAtCreation: true,
 		});
 
-		new Float32Array(boundsBuffer.getMappedRange()).set([this.#xmin, this.#xmax, this.#ymin, this.#ymax]);
+		new Float32Array(boundsBuffer.getMappedRange()).set([
+			this.#xmin,
+			this.#xmax,
+			this.#ymin,
+			this.#ymax,
+		]);
 		boundsBuffer.unmap();
-
 
 		const boundsGroup = this.#device.createBindGroup({
 			layout: this.#renderPipeline.getBindGroupLayout(0),
@@ -269,10 +296,10 @@ export class WcGraphWgpu extends HTMLElement {
 					resource: {
 						buffer: boundsBuffer,
 						offset: 0,
-						size: 16
-					}
-				}
-			]
+						size: 16,
+					},
+				},
+			],
 		});
 
 		const commandEncoder = this.#device.createCommandEncoder();
@@ -282,13 +309,13 @@ export class WcGraphWgpu extends HTMLElement {
 				{
 					loadValue: clearColor,
 					storeOp: "store",
-					view: this.#context.getCurrentTexture().createView()
-				}
-			]
+					view: this.#context.getCurrentTexture().createView(),
+				},
+			],
 		};
 
 		const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-		
+
 		passEncoder.setPipeline(this.#guidePipeline);
 		passEncoder.setVertexBuffer(0, this.#guideVertexBuffer);
 		passEncoder.draw(4);
@@ -303,23 +330,22 @@ export class WcGraphWgpu extends HTMLElement {
 		this.#device.queue.submit([commandEncoder.finish()]);
 	}
 	attachEvents() {
-
 	}
 	attributeChangedCallback(name, oldValue, newValue) {
 		this[hyphenCaseToCamelCase(name)] = newValue;
 	}
 	set points(value) {
-		if (typeof (value) === "string") {
+		if (typeof value === "string") {
 			value = JSON.parse(value);
 		}
 
-		this.#points = value.map(p => [
+		this.#points = value.map((p) => [
 			p[0],
 			p[1],
 			p[2] ?? this.#defaultColor[0],
 			p[3] ?? this.#defaultColor[1],
 			p[4] ?? this.#defaultColor[2],
-			p[5] ?? this.#defaultColor[3]
+			p[5] ?? this.#defaultColor[3],
 		]).flat();
 
 		this.render();
@@ -374,7 +400,7 @@ export class WcGraphWgpu extends HTMLElement {
 		this.#defaultSize = parseFloat(value);
 	}
 	set defaultColor(value) {
-		if (typeof (value) === "string") {
+		if (typeof value === "string") {
 			this.#defaultColor = JSON.parse(value);
 		} else {
 			this.#defaultColor = value;

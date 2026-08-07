@@ -1,5 +1,5 @@
 export function cartesianToPolar(x, y, cx = 0, cy = 0) {
-	return [Math.sqrt((x - cx) ** 2 + (y - cy) ** 2), Math.atan2((y - cy), (x - cx))];
+	return [Math.sqrt((x - cx) ** 2 + (y - cy) ** 2), Math.atan2(y - cy, x - cx)];
 }
 
 export function degreesToRadians(deg) {
@@ -13,7 +13,8 @@ function linearGradient(stops, value) {
 	}
 
 	const remainder = value - stops[stopIndex][4];
-	const stopFraction = remainder / (stops[stopIndex + 1][4] - stops[stopIndex][4]);
+	const stopFraction = remainder /
+		(stops[stopIndex + 1][4] - stops[stopIndex][4]);
 
 	return lerp(stops[stopIndex], stops[stopIndex + 1], stopFraction);
 }
@@ -40,14 +41,16 @@ function validateStops(stops) {
 	for (const color of stops) {
 		if (color.length === 3) color.push(1);
 		for (const component of color) {
-			if (component < 0 || component > 1) throw `Color stop has out of range component: ${component}`;
+			if (component < 0 || component > 1) {
+				throw `Color stop has out of range component: ${component}`;
+			}
 		}
 	}
-	if (stops.every(color => color.length === 4)) {
+	if (stops.every((color) => color.length === 4)) {
 		const stopLength = 1 / (stops.length - 1);
-		stops.forEach((color, i) => color.push(i * stopLength))
+		stops.forEach((color, i) => color.push(i * stopLength));
 	}
-	if (stops.some(color => color.length === 4)) {
+	if (stops.some((color) => color.length === 4)) {
 		throw "Colors must either all have positions, or none have positions";
 	}
 	if (stops[0][4] !== 0) {
@@ -68,7 +71,7 @@ function validateStops(stops) {
 }
 
 function hyphenCaseToCamelCase(text) {
-	return text.replace(/-([a-z])/g, g => g[1].toUpperCase());
+	return text.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
 function parseColor(val) {
@@ -79,7 +82,7 @@ function parseColor(val) {
 			parseInt(hex.substring(0, 2), 16) / 255,
 			parseInt(hex.substring(2, 4), 16) / 255,
 			parseInt(hex.substring(4, 6), 16) / 255,
-			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255
+			hex.length < 8 ? 1 : parseInt(hex.substring(6, 8), 16) / 255,
 		];
 	} else if (trimmedVal.startsWith("[")) {
 		return JSON.parse(trimmedVal);
@@ -106,7 +109,20 @@ export class WcConicGradient extends HTMLElement {
 	#clipAngle = 0;
 	#width = 400;
 	#height = 400;
-	static observedAttributes = ["stops", "cx", "cy", "r", "p", "rx", "ry", "clip", "angle", "clip-angle", "width", "height"];
+	static observedAttributes = [
+		"stops",
+		"cx",
+		"cy",
+		"r",
+		"p",
+		"rx",
+		"ry",
+		"clip",
+		"angle",
+		"clip-angle",
+		"width",
+		"height",
+	];
 	constructor() {
 		super();
 		this.bind(this);
@@ -130,26 +146,35 @@ export class WcConicGradient extends HTMLElement {
 	}
 	renderGradient() {
 		const context = this.dom.canvas.getContext("2d");
-		const imageData = context.getImageData(0, 0, this.dom.canvas.width, this.dom.canvas.height);
+		const imageData = context.getImageData(
+			0,
+			0,
+			this.dom.canvas.width,
+			this.dom.canvas.height,
+		);
 		for (let i = 0; i < imageData.width; i++) {
 			for (let j = 0; j < imageData.height; j++) {
 				const y = imageData.height - j;
 				const [r, theta] = cartesianToPolar(i, y, this.#cx, this.#cy);
 				const rValue = this.getRValue(r, theta);
 				if (this.#clip !== "clamp" && rValue > 1) {
-					writePixel(imageData, i,j, this.#clip);
+					writePixel(imageData, i, j, this.#clip);
 				} else {
 					const tValue = normalizeAngle(theta - this.#angle) / TWO_PI;
 					const color = linearGradient(this.#stops, tValue);
-					writePixel(imageData, i,j, color);
+					writePixel(imageData, i, j, color);
 				}
 			}
 		}
 		context.putImageData(imageData, 0, 0);
 	}
-	getRValue(r, theta){
+	getRValue(r, theta) {
 		const transformedTheta = normalizeAngle(theta - this.#clipAngle);
-		return r / ((this.#rx * this.#ry) / (Math.abs(this.#ry * Math.cos(transformedTheta)) ** this.#p + Math.abs(this.#rx * Math.sin(transformedTheta)) ** this.#p) ** (1 / this.#p));
+		return r /
+			((this.#rx * this.#ry) /
+				(Math.abs(this.#ry * Math.cos(transformedTheta)) ** this.#p +
+						Math.abs(this.#rx * Math.sin(transformedTheta)) ** this.#p) **
+					(1 / this.#p));
 	}
 	connectedCallback() {
 		this.render();
@@ -160,7 +185,7 @@ export class WcConicGradient extends HTMLElement {
 	cacheDom() {
 		this.dom = {
 			canvas: this.shadowRoot.querySelector("canvas"),
-			slider: this.shadowRoot.querySelector("input")
+			slider: this.shadowRoot.querySelector("input"),
 		};
 	}
 	attachEvents() {
@@ -170,7 +195,7 @@ export class WcConicGradient extends HTMLElement {
 	}
 	set stops(val) {
 		if (val.startsWith("#")) {
-			this.#stops = validateStops(val.split(",").map(x => parseColor(x)));
+			this.#stops = validateStops(val.split(",").map((x) => parseColor(x)));
 		} else if (val.startsWith("[")) {
 			this.#stops = validateStops(JSON.parse(val));
 		}
@@ -186,10 +211,10 @@ export class WcConicGradient extends HTMLElement {
 		this.#rx = r;
 		this.#ry = r;
 	}
-	set rx(val){
+	set rx(val) {
 		this.#rx = parseFloat(val);
 	}
-	set ry(val){
+	set ry(val) {
 		this.#ry = parseFloat(val);
 	}
 	set clip(val) {
@@ -199,19 +224,19 @@ export class WcConicGradient extends HTMLElement {
 			this.#clip = parseColor(val);
 		}
 	}
-	set angle(val){
+	set angle(val) {
 		this.#angle = degreesToRadians(parseFloat(val));
 	}
-	set width(val){
+	set width(val) {
 		this.#width = parseFloat(val);
 	}
-	set height(val){
+	set height(val) {
 		this.#height = parseFloat(val);
 	}
-	set clipAngle(val){
+	set clipAngle(val) {
 		this.#clipAngle = degreesToRadians(parseFloat(val));
 	}
-	set p(val){
+	set p(val) {
 		this.#p = parseFloat(val);
 	}
 }

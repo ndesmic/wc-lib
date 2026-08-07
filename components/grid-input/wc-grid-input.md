@@ -14,34 +14,28 @@ A grid of inputs
 
 ### Attributes
 
-| name | type | description | default |
-|-|-|-|-|
-| rows | number | the number of rows | 3
-| columns | number | the number of columns | 3
-| add-row | boolean | allows adding rows | false |
-| add-column | boolean | allows adding columns | false |
-| values | CommaDelimitedList | the values of the grid, uses `rows` and `columns` to size tensor | undefined |
+| name       | type               | description                                                      | default   |
+| ---------- | ------------------ | ---------------------------------------------------------------- | --------- |
+| rows       | number             | the number of rows                                               | 3         |
+| columns    | number             | the number of columns                                            | 3         |
+| add-row    | boolean            | allows adding rows                                               | false     |
+| add-column | boolean            | allows adding columns                                            | false     |
+| values     | CommaDelimitedList | the values of the grid, uses `rows` and `columns` to size tensor | undefined |
 
 ### Props
 
-| name | type | description | default |
-|-|-|-|-|-|
-| rows | number | the number of rows | 3 |
-| columns | number | the number of columns | 3 |
-| add-row | boolean | allows adding rows | false |
-| add-column | boolean | allows adding columns | false |
-| values | `Tensor` | the value of the grid | undefined |
+| name | type | description | default | |-|-|-|-|-| | rows | number | the number of rows | 3 | | columns | number | the number of columns | 3 | | add-row | boolean | allows adding rows | false | | add-column | boolean | allows adding columns | false | | values | `Tensor` | the value of the grid | undefined |
 
 ## Outputs
 
-| name | type | description | default |
-|-|-|-|-|
+| name   | type       | description           | default   |
+| ------ | ---------- | --------------------- | --------- |
 | values | Array<any> | the value of the grid | undefined |
 
 ## Events
 
-| name | payload |
-|-|-|
+| name       | payload                                       |
+| ---------- | --------------------------------------------- |
 | grid-input | `{ values: Array, shape: [number, number ] }` |
 
 ## TODO

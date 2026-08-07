@@ -1,9 +1,8 @@
 /**
- * 
- * @param {Array} array 
- * @param {number} length 
- * @param {any} element 
- * @returns 
+ * @param {Array} array
+ * @param {number} length
+ * @param {any} element
+ * @returns
  */
 export function padArrayStart(array, length, element = 0) {
 	const result = [...array];
@@ -14,11 +13,10 @@ export function padArrayStart(array, length, element = 0) {
 }
 
 /**
- * 
- * @param {Array} array 
- * @param {number} length 
- * @param {any} element 
- * @returns 
+ * @param {Array} array
+ * @param {number} length
+ * @param {any} element
+ * @returns
  */
 export function padArrayEnd(array, length, element = 0) {
 	const result = [...array];
@@ -28,12 +26,12 @@ export function padArrayEnd(array, length, element = 0) {
 	return result;
 }
 
-export function getValuesFromEntriesRecursive(entries){
-	return entries.map(keyval => {
-		if(!Array.isArray(keyval)){
+export function getValuesFromEntriesRecursive(entries) {
+	return entries.map((keyval) => {
+		if (!Array.isArray(keyval)) {
 			return keyval;
 		}
-		if(Array.isArray(keyval[1])){
+		if (Array.isArray(keyval[1])) {
 			return getValuesFromEntriesRecursive(keyval[1]);
 		}
 		return keyval[1];
@@ -41,12 +39,12 @@ export function getValuesFromEntriesRecursive(entries){
 }
 
 /**
- * 
- * @param {T | T[]} val 
- * @returns 
+ * Normalizes scalars and vectors into arrays
+ * @param {T | T[]} val
+ * @returns
  */
-export function getSingleOrArray(val){
-	if(Array.isArray(val)){
+export function getSingleOrArray(val) {
+	if (Array.isArray(val)) {
 		return val;
 	}
 	return [val];
@@ -54,23 +52,23 @@ export function getSingleOrArray(val){
 
 /**
  * Removes matching element from start of array
- * @param {Array<any>} array 
- * @param {any} element 
- * @returns 
+ * @param {Array<any>} array
+ * @param {any} element
+ * @returns
  */
-export function trimArrayStart(array, element = 0){
+export function trimArrayStart(array, element = 0) {
 	const result = array.slice(0);
-	while(result[0] === element){
-		result.shift()
+	while (result[0] === element) {
+		result.shift();
 	}
 	return result;
 }
 
 /**
  * Divides array into an array of subarrays with length equal to lengthPerChunk
- * @param {Array<any>} array 
- * @param {number} lengthPerChunk 
- * @returns 
+ * @param {Array<any>} array
+ * @param {number} lengthPerChunk
+ * @returns
  */
 export function chunkArray(array, lengthPerChunk) {
 	const result = [];
@@ -88,8 +86,8 @@ export function chunkArray(array, lengthPerChunk) {
 
 /**
  * Gets an array filled with numbers from `start` to `end` stepping by `step`
- * @param {{ start?: number, end: number, step?: number}} param0 
- * @returns 
+ * @param {{ start?: number, end: number, step?: number}} param0
+ * @returns
  */
 export function getRange({ start, end, step }) {
 	let i = start ?? 0;
@@ -103,14 +101,17 @@ export function getRange({ start, end, step }) {
 
 /**
  * Gets a list of all permutations of the elements in the array of length `length`.  By default considers all.
- * @param {Array} items 
- * @param {number} size 
- * @returns 
+ * @param {Array} items
+ * @param {number} size
+ * @returns
  */
 export function getPermutations(items, size) {
 	size ??= items.length;
 	if (size > items.length) return [];
-	if (size === 1) return items.map(x => [x]);
-	return items.flatMap(x =>
-		getPermutations(items.filter(v => x !== v), size - 1).map(item => [x, ...item]));
+	if (size === 1) return items.map((x) => [x]);
+	return items.flatMap((x) =>
+		getPermutations(items.filter((v) => x !== v), size - 1).map(
+			(item) => [x, ...item],
+		)
+	);
 }

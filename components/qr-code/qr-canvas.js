@@ -1,9 +1,8 @@
-import { ArrayCanvas } from "./array-canvas.js"
+import { ArrayCanvas } from "./array-canvas.js";
 import { getPermutations } from "../../libs/array-utils.js";
 
 /**
- * 
- * @param {number} version 
+ * @param {number} version
  * @returns {number}
  */
 export function getVersionSize(version) {
@@ -24,12 +23,12 @@ export const masks = [
 	(c, r) => (Math.floor(r / 2) + Math.floor(c / 3)) % 2,
 	(c, r) => ((r * c) % 2) + ((r * c) % 3),
 	(c, r) => (((r * c) % 2) + ((r * c) % 3)) % 2,
-	(c, r) => (((r + c) % 2) + ((r * c) % 3)) % 2
+	(c, r) => (((r + c) % 2) + ((r * c) % 3)) % 2,
 ];
 
 export function getAlignmentPositions(version) {
 	if (version < 2) return [];
-	const patternCount = Math.floor(version / 7) + 1
+	const patternCount = Math.floor(version / 7) + 1;
 	const width = getVersionSize(version);
 	const totalDistance = width - 13;
 	let step = Math.round(totalDistance / patternCount);
@@ -37,7 +36,6 @@ export function getAlignmentPositions(version) {
 	const positions = [6];
 	for (let i = 1; i <= patternCount; i++) {
 		positions.push(6 + totalDistance - (step * (patternCount - i)));
-
 	}
 
 	return positions;
@@ -57,7 +55,7 @@ export class QrCanvas extends ArrayCanvas {
 	}
 
 	static fromVersion(version) {
-		const size = getVersionSize(version)
+		const size = getVersionSize(version);
 		return new QrCanvas({ height: size, width: size, version });
 	}
 
@@ -100,16 +98,15 @@ export class QrCanvas extends ArrayCanvas {
 			this.reserveRect(this.width - 11, 0, 3, 6); //format reserved space to the left of top-right finder pattern
 		}
 	}
-	drawAlignmentPatterns(){
+	drawAlignmentPatterns() {
 		const positions = getAlignmentPositions(this.version);
 		const coordinates = getPermutations(positions, 2);
-		coordinates.push(...positions.map(p => [p,p]));
+		coordinates.push(...positions.map((p) => [p, p]));
 		for (const [c, r] of coordinates) {
 			if (this.getPixel(c, r) === 0) {
 				this.drawAlignmentPattern(c, r);
 			}
 		}
-
 	}
 	drawAlignmentPattern(x, y) {
 		this.drawOutlineRect(x - 2, y - 2, 5, 5, 3);
@@ -155,7 +152,11 @@ export class QrCanvas extends ArrayCanvas {
 		let isGoingUp = true;
 
 		//gets a 2 pixel column to traverse in a zig-zag motion from right to left, up to down, ignores reserved space, skips timing column
-		for (let dataColumnStart = this.width - 2; dataColumnStart >= 0; dataColumnStart -= 2) {
+		for (
+			let dataColumnStart = this.width - 2;
+			dataColumnStart >= 0;
+			dataColumnStart -= 2
+		) {
 			if (dataColumnStart == 5) { //all QR codes have odd sizes, and the smallest is 21x21 so this will always hit
 				dataColumnStart--;
 			}
@@ -166,9 +167,7 @@ export class QrCanvas extends ArrayCanvas {
 				sliceRow = Math.floor(slicePathIndex / 2);
 
 				const canvasColumn = dataColumnStart + sliceColumn;
-				const canvasRow = isGoingUp
-					? this.height - sliceRow - 1
-					: sliceRow;
+				const canvasRow = isGoingUp ? this.height - sliceRow - 1 : sliceRow;
 
 				if (this.getPixel(canvasColumn, canvasRow) === 0) {
 					this.drawPixel(canvasColumn, canvasRow, payload[payloadIndex++]);
@@ -227,7 +226,7 @@ export class QrCanvas extends ArrayCanvas {
 			i++;
 			if (i % 3 === 0) {
 				col--;
-				row = -9
+				row = -9;
 			} else {
 				row--;
 			}
@@ -240,10 +239,10 @@ export class QrCanvas extends ArrayCanvas {
 			this.drawPixel(col, row, versionString[i] + 2);
 			i++;
 			if (i % 3 === 0) {
-				row--
-				col = -9
+				row--;
+				col = -9;
 			} else {
-				col--
+				col--;
 			}
 		}
 	}
@@ -321,13 +320,12 @@ export class QrCanvas extends ArrayCanvas {
 		let score = 0;
 		const patterns = [
 			[true, false, true, true, true, false, true, false, false, false, false],
-			[false, false, false, false, true, false, true, true, true, false, true]
+			[false, false, false, false, true, false, true, true, true, false, true],
 		];
 		for (let c = 0; c < this.width - 11; c++) {
 			for (let r = 0; r < this.height - 11; r++) {
-
 				for (const pattern of patterns) {
-					let matched = 0
+					let matched = 0;
 					for (let i = 0; i < pattern.length; i++) {
 						if (this.getMaskedPixel(c + i, r) === pattern[i]) {
 							matched++;
@@ -358,10 +356,11 @@ export class QrCanvas extends ArrayCanvas {
 	getPenaltyScoreForRatio() {
 		let count = 0;
 		for (let i = 0; i < this.width; i++) {
-			for (let j = 0; j < this.height; j++)
+			for (let j = 0; j < this.height; j++) {
 				if (this.getMaskedPixel(i, j)) {
 					count++;
 				}
+			}
 		}
 		const percent = count / this.data.length * 100;
 		const previousDisplacement = Math.abs(roundDown(percent, 5) - 50) / 5;
@@ -374,7 +373,8 @@ export class QrCanvas extends ArrayCanvas {
 		const penaltyScoreForMarkers = this.getPenaltyScoreForMarkers();
 		const penaltyScoreForRatio = this.getPenaltyScoreForRatio();
 
-		return penaltyScoreForSpans + penaltyScoreForBlocks + penaltyScoreForMarkers + penaltyScoreForRatio;
+		return penaltyScoreForSpans + penaltyScoreForBlocks + penaltyScoreForMarkers +
+			penaltyScoreForRatio;
 	}
 	getBestMask() {
 		let lowestScore = Infinity;
@@ -410,7 +410,7 @@ export class QrCanvas extends ArrayCanvas {
 	printMasked() {
 		const result = [];
 		for (let row = 0; row < this.height; row++) {
-			const outRow = []
+			const outRow = [];
 			for (let col = 0; col < this.width; col++) {
 				outRow.push(this.getMaskedPixel(col, row));
 			}

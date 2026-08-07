@@ -20,7 +20,7 @@ export class WcRectangle extends HTMLElement {
 		this.attachEvents = this.attachEvents.bind(element);
 		this.renderSquircle = this.renderSquircle.bind(element);
 	}
-	render(){
+	render() {
 		this.attachShadow({ mode: "open" });
 
 		this.shadowRoot.innerHTML = `
@@ -38,17 +38,45 @@ export class WcRectangle extends HTMLElement {
 		//draw background
 		context.clearRect(0, 0, this.dom.canvas.width, this.dom.canvas.height);
 
-		const imageData = context.getImageData(0, 0, this.dom.canvas.width, this.dom.canvas.height);
-
+		const imageData = context.getImageData(
+			0,
+			0,
+			this.dom.canvas.width,
+			this.dom.canvas.height,
+		);
 
 		context.strokeStyle = "#ff0000";
 		context.lineWidth = 2;
 		//top
 		context.moveTo(this.#cx, this.#cy - this.#r); //t
-		context.arcTo(this.#cx + this.#r, this.#cy - this.#r, this.#cx + this.#r, this.#cy, this.#cr); //r
-		context.arcTo(this.#cx + this.#r, this.#cy + this.#r, this.#cx, this.#cy + this.#r, this.#cr); //b
-		context.arcTo(this.#cx - this.#r, this.#cy + this.#r, this.#cx - this.#r, this.#cy, this.#cr); //l
-		context.arcTo(this.#cx - this.#r, this.#cy - this.#r, this.#cx, this.#cy - this.#r, this.#cr); //t
+		context.arcTo(
+			this.#cx + this.#r,
+			this.#cy - this.#r,
+			this.#cx + this.#r,
+			this.#cy,
+			this.#cr,
+		); //r
+		context.arcTo(
+			this.#cx + this.#r,
+			this.#cy + this.#r,
+			this.#cx,
+			this.#cy + this.#r,
+			this.#cr,
+		); //b
+		context.arcTo(
+			this.#cx - this.#r,
+			this.#cy + this.#r,
+			this.#cx - this.#r,
+			this.#cy,
+			this.#cr,
+		); //l
+		context.arcTo(
+			this.#cx - this.#r,
+			this.#cy - this.#r,
+			this.#cx,
+			this.#cy - this.#r,
+			this.#cr,
+		); //t
 		context.lineTo(this.#cx, this.#cy - this.#r);
 
 		context.textAlign = "center";
@@ -66,7 +94,7 @@ export class WcRectangle extends HTMLElement {
 	cacheDom() {
 		this.dom = {
 			canvas: this.shadowRoot.querySelector("canvas"),
-			slider: this.shadowRoot.querySelector("input")
+			slider: this.shadowRoot.querySelector("input"),
 		};
 	}
 	attachEvents() {
@@ -89,7 +117,7 @@ export class WcRectangle extends HTMLElement {
 	set r(val) {
 		this.#r = parseFloat(val);
 	}
-	set cr(val){
+	set cr(val) {
 		this.#cr = parseFloat(val);
 	}
 }

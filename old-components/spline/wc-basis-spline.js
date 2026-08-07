@@ -1,5 +1,4 @@
-function basisSpline(){
-
+function basisSpline() {
 }
 
 export class WcBasisSpline extends HTMLElement {
@@ -49,7 +48,6 @@ export class WcBasisSpline extends HTMLElement {
 		}
 		*/
 
-
 		context.putImageData(imageData, 0, 0);
 	}
 	connectedCallback() {
@@ -60,7 +58,7 @@ export class WcBasisSpline extends HTMLElement {
 	}
 	cacheDom() {
 		this.dom = {
-			canvas: this.shadowRoot.querySelector("canvas")
+			canvas: this.shadowRoot.querySelector("canvas"),
 		};
 	}
 	attachEvents() {
