@@ -1,21 +1,20 @@
 import { getRandomString } from "../../random-utils.js";
-import { meyersDiff } from "../meyers-diff/meyers-diff.js";
-import { meyersDiff2 } from "../meyers-diff/meyers-diff2.js";
+import { meyersDiffNaive, meyersDiffMiddleSnake } from "../meyers-diff/meyers-diff.js";
 
-Deno.bench("meyers diff", { group: "meyers-diff", baseline: true }, b => {
-	const x = getRandomString(5000);
-	const y = getRandomString(5000);
+Deno.bench("Meyers diff naive", { group: "meyers-diff", baseline: true }, b => {
+	const x = getRandomString(2000);
+	const y = getRandomString(2000);
 
 	b.start();
-	meyersDiff(x, y);
+	meyersDiffNaive(x, y);
 	b.end();
 });
 
-Deno.bench("meyers diff 2", { group: "meyers-diff", baseline: true }, b => {
-	const x = getRandomString(5000);
-	const y = getRandomString(5000);
+Deno.bench("Meyers diff middle-snake", { group: "meyers-diff" }, b => {
+	const x = getRandomString(2000);
+	const y = getRandomString(2000);
 
 	b.start();
-	meyersDiff2(x, y);
+	meyersDiffMiddleSnake(x, y);
 	b.end();
 });
